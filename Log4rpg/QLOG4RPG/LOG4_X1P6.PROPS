@@ -1,0 +1,18 @@
+ 
+log4rpg.debug=verbose , printer
+ 
+log4rpg.rootLogger=DEBUG, chainsawHub
+log4rpg.logger.de.tools400=DEBUG
+ 
+log4rpg.appender.chainsawHub=*LIBL/LOG4SHBAPP(XMLSocketHubAppender)
+log4rpg.appender.chainsawHub.port=4560
+log4rpg.appender.chainsawHub.ccsid=819
+log4rpg.appender.chainsawHub.layout=XMLLayout
+log4rpg.appender.chainsawHub.layout.replaceUnprintableCharacters=true
+log4rpg.appender.chainsawHub.filter=appName
+ 
+log4rpg.filter.appName=LOG4PROFLT(PropertyFilter)
+log4rpg.filter.appName.property.application=myApplication
+ 
+ 
+ 

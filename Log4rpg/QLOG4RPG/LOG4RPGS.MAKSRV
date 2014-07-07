@@ -1,0 +1,128 @@
+     /* ====================================================================== */
+     /* >>PRE-COMPILER<<                                                       */
+     /*                                                                        */
+     /*   >>CRTCMD<< CRTSRVPGM    SRVPGM(&LI/&OB);                             */
+     /*                                                                        */
+     /*   >>COMPILE<<                                                          */
+     /*     >>PARM<< MODULE( +                                                 */
+     /*                     &LI/LOG4RPG00 +                                    */
+     /*                                );                                      */
+     /*     >>PARM<< EXPORT(*SRCFILE);                                         */
+     /*     >>PARM<<   SRCFILE(&SL/&SF);                                       */
+     /*     >>PARM<<   SRCMBR(&SM);                                            */
+     /*     >>PARM<< ACTGRP(*CALLER);                                          */
+     /*     >>PARM<< ALWUPD(*YES);                                             */
+     /*     >>PARM<< ALWLIBUPD(*YES);                                          */
+     /*     >>PARM<< BNDDIR(QC2LE);                                            */
+     /*     >>PARM<< TEXT('Tools/400 - Log4rpg Stub');                         */
+     /*     >>PARM<< TGTRLS(V6R1M0  );                                         */
+     /*     >>PARM<< DETAIL(*BASIC);                                           */
+     /*   >>END-COMPILE<<                                                      */
+     /*                                                                        */
+     /*   >>LINK<<                                                             */
+     /*   >>END-LINK<<                                                         */
+     /*                                                                        */
+     /*   >>EXECUTE<<                                                          */
+     /*                                                                        */
+     /* >>END-PRE-COMPILER<<                                                   */
+     /* ====================================================================== */
+STRPGMEXP PGMLVL(*CURRENT) SIGNATURE('Version 1.10')
+ 
+  EXPORT SYMBOL('LOG4RPG00_LoggerStub_loadSrvPgm')
+ 
+  EXPORT SYMBOL('LOG4RPG01_Logger_addAppender')
+  EXPORT SYMBOL('LOG4RPG01_Logger_debug')
+  EXPORT SYMBOL('LOG4RPG01_Logger_debugMsg')
+  EXPORT SYMBOL('LOG4RPG01_Logger_error')
+  EXPORT SYMBOL('LOG4RPG01_Logger_errorMsg')
+  EXPORT SYMBOL('LOG4RPG01_Logger_fatal')
+  EXPORT SYMBOL('LOG4RPG01_Logger_fatalMsg')
+  EXPORT SYMBOL('LOG4RPG01_Logger_forcedLog')
+  EXPORT SYMBOL('LOG4RPG01_Logger_forcedLogMsg')
+  EXPORT SYMBOL('LOG4RPG01_Logger_getInternalDebugMode')
+  EXPORT SYMBOL('LOG4RPG01_Logger_getInternalDebugOutput')
+  EXPORT SYMBOL('LOG4RPG01_Logger_getLogger')
+  EXPORT SYMBOL('LOG4RPG01_Logger_getName')
+  EXPORT SYMBOL('LOG4RPG01_Logger_getRootLogger')
+  EXPORT SYMBOL('LOG4RPG01_Logger_info')
+  EXPORT SYMBOL('LOG4RPG01_Logger_infoMsg')
+  EXPORT SYMBOL('LOG4RPG01_Logger_isLogging')
+  EXPORT SYMBOL('LOG4RPG01_Logger_isNull')
+  EXPORT SYMBOL('LOG4RPG01_Logger_null')
+  EXPORT SYMBOL('LOG4RPG01_Logger_setInternalDebugging')
+  EXPORT SYMBOL('LOG4RPG01_Logger_setLevel')
+  EXPORT SYMBOL('LOG4RPG01_Logger_setLogging')
+  EXPORT SYMBOL('LOG4RPG01_Logger_warn')
+  EXPORT SYMBOL('LOG4RPG01_Logger_warnMsg')
+ 
+  EXPORT SYMBOL('LOG4RPG08_Configurator_clearConfiguration')
+  EXPORT SYMBOL('LOG4RPG08_Configurator_loadAndWatchPropertiesConfiguration')
+  EXPORT SYMBOL('LOG4RPG08_Configurator_loadDefaultConfiguration')
+  EXPORT SYMBOL('LOG4RPG08_Configurator_loadPropertiesConfiguration')
+ 
+  EXPORT SYMBOL('LOG4RPG03_Appender_new')
+  EXPORT SYMBOL('LOG4RPG03_Appender_null')
+  EXPORT SYMBOL('LOG4RPG03_Appender_setFilter')
+  EXPORT SYMBOL('LOG4RPG03_Appender_setLayout')
+ 
+  EXPORT SYMBOL('LOG4RPG17_Filter_new')
+  EXPORT SYMBOL('LOG4RPG17_Filter_null')
+ 
+  EXPORT SYMBOL('LOG4RPG11_Layout_new')
+  EXPORT SYMBOL('LOG4RPG11_Layout_null')
+ 
+  /*   New with V1.10:     */
+  EXPORT SYMBOL('LOG4RPG01_Logger_isDebugEnabled')
+  EXPORT SYMBOL('LOG4RPG01_Logger_isInfoEnabled')
+  EXPORT SYMBOL('LOG4RPG01_Logger_isWarnEnabled')
+  EXPORT SYMBOL('LOG4RPG01_Logger_isErrorEnabled')
+  EXPORT SYMBOL('LOG4RPG01_Logger_isFatalEnabled')
+ 
+ENDPGMEXP
+ 
+STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.8')
+ 
+  EXPORT SYMBOL('LOG4RPG00_LoggerStub_loadSrvPgm')
+ 
+  EXPORT SYMBOL('LOG4RPG01_Logger_addAppender')
+  EXPORT SYMBOL('LOG4RPG01_Logger_debug')
+  EXPORT SYMBOL('LOG4RPG01_Logger_debugMsg')
+  EXPORT SYMBOL('LOG4RPG01_Logger_error')
+  EXPORT SYMBOL('LOG4RPG01_Logger_errorMsg')
+  EXPORT SYMBOL('LOG4RPG01_Logger_fatal')
+  EXPORT SYMBOL('LOG4RPG01_Logger_fatalMsg')
+  EXPORT SYMBOL('LOG4RPG01_Logger_forcedLog')
+  EXPORT SYMBOL('LOG4RPG01_Logger_forcedLogMsg')
+  EXPORT SYMBOL('LOG4RPG01_Logger_getInternalDebugMode')
+  EXPORT SYMBOL('LOG4RPG01_Logger_getInternalDebugOutput')
+  EXPORT SYMBOL('LOG4RPG01_Logger_getLogger')
+  EXPORT SYMBOL('LOG4RPG01_Logger_getName')
+  EXPORT SYMBOL('LOG4RPG01_Logger_getRootLogger')
+  EXPORT SYMBOL('LOG4RPG01_Logger_info')
+  EXPORT SYMBOL('LOG4RPG01_Logger_infoMsg')
+  EXPORT SYMBOL('LOG4RPG01_Logger_isLogging')
+  EXPORT SYMBOL('LOG4RPG01_Logger_isNull')
+  EXPORT SYMBOL('LOG4RPG01_Logger_null')
+  EXPORT SYMBOL('LOG4RPG01_Logger_setInternalDebugging')
+  EXPORT SYMBOL('LOG4RPG01_Logger_setLevel')
+  EXPORT SYMBOL('LOG4RPG01_Logger_setLogging')
+  EXPORT SYMBOL('LOG4RPG01_Logger_warn')
+  EXPORT SYMBOL('LOG4RPG01_Logger_warnMsg')
+ 
+  EXPORT SYMBOL('LOG4RPG08_Configurator_clearConfiguration')
+  EXPORT SYMBOL('LOG4RPG08_Configurator_loadAndWatchPropertiesConfiguration')
+  EXPORT SYMBOL('LOG4RPG08_Configurator_loadDefaultConfiguration')
+  EXPORT SYMBOL('LOG4RPG08_Configurator_loadPropertiesConfiguration')
+ 
+  EXPORT SYMBOL('LOG4RPG03_Appender_new')
+  EXPORT SYMBOL('LOG4RPG03_Appender_null')
+  EXPORT SYMBOL('LOG4RPG03_Appender_setFilter')
+  EXPORT SYMBOL('LOG4RPG03_Appender_setLayout')
+ 
+  EXPORT SYMBOL('LOG4RPG17_Filter_new')
+  EXPORT SYMBOL('LOG4RPG17_Filter_null')
+ 
+  EXPORT SYMBOL('LOG4RPG11_Layout_new')
+  EXPORT SYMBOL('LOG4RPG11_Layout_null')
+ 
+ENDPGMEXP

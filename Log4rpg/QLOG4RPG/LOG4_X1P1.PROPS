@@ -1,0 +1,18 @@
+ 
+log4rpg.debug=off, printer
+ 
+log4rpg.rootLogger=DEBUG, file
+log4rpg.logger.de.tools400=INFO
+ 
+log4rpg.appender.file=*LIBL/LOG4RPG(DailyRollingFileAppender)
+log4rpg.appender.file.path=log4_x1p1.log
+log4rpg.appender.file.layout=PatternLayout
+log4rpg.appender.file.layout.conversionPattern=%z [%-5p] %L/%P(%M).%F (%S) %m%n
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

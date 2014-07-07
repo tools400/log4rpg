@@ -1,0 +1,18 @@
+ 
+log4rpg.debug=off, printer
+ 
+log4rpg.rootLogger=DEBUG, htmlFile
+log4rpg.logger.de.tools400=INFO
+ 
+log4rpg.appender.htmlFile=DailyRollingFileAppender
+log4rpg.appender.htmlFile.path=log4_x1p3.html
+log4rpg.appender.htmlFile.layout=*LIBL/LOG4HTMLAY(HTMLLayout)
+ 
+// Enforce a new file every minute!
+log4rpg.appender.htmlFile.datePattern=_yyyy-MM-dd-HH.mm.
+ 
+ 
+ 
+ 
+ 
+ 

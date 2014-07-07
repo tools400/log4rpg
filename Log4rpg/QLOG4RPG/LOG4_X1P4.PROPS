@@ -1,0 +1,18 @@
+ 
+log4rpg.debug=off, printer
+ 
+log4rpg.rootLogger=DEBUG, chainsaw
+log4rpg.logger.de.tools400=INFO
+ 
+log4rpg.appender.chainsaw=*LIBL/LOG4SCKAPP(XMLSocketAppender)
+log4rpg.appender.chainsaw.remoteHost=xxx.xxx.xxx.xxx
+log4rpg.appender.chainsaw.port=4448
+log4rpg.appender.chainsaw.layout=XMLLayout
+log4rpg.appender.chainsaw.filter=appName
+ 
+log4rpg.filter.appName=*LIBL/LOG4PROFLT(PropertyFilter)
+log4rpg.filter.appName.property.application=myApplication
+ 
+ 
+ 
+ 

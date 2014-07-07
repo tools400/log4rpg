@@ -1,0 +1,168 @@
+# -----------------------------------------------------------------------
+#  Enable/disable Log4rpg
+#    log4rpg=mode
+# -----------------------------------------------------------------------
+#      mode     :  on, off
+# -----------------------------------------------------------------------
+log4rpg=on
+ 
+# -----------------------------------------------------------------------
+#  Set internal logging
+#    log4rpg.debug=mode, output
+# -----------------------------------------------------------------------
+#      mode     :  on, off, verbose, quiet
+#      output   :  printer, stdout
+# -----------------------------------------------------------------------
+log4rpg.debug=on, printer
+ 
+# -----------------------------------------------------------------------
+#  Set log level for root logger
+#    log4rpg.rootLogger=level, appender, ...
+# -----------------------------------------------------------------------
+#      level    : DEBUG, INFO, WARN, ERROR, FATAL
+#      appender : a1, a2, a3, ...
+# -----------------------------------------------------------------------
+log4rpg.rootLogger=DEBUG, file
+ 
+# -----------------------------------------------------------------------
+#  Set log level for named logger
+#    log4rpg.logger.name=level, appender, ...
+# -----------------------------------------------------------------------
+#      level    : DEBUG, INFO, WARN, ERROR, FATAL
+#      appender : [a1, a2, a3, ...
+# -----------------------------------------------------------------------
+log4rpg.logger.de.tools400=DEBUG
+ 
+# -----------------------------------------------------------------------
+#  Define a print appender
+#    log4rpg.appender.name=lib/srvpgm(procedure)
+# -----------------------------------------------------------------------
+#      lib      : Name of the library that contains 'srvpgm'.
+#      srvpgm   : Name of the service program that exports 'procedure'.
+#      procedure: Prefix of the procedure that implements the appender.
+#    Properties
+#      outQ     : The output where the splooled file goes to.
+#      splfName : The name of the spooled file.
+#      usrdta   : The user data of the spooled file.
+#      length   : Page length measured in lines.
+#      width    : Page width measured in characters.
+#      lpi      : Lines per inch.
+#      cpi      : Characters per inch.
+#      ovrflw   : Overflow line.
+#      leftMargin  : Left margin of the page.
+#      rightMargin : Right margin of the page.
+#      datePattern : Date pattern.  dd   = days
+#                                   MM   = months
+#                                   yy   = years
+#                                   mm   = minutes
+#                                   HH   = hours
+#      layout      : Layout to use.
+#      layout.conversionPattern : Conversion pattern for 'layout'.
+# -----------------------------------------------------------------------
+log4rpg.appender.print=*LIBL/LOG4RPG(DailyRollingPrintAppender)
+log4rpg.appender.print.outQ=RADDATZ
+log4rpg.appender.print.splfName=PRINT_APP
+log4rpg.appender.print.usrdta=PRINT
+log4rpg.appender.print.length=49
+log4rpg.appender.print.width=132
+log4rpg.appender.print.lpi=6
+log4rpg.appender.print.cpi=10
+log4rpg.appender.print.ovrflw=42
+log4rpg.appender.print.leftMargin=10
+log4rpg.appender.print.rightMargin=10
+log4rpg.appender.print.datePattern=yyyy-MM-dd-HH.mm
+log4rpg.appender.print.layout=PatternLayout
+log4rpg.appender.print.layout.conversionPattern=%z [%-5p] %P(%M).%F (%S) %m%n
+ 
+# -----------------------------------------------------------------------
+#  Define a file appender
+#    log4rpg.appender.name=lib/srvpgm(procedure)
+# -----------------------------------------------------------------------
+#      lib      : Name of the library that contains 'srvpgm'.
+#      srvpgm   : Name of the service program that exports 'procedure'.
+#      procedure: Prefix of the procedure that implements the appender.
+#    Properties
+#      path     : The directory and name of the log file.
+#      share    : Specifies whether to share the log file for writing with other jobs
+#      datePattern : Date pattern.  dd   = days
+#                                   MM   = months
+#                                   yy   = years
+#                                   mm   = minutes
+#                                   HH   = hours
+#      layout      : Layout to use.
+#      layout.conversionPattern : Conversion pattern for 'layout'.
+#      writeHeader : Specifies whether layout header data is appended or not.
+#      writeFooter : Specifies whether layout footer data is appended or not.
+# -----------------------------------------------------------------------
+log4rpg.appender.file=*LIBL/LOG4RPG(DailyRollingFileAppender)
+log4rpg.appender.file.path=log4rpg.log
+log4rpg.appender.file.datePattern=yyyy-MM-dd-HH.mm.
+log4rpg.appender.file.layout=PatternLayout
+log4rpg.appender.file.layout.conversionPattern=%z [%-5p] %L/%P(%M).%F (%S) %m%n
+ 
+# -----------------------------------------------------------------------
+#  Define a HTML file appender
+#    log4rpg.appender.name=lib/srvpgm(procedure)
+# -----------------------------------------------------------------------
+log4rpg.appender.html=*LIBL/LOG4RPG(DailyRollingFileAppender)
+log4rpg.appender.html.path=log4rpg.html
+log4rpg.appender.html.datePattern=yyyy-MM-dd-HH.mm.
+log4rpg.appender.html.layout=*LIBL/LOG4HTMLAY(HTMLLayout)
+ 
+# -----------------------------------------------------------------------
+#  Define a XMLSocketAppender
+#    log4rpg.appender.name=lib/srvpgm(procedure)
+# -----------------------------------------------------------------------
+#      lib      : Name of the library that contains 'srvpgm'.
+#      srvpgm   : Name of the service program that exports 'procedure'.
+#      procedure: Prefix of the procedure that implements the appender.
+#    Properties
+#      host     : Name of the host.
+#      port     : Port number.
+#      ccsid    : CCSID of XML stream.
+#      layout   : Layout to use.
+#      filter   : Filter used to modify the log event. In this specific case
+#                 the 'application' property is added and set to 'myApplication'.
+#                 This way Chainsaw is told to display the events in a tab
+#                 called 'myApplication'.
+# -----------------------------------------------------------------------
+log4rpg.appender.chainsaw=*LIBL/LOG4SCKAPP(XMLSocketAppender)
+log4rpg.appender.chainsaw.remoteHost=xxx.xxx.xxx.xxx
+log4rpg.appender.chainsaw.port=4448
+log4rpg.appender.chainsaw.ccsid=819
+log4rpg.appender.chainsaw.layout=XMLLayout
+log4rpg.appender.chainsaw.filter=AppName
+ 
+log4rpg.filter.appName=LOG4PROFLT(PropertyFilter)
+log4rpg.filter.appName.property.application=myApplication
+ 
+# -----------------------------------------------------------------------
+#  Properties of the 'PatternLayout'
+#      %p      priority
+#      %t      time
+#      %d      date
+#      %z      timestamp
+#      %l      logger name
+#      %m      application supplied message text
+#      %n      new line
+#      %P      program name
+#      %L      program library name
+#      %M      module name
+#      %F      function/procedure name
+#      %S      statement
+#      %j      qualified job name
+#      %u      user name
+#      %U      name of the current user
+#
+#  Sample:         '%z [%M.%F]  %-5p  %S - %m'
+#
+#  Formatted as:   2006-02-22-11.38.42.567000 [LOG4RPG_T1.P_MAIN]  debug  0000010500 -
+#
+#  Description:    '%z'          produces the current timestamp.
+#                  '%M'          prints the name of the module the logger was called f
+#                  '%F'          prints the name of the procedure the logger was calle
+#                  '%-5p'        prints the logging priority, left adjusted in a 5 cha
+#                  '%S'          prints the statement identifier the logger was called
+#                  '%m'          prints the message text supplied by the application.
+# -----------------------------------------------------------------------
+ 
