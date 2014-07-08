@@ -1,0 +1,173 @@
+PGM
+
+DCL        VAR(&FAILED    ) TYPE(*DEC ) LEN(10 0) VALUE(0)
+DCL        VAR(&FAILEDSTR ) TYPE(*CHAR) LEN(10)
+DCL        VAR(&TGTRLS    ) TYPE(*CHAR) LEN(10) VALUE(*CURRENT)
+DCL        VAR(&LIB       ) TYPE(*CHAR) LEN(10) VALUE('RADDATZ')
+DCL        VAR(&BASICS1LIB) TYPE(*CHAR) LEN(10) VALUE('RADDATZ')
+DCL        VAR(&IFSLIB    ) TYPE(*CHAR) LEN(10) VALUE('RADDATZ')
+
+CRTSRVPGM  SRVPGM(&LIB/LOG4RPG) +
+             MODULE(&LIB/LOG4RPG01  +
+                    &LIB/LOG4RPG02  +
+                    &LIB/LOG4RPG03  +
+                    &LIB/LOG4RPG04  +
+                    &LIB/LOG4RPG07  +
+                    &LIB/LOG4RPG08  +
+                    &LIB/LOG4RPG09  +
+                    &LIB/LOG4RPG10  +
+                    &LIB/LOG4RPG11  +
+                    &LIB/LOG4RPG12  +
+                    &LIB/LOG4RPG13  +
+                    &LIB/LOG4RPG14  +
+                    &LIB/LOG4RPG15  +
+                    &LIB/LOG4RPG16  +
+                    &LIB/LOG4RPG17  +
+                    &LIB/LOG4RPG18  +
+                    &LIB/LOG4RPG50  +
+                    &LIB/LOG4RPG51  +
+                    &LIB/LOG4RPG52  +
+                    &LIB/LOG4RPG60  +
+                    &LIB/LOG4RPG61  +
+                    &LIB/LOG4RPG62  +
+                    &LIB/LOG4RPG97  +
+                    &LIB/LOG4RPG98  +
+                    &LIB/LOG4RPG99) +
+             EXPORT(*SRCFILE) SRCFILE(&LIB/QLOG4RPG) SRCMBR(LOG4RPG) +
+             BNDSRVPGM((&IFSLIB/IFS) +
+                       (&BASICS1LIB/BASICS1)) +
+             BNDDIR(QC2LE) ACTGRP(*CALLER) DETAIL(*BASIC) +
+             ALWUPD(*YES) ALWLIBUPD(*YES) TGTRLS(&TGTRLS) +
+             TEXT('Tools/400 - Log4rpg     ')
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTSRVPGM  SRVPGM(&LIB/LOG4RPGS) +
+             MODULE(&LIB/LOG4RPG00) +
+             EXPORT(*SRCFILE) SRCFILE(&LIB/QLOG4RPG) SRCMBR(LOG4RPGS) +
+             BNDSRVPGM(*N) +
+             BNDDIR(QC2LE) ACTGRP(*CALLER) DETAIL(*BASIC) +
+             ALWUPD(*YES) ALWLIBUPD(*YES) TGTRLS(&TGTRLS) +
+             TEXT('Tools/400 - Log4rpg Stub')
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+   /* ------------------------------------------- */
+   /*   Plugins                                   */
+   /* ------------------------------------------- */
+CRTSRVPGM  SRVPGM(&LIB/LOG4HTMLAY) +
+             MODULE(&LIB/LOG4HTMLAY) +
+             EXPORT(*ALL) +
+             BNDSRVPGM(&LIB/LOG4RPG +
+                       &BASICS1LIB/BASICS1 ) +
+             BNDDIR(QC2LE) ACTGRP(*CALLER) DETAIL(*BASIC) +
+             ALWUPD(*YES) ALWLIBUPD(*YES) TGTRLS(&TGTRLS) +
+             TEXT('Tools/400 - Log4rpg HTMLLayout ')
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTSRVPGM  SRVPGM(&LIB/LOG4PROFLT) +
+             MODULE(&LIB/LOG4PROFLT) +
+             EXPORT(*ALL) +
+             BNDSRVPGM(&LIB/LOG4RPG +
+                       &BASICS1LIB/BASICS1 ) +
+             BNDDIR(QC2LE) ACTGRP(*CALLER) DETAIL(*BASIC) +
+             ALWUPD(*YES) ALWLIBUPD(*YES) TGTRLS(&TGTRLS) +
+             TEXT('Tools/400 - Log4rpg HTMLLayout')
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTSRVPGM  SRVPGM(&LIB/LOG4PROFLT) +
+             MODULE(&LIB/LOG4PROFLT) +
+             EXPORT(*ALL) +
+             BNDSRVPGM(&LIB/LOG4RPG +
+                       &BASICS1LIB/BASICS1 ) +
+             BNDDIR(QC2LE) ACTGRP(*CALLER) DETAIL(*BASIC) +
+             ALWUPD(*YES) ALWLIBUPD(*YES) TGTRLS(&TGTRLS) +
+             TEXT('Tools/400 - Log4rpg Property Filter')
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTSRVPGM  SRVPGM(&LIB/LOG4RLFAPP) +
+             MODULE(&LIB/LOG4RLFAPP +
+                    &LIB/LOG4RPG97) +
+             EXPORT(*ALL) +
+             BNDSRVPGM(&LIB/LOG4RPG +
+                       &BASICS1LIB/BASICS1 +
+                       &BASICS1LIB/IFS) +
+             BNDDIR(QC2LE) ACTGRP(*CALLER) DETAIL(*BASIC) +
+             ALWUPD(*YES) ALWLIBUPD(*YES) TGTRLS(&TGTRLS) +
+             TEXT('Tools/400 - Log4rpg RollingFileAppender')
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTSRVPGM  SRVPGM(&LIB/LOG4RLMAPP) +
+             MODULE(&LIB/LOG4RLMAPP +
+                    &LIB/LOG4RPG97) +
+             EXPORT(*ALL) +
+             BNDSRVPGM(&LIB/LOG4RPG +
+                       &BASICS1LIB/BASICS1) +
+             BNDDIR(QC2LE) ACTGRP(*CALLER) DETAIL(*BASIC) +
+             ALWUPD(*YES) ALWLIBUPD(*YES) TGTRLS(&TGTRLS) +
+             TEXT('Tools/400 - Log4rpg RollingMemberAppender')
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTSRVPGM  SRVPGM(&LIB/LOG4SCKAPP) +
+             MODULE(&LIB/LOG4SCKAPP +
+                    &LIB/LOG4SOCK) +
+             EXPORT(*ALL) +
+             BNDSRVPGM(&LIB/LOG4RPG +
+                       &BASICS1LIB/BASICS1) +
+             BNDDIR(QC2LE) ACTGRP(*CALLER) DETAIL(*BASIC) +
+             ALWUPD(*YES) ALWLIBUPD(*YES) TGTRLS(&TGTRLS) +
+             TEXT('Tools/400 - Log4rpg XMLSocketAppender')
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTSRVPGM  SRVPGM(&LIB/LOG4SHBAPP) +
+             MODULE(&LIB/LOG4SHBAPP) +
+             EXPORT(*ALL) +
+             BNDSRVPGM(&LIB/LOG4RPG +
+                       &BASICS1LIB/BASICS1) +
+             BNDDIR(QC2LE) ACTGRP(*CALLER) DETAIL(*BASIC) +
+             ALWUPD(*YES) ALWLIBUPD(*YES) TGTRLS(&TGTRLS) +
+             TEXT('Tools/400 - Log4rpg XMLSocketHubAppender')
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTPGM     PGM(&LIB/LOG4SHBAPC) +
+             MODULE(LIB/LOG4SHBAPC   +
+                    LIB/LOG4SOCK   ) +
+             BNDSRVPGM(&LIB/LOG4RPG   +
+                       &BASICS1LIB/BASICS1 ) +
+             BNDDIR(QC2LE ) ACTGRP(*NEW) DETAIL(*BASIC) +
+             TGTRLS(&TGTRLS) +
+             TEXT('Tools/400 - Log4rpg XMLSocketHubAppender')
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTPGM     PGM(&LIB/LOG4_X1PGM) +
+             MODULE(&LIB/LOG4_X1) +
+             BNDSRVPGM(&LIB/LOG4RPG) +
+             BNDDIR(QC2LE ) ACTGRP(*NEW) DETAIL(*BASIC) +
+             TGTRLS(&TGTRLS) +
+             TEXT('Tools/400 - Log4rpg XMLSocketHubAppender')
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CHGVAR     VAR(&FAILEDSTR) VALUE(&FAILED)
+ADDENVVAR  ENVVAR(QRB_NUMBER_FAILED) VALUE(&FAILEDSTR) REPLACE(*YES)
+
+ENDPGM
