@@ -38,7 +38,7 @@
       *       >>PARM<< DATFMT(*ISO);                                        *
       *       >>PARM<< TIMFMT(*ISO);                                        *
       *       >>PARM<< DBGVIEW(*NONE);                                      *
-      *       >>PARM<< TGTRLS(V5R3M0  );                                    *
+      *       >>PARM<< TGTRLS(V6R1M0  );                                    *
       *       >>PARM<< COMPILEOPT('DBGVIEW(*LIST)');                        *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *

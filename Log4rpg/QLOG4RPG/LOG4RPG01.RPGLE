@@ -86,7 +86,7 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
-      *       >>PARM<< TGTRLS(V5R3M0  );                                    *
+      *       >>PARM<< TGTRLS(V6R1M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
       *     >>EXECUTE<<                                                     *
@@ -229,7 +229,7 @@
      D  i_isLogging                    N   const
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if i_isLogging;
             g_isLogging = cTrue;
             LogLog_verbose('LOG4RPG is enabled now.');
@@ -237,9 +237,9 @@
             g_isLogging = cFalse;
             LogLog_verbose('LOG4RPG is disabled now.');
          endif;
- 
+
          return g_isLogging;
- 
+
       /END-FREE
       *
      P Logger_setLogging...
@@ -261,13 +261,13 @@
      D                 PI              N
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if g_isLogging;
             return cTrue;
          else;
             return cFalse;
          endif;
- 
+
       /END-FREE
       *
      P Logger_isLogging...
@@ -293,9 +293,9 @@
      D hLogger         S                   like(LOG4RPG_hLogger_t  ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return Logger_getLogger(cROOT_LOGGER);
- 
+
       /END-FREE
       *
      P Logger_getRootLogger...
@@ -322,20 +322,20 @@
      D hLogger         S                   like(LOG4RPG_hLogger_t  ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logging is disabled.
          if not Logger_isLogging();
             return Logger_null();
          endif;
- 
+
          initializeModule();
- 
+
          Configurator_checkAndReloadPropertiesConfiguration();
- 
+
          hLogger = Repository_getLogger(translateLoggerName(i_logName));
- 
+
          return hLogger;
- 
+
       /END-FREE
       *
      P Logger_getLogger...
@@ -368,12 +368,12 @@
      D                                     based(i_hLogger)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logging is disabled.
          if (not Logger_isDebugEnabled(i_hLogger));
             return;
          endif;
- 
+
          caller.procedure = f_caller(caller.module.name
                                      : caller.pgm.name
                                      : caller.stmtID
@@ -381,9 +381,9 @@
          logLoggingEvent(i_hLogger: cLOG4RPG_PRIORITY_DEBUG
                          : i_text
                          : caller);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_debug...
@@ -419,12 +419,12 @@
      D errMsg          DS                  likeds(msg_t   ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logging is disabled.
          if (not Logger_isDebugEnabled(i_hLogger));
             return;
          endif;
- 
+
          caller.procedure = f_caller(caller.module.name
                                      : caller.pgm.name
                                      : caller.stmtID
@@ -433,9 +433,9 @@
                          : %trimR(f_rtvMsgText(i_msg: errMsg))
                          : caller
                          : errMsg);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_debugMsg...
@@ -466,17 +466,17 @@
      D                                     based(i_hLogger)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logging is disabled.
          if (not isLoggingEnabled(i_hLogger));
             return cFalse;
          endif;
- 
+
          isEnabled =
  B01        cLOG4RPG_PRIORITY_DEBUG >= getPriorityFromHierarchy(i_hLogger);
- 
+
          return isEnabled;
- 
+
       /END-FREE
       *
      P Logger_isDebugEnabled...
@@ -509,12 +509,12 @@
      D                                     based(i_hLogger)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logging is disabled.
          if (not Logger_isInfoEnabled(i_hLogger));
             return;
          endif;
- 
+
          caller.procedure = f_caller(caller.module.name
                                      : caller.pgm.name
                                      : caller.stmtID
@@ -522,9 +522,9 @@
          logLoggingEvent(i_hLogger: cLOG4RPG_PRIORITY_INFO
                          : i_text
                          : caller);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_info...
@@ -560,12 +560,12 @@
      D errMsg          DS                  likeds(msg_t   ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logging is disabled.
          if (not Logger_isInfoEnabled(i_hLogger));
             return;
          endif;
- 
+
          caller.procedure = f_caller(caller.module.name
                                      : caller.pgm.name
                                      : caller.stmtID
@@ -574,9 +574,9 @@
                          : %trimR(f_rtvMsgText(i_msg: *omit))
                          : caller
                          : errMsg);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_infoMsg...
@@ -608,17 +608,17 @@
      D                                     based(i_hLogger)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logging is disabled.
          if (not isLoggingEnabled(i_hLogger));
             return cFalse;
          endif;
- 
+
          isEnabled =
  B01        cLOG4RPG_PRIORITY_INFO >= getPriorityFromHierarchy(i_hLogger);
- 
+
          return isEnabled;
- 
+
       /END-FREE
       *
      P Logger_isInfoEnabled...
@@ -651,12 +651,12 @@
      D                                     based(i_hLogger)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logging is disabled.
          if (not Logger_isWarnEnabled(i_hLogger));
             return;
          endif;
- 
+
          caller.procedure = f_caller(caller.module.name
                                      : caller.pgm.name
                                      : caller.stmtID
@@ -664,9 +664,9 @@
          logLoggingEvent(i_hLogger: cLOG4RPG_PRIORITY_WARN
                          : i_text
                          : caller);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_warn...
@@ -702,12 +702,12 @@
      D errMsg          DS                  likeds(msg_t   ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logging is disabled.
          if (not Logger_isWarnEnabled(i_hLogger));
             return;
          endif;
- 
+
          caller.procedure = f_caller(caller.module.name
                                      : caller.pgm.name
                                      : caller.stmtID
@@ -716,9 +716,9 @@
                          : %trimR(f_rtvMsgText(i_msg: *omit))
                          : caller
                          : errMsg);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_warnMsg...
@@ -750,17 +750,17 @@
      D                                     based(i_hLogger)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logging is disabled.
          if (not isLoggingEnabled(i_hLogger));
             return cFalse;
          endif;
- 
+
          isEnabled =
  B01        cLOG4RPG_PRIORITY_WARN >= getPriorityFromHierarchy(i_hLogger);
- 
+
          return isEnabled;
- 
+
       /END-FREE
       *
      P Logger_isWarnEnabled...
@@ -793,12 +793,12 @@
      D                                     based(i_hLogger)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logging is disabled.
          if (not Logger_isErrorEnabled(i_hLogger));
             return;
          endif;
- 
+
          caller.procedure = f_caller(caller.module.name
                                      : caller.pgm.name
                                      : caller.stmtID
@@ -806,9 +806,9 @@
          logLoggingEvent(i_hLogger: cLOG4RPG_PRIORITY_ERROR
                          : i_text
                          : caller);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_error...
@@ -844,12 +844,12 @@
      D errMsg          DS                  likeds(msg_t   ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logging is disabled.
          if (not Logger_isErrorEnabled(i_hLogger));
             return;
          endif;
- 
+
          caller.procedure = f_caller(caller.module.name
                                      : caller.pgm.name
                                      : caller.stmtID
@@ -858,9 +858,9 @@
                          : %trimR(f_rtvMsgText(i_msg: *omit))
                          : caller
                          : errMsg);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_errorMsg...
@@ -892,17 +892,17 @@
      D                                     based(i_hLogger)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logging is disabled.
          if (not isLoggingEnabled(i_hLogger));
             return cFalse;
          endif;
- 
+
          isEnabled =
  B01        cLOG4RPG_PRIORITY_ERROR >= getPriorityFromHierarchy(i_hLogger);
- 
+
          return isEnabled;
- 
+
       /END-FREE
       *
      P Logger_isErrorEnabled...
@@ -935,12 +935,12 @@
      D                                     based(i_hLogger)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logging is disabled.
          if (not Logger_isFatalEnabled(i_hLogger));
             return;
          endif;
- 
+
          caller.procedure = f_caller(caller.module.name
                                      : caller.pgm.name
                                      : caller.stmtID
@@ -948,9 +948,9 @@
          logLoggingEvent(i_hLogger: cLOG4RPG_PRIORITY_FATAL
                          : i_text
                          : caller);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_fatal...
@@ -986,12 +986,12 @@
      D errMsg          DS                  likeds(msg_t   ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logging is disabled.
          if (not Logger_isFatalEnabled(i_hLogger));
             return;
          endif;
- 
+
          caller.procedure = f_caller(caller.module.name
                                      : caller.pgm.name
                                      : caller.stmtID
@@ -1000,9 +1000,9 @@
                          : %trimR(f_rtvMsgText(i_msg: *omit))
                          : caller
                          : errMsg);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_fatalMsg...
@@ -1034,17 +1034,17 @@
      D                                     based(i_hLogger)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logging is disabled.
          if (not isLoggingEnabled(i_hLogger));
             return cFalse;
          endif;
- 
+
          isEnabled =
  B01        cLOG4RPG_PRIORITY_FATAL >= getPriorityFromHierarchy(i_hLogger);
- 
+
          return isEnabled;
- 
+
       /END-FREE
       *
      P Logger_isFatalEnabled...
@@ -1078,25 +1078,25 @@
      D                                     based(i_hLogger)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logging is disabled.
          if not Logger_isLogging();
             return;
          endif;
- 
+
          // Return to caller if logger is NULL
          if Logger_isNull(i_hLogger);
             return;
          endif;
- 
+
          // Reload properties (if reloading has been enabled)
          Configurator_checkAndReloadPropertiesConfiguration();
- 
+
          // Return to caller if logger does not exist
          if not Repository_existLogger(logger.name);
             return;
          endif;
- 
+
          caller.procedure = f_caller(caller.module.name
                                      : caller.pgm.name
                                      : caller.stmtID
@@ -1104,9 +1104,9 @@
          logLoggingEvent(i_hLogger: Level_toInt(i_level)
                          : i_text
                          : caller);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_forcedLog...
@@ -1143,23 +1143,23 @@
      D errMsg          DS                  likeds(msg_t   ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logging is disabled.
          if not Logger_isLogging();
             return;
          endif;
- 
+
          // Return to caller if logger is NULL
          if Logger_isNull(i_hLogger);
             return;
          endif;
- 
+
          Configurator_checkAndReloadPropertiesConfiguration();
- 
+
          if not Repository_existLogger(logger.name);
             return;
          endif;
- 
+
          caller.procedure = f_caller(caller.module.name
                                      : caller.pgm.name
                                      : caller.stmtID
@@ -1168,9 +1168,9 @@
                          : %trimR(f_rtvMsgText(i_msg: *omit))
                             : caller                                                        //RADDAT
                             : errMsg);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_forcedLogMsg...
@@ -1198,14 +1198,14 @@
      D                                     based(i_hLogger)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logging is disabled.
          if not Logger_isLogging();
             return '';
          endif;
- 
+
          return Node_getName(i_hLogger);
- 
+
       /END-FREE
       *
      P Logger_getName...
@@ -1238,35 +1238,35 @@
      D                                     based(i_hLogger)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logging is disabled.
          if not Logger_isLogging();
             return;
          endif;
- 
+
          // Return to caller if logger is NULL
          if Logger_isNull(i_hLogger);
             return;
          endif;
- 
+
          if Appender_isNull(i_pAppender);
             LogLog_warning('Appender is NULL. Please check call from [' +
                            f_caller() + '] to [' + f_this() + '].');
             return;
          endif;
- 
+
          appName = Appender_getName(i_pAppender);
- 
+
          if AppenderList_isNull(logger.pAppenderList);
             logger.pAppenderList = AppenderList_new();
          endif;
- 
+
          if Appender_isNull(i_pAppender);
             LogLog_warning('Appender [' + appName +
                            '] does not exist in repository.');
             return;
          endif;
- 
+
          if AppenderList_put(logger.pAppenderList: i_pAppender) = 0;
             LogLog_debug('Appender [' + appName +
                          '] added to logger [' + logger.name + '].');
@@ -1274,9 +1274,9 @@
             LogLog_error('Failed to add appender [' + appName +
                          '] to logger [' + logger.name + '].');
          endif;
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_addAppender...
@@ -1306,30 +1306,30 @@
      D                                     based(i_hLogger)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logging is disabled.
          if not Logger_isLogging();
             if not Repository_isShutdown();
                return;
             endif;
          endif;
- 
+
          // Return to caller if logger is NULL
          if Logger_isNull(i_hLogger);
             return;
          endif;
- 
+
          if AppenderList_isNull(logger.pAppenderList);
             return;
          endif;
- 
+
          AppenderList_remove(logger.pAppenderList: i_appName);
- 
+
          LogLog_verbose('Appender [' + i_appName +
                         '] removed from logger [' + logger.name + '].');
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_removeAppender...
@@ -1362,30 +1362,30 @@
      D                                     based(i_hLogger)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logging is disabled.
          if not Logger_isLogging();
             return;
          endif;
- 
+
          // Return to caller if logger is NULL
          if Logger_isNull(i_hLogger);
             return;
          endif;
- 
+
          if AppenderList_isNull(logger.pAppenderList);
             return;
          endif;
- 
+
          appIter = AppenderList_getIterator(logger.pAppenderList);
- 
+
          dow AppenderList_getNumE(logger.pAppenderList) > 0;
             pAppender = AppenderList_getFirst(appIter);
             Logger_removeAppender(i_hLogger: Appender_getName(pAppender));
          enddo;
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_removeAllAppenders...
@@ -1411,13 +1411,13 @@
      D                                     based(i_hLogger)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          p_assert(i_hLogger = *NULL or
                   logger.node = cLOG4RPG_NODE_LOGGER
                   : 'Expected a logger node');
- 
+
          return Node_isNull(i_hLogger);
- 
+
       /END-FREE
      P                 E
       *
@@ -1435,9 +1435,9 @@
      D                 PI                         like(LOG4RPG_hLogger_t )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return *NULL;
- 
+
       /END-FREE
      P                 E
       *
@@ -1470,21 +1470,21 @@
      D                                     based(i_hLogger)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logging is disabled.
          if not Logger_isLogging();
             return;
          endif;
- 
+
          // Return to caller if logger is NULL
          if Logger_isNull(i_hLogger);
             return;
          endif;
- 
+
          logger.priority = Level_toInt(f_ucase(i_level));
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_setLevel...
@@ -1513,21 +1513,21 @@
      D                                     based(i_hLogger)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logging is disabled.
          if not Logger_isLogging();
             return;
          endif;
- 
+
          // Return to caller if logger is NULL
          if Logger_isNull(i_hLogger);
             return;
          endif;
- 
+
          logger.priority = cLOG4RPG_LEVEL_PARENT;
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_resetLevel...
@@ -1559,20 +1559,20 @@
      D p_output        C                   const(2)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logging is disabled.
          if not Logger_isLogging();
             return;
          endif;
- 
+
          if %parms() >= p_output;
             LogLog_setInternalDebugging(i_debugMode: i_output);
          else;
             LogLog_setInternalDebugging(i_debugMode);
          endif;
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_setInternalDebugging...
@@ -1594,14 +1594,14 @@
      D                 PI                         like(LOG4RPG_debugMode_t  )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logging is disabled.
          if not Logger_isLogging();
             return '';
          endif;
- 
+
          return LogLog_getInternalDebugMode();
- 
+
       /END-FREE
       *
      P Logger_getInternalDebugMode...
@@ -1623,14 +1623,14 @@
      D                 PI                         like(LOG4RPG_debugOutput_t)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logging is disabled.
          if not Logger_isLogging();
             return '';
          endif;
- 
+
          return LogLog_getInternalDebugOutput();
- 
+
       /END-FREE
       *
      P Logger_getInternalDebugOutput...
@@ -1662,17 +1662,17 @@
      D                                     based(hLogger)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          LogLog_debug('Creating logger [' + i_logName + '] ...');
- 
+
          hLogger = %alloc(%size(LOG4RPG_logger_t));
- 
+
          initializeLoggerHandle(logger: i_logName);
- 
+
          LogLog_verbose('+ Allocated memory for logger [' + logger.name + ']');
- 
+
          return hLogger;
- 
+
       /END-FREE
       *
      P Logger_new...
@@ -1704,25 +1704,25 @@
      D name            S                   like(logger.name        ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if not Repository_existLogger(logger.name);
             io_hLogger = Logger_null();
             return;
          endif;
- 
+
          LogLog_verbose('Deleting logger [' + logger.name + '] ...');
- 
+
          name = logger.name;
- 
+
          deleteLogger(io_hLogger);
- 
+
          dealloc(N) io_hLogger;
          io_hLogger = Logger_null();
- 
+
          LogLog_verbose('- Freed memory of logger [' + name + ']');
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_delete...
@@ -1756,16 +1756,16 @@
      D                                     based(hLogger)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          hLogger = i_hLogger;
- 
+
          p_assert(logger.node = cLOG4RPG_NODE_LOGGER
                   : 'Expected a logger node');
- 
+
          index = Node_addChild(i_hLogger: i_hChild);
- 
+
          return index;
- 
+
       /END-FREE
      P                 E
       *
@@ -1796,12 +1796,12 @@
      D                                     based(i_hParent)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          p_assert(logger.node = cLOG4RPG_NODE_LOGGER
                   : 'Expected a logger node');
- 
+
          Node_setParent(i_hLogger: i_hParent);
- 
+
          if not Logger_isNull(i_hParent);
             LogLog_verbose('Set parent of logger [' + logger.name + '] to ' +
                                                 '[' + parent.name + ']');
@@ -1809,7 +1809,7 @@
             LogLog_verbose('Set parent of logger [' + logger.name + '] to ' +
                                                 '[' + '*NULL'     + ']');
          endif;
- 
+
       /END-FREE
       *
      P Logger_setParent...
@@ -1838,9 +1838,9 @@
      D                                     based(i_hLogger)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return Node_getParent(i_hLogger);
- 
+
       /END-FREE
       *
      P Logger_getParent...
@@ -1866,16 +1866,16 @@
      D                                     based(hNode)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logger is NULL
          if Node_isNull(i_hNode);
             return '';
          endif;
- 
+
          hNode = i_hNode;
- 
+
          return node.name;
- 
+
       /END-FREE
      P                 E
       *
@@ -1904,7 +1904,7 @@
      D                                     based(i_hNode)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logger is NULL
          if Node_isNull(i_hNode);
             return cFalse;
@@ -1913,9 +1913,9 @@
                return cFalse;
             endif;
          endif;
- 
+
          return cTrue;
- 
+
       /END-FREE
       *
      P Node_isProvisionNode...
@@ -1946,7 +1946,7 @@
      D                                     based(i_hNode)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logger is NULL
          if Node_isNull(i_hNode);
             return cFalse;
@@ -1955,9 +1955,9 @@
                return cFalse;
             endif;
          endif;
- 
+
          return cTrue;
- 
+
       /END-FREE
       *
      P Node_isLoggerNode...
@@ -1988,21 +1988,21 @@
      D                                     based(pNode)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          pNode = i_hNode;
- 
+
          p_assert(node.node = cLOG4RPG_NODE_PROVISION or
                   node.node = cLOG4RPG_NODE_LOGGER
                   : 'Expected a provision or logger node');
- 
+
          if BasicList_isNull(node.pChildren);
             numChildren = 0;
          else;
             numChildren = BasicList_getNumE(node.pChildren);
          endif;
- 
+
          return numChildren;
- 
+
       /END-FREE
      P                 E
       *
@@ -2033,17 +2033,17 @@
      D                                     based(pLogger)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          pLogger = i_hNode;
- 
+
          p_assert(logger.node = cLOG4RPG_NODE_PROVISION or
                   logger.node = cLOG4RPG_NODE_LOGGER
                   : 'Expected a provision or logger node');
- 
+
          hChild = BasicList_getPointer(logger.pChildren: i_index);
- 
+
          return hChild;
- 
+
       /END-FREE
      P                 E
       *
@@ -2075,15 +2075,15 @@
      D                                     based(pChild)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          pNode = i_hNode;
          pChild = i_hChild;
- 
+
          index = BasicList_addPointer(node.pChildren: i_hChild);
          Node_setParent(i_hChild: i_hNode);
- 
+
          return index;
- 
+
       /END-FREE
      P                 E
       *
@@ -2111,12 +2111,12 @@
      D                                     based(pParent)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          pNode = i_hNode;
          pParent = i_hParent;
- 
+
          node.pParent = i_hParent;
- 
+
       /END-FREE
      P                 E
       *
@@ -2140,9 +2140,9 @@
      D                                     based(i_hNode)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return node.pParent;
- 
+
       /END-FREE
      P                 E
       *
@@ -2173,22 +2173,22 @@
      D                                     based(hChild)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          hNode = i_hNode;
- 
+
          p_assert(node.node = cLOG4RPG_NODE_PROVISION or
                   node.node = cLOG4RPG_NODE_LOGGER
                   : 'Expected provision or logger nodes');
- 
+
          hChild = BasicList_getPointer(node.pChildren: i_index);
- 
+
          if (BasicList_remove(node.pChildren: i_index) = 0);
             Node_setParent(hChild: Logger_null());
             rc = 0;
          endif;
- 
+
          return rc;
- 
+
       /END-FREE
       *
      P                 E
@@ -2223,25 +2223,25 @@
      D                                     based(hCurChild)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          hNode = i_hNode;
          hChild = i_hChild;
- 
+
          p_assert(node.node = cLOG4RPG_NODE_PROVISION or
                   node.node = cLOG4RPG_NODE_LOGGER
                   : 'Expected a provision or logger node');
- 
+
          numChildren = BasicList_getNumE(node.pChildren);
- 
+
          for x = 1 to numChildren;
             hCurChild = BasicList_getPointer(node.pChildren: x);
             if (hCurChild = i_hChild);
                return x;
             endif;
          endfor;
- 
+
          return -1;
- 
+
       /END-FREE
       *
      P                 E
@@ -2265,13 +2265,13 @@
      D                                     based(i_hNode)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if i_hNode = Node_null();
             return cTrue;
          endif;
- 
+
          return cFalse;
- 
+
       /END-FREE
      P                 E
       *
@@ -2289,9 +2289,9 @@
      D                 PI                         like(LOG4RPG_hLogger_t )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return *NULL;
- 
+
       /END-FREE
      P                 E
       *
@@ -2325,7 +2325,7 @@
      D                                     based(i_hNode)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          select;
          when Node_isLoggerNode(i_hNode);
             priority = getPriorityFromHierarchy(i_hNode);
@@ -2337,21 +2337,21 @@
             priority = -1;
             desc = '*** Unknown node type ***';
          endsl;
- 
+
          if (priority = -1);
             return desc;
          endif;
- 
+
          desc += ' [' + Level_toString(priority) + ']';
- 
+
          pAppenderList = getAppenderListFromHierarchy(i_hNode);
          if AppenderList_isNull(pAppenderList);
             return desc;
          endif;
- 
+
          appIter = AppenderList_getIterator(pAppenderList);
          pAppender = AppenderList_getFirst(appIter);
- 
+
          dow (not Appender_isNull(pAppender));
             if (appenders = '');
                appenders = '; ';
@@ -2361,11 +2361,11 @@
             appenders += Appender_getName(pAppender);
             pAppender = AppenderList_getNext(appIter);
          enddo;
- 
+
          desc += appenders;
- 
+
          return desc;
- 
+
       /END-FREE
      P                 E
       *
@@ -2397,14 +2397,14 @@
      D                                     based(i_hProvNode)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          p_assert(logger.node = cLOG4RPG_NODE_PROVISION
                   : 'Expected a provision node');
- 
+
          numChildren = Node_getNumChildren(i_hProvNode);
- 
+
          return numChildren;
- 
+
       /END-FREE
       *
      P ProvisionNode_getNumChildren...
@@ -2443,14 +2443,14 @@
      D                                     based(i_hProvNode)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          p_assert(provNode.node = cLOG4RPG_NODE_PROVISION
                   : 'Expected a provision node');
- 
+
          index = Node_addChild(i_hProvNode: i_hChild);
- 
+
          return index;
- 
+
       /END-FREE
       *
      P ProvisionNode_addChild...
@@ -2485,14 +2485,14 @@
      D                                     based(i_hProvNode)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          p_assert(logger.node = cLOG4RPG_NODE_PROVISION
                   : 'Expected a provision node');
- 
+
          hChild = Node_getChild(i_hProvNode: i_index);
- 
+
          return hChild;
- 
+
       /END-FREE
       *
      P ProvisionNode_getChild...
@@ -2527,14 +2527,14 @@
      D                                     based(i_hProvNode)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          p_assert(logger.node = cLOG4RPG_NODE_PROVISION
                   : 'Expected provision node only');
- 
+
          rc = Node_removeChild(i_hProvNode: i_index);
- 
+
          return rc;
- 
+
       /END-FREE
       *
      P ProvisionNode_removeChild...
@@ -2564,15 +2564,15 @@
      D                                     based(hParent)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          hProvNode = i_hProvNode;
          hParent = i_hParent;
- 
+
          p_assert(provNode.node = cLOG4RPG_NODE_PROVISION
                   : 'Expected a provision node');
- 
+
          Node_setParent(i_hProvNode: i_hParent);
- 
+
          if not Logger_isNull(i_hParent);
             LogLog_verbose('Set parent of provision node [' +
                                                     provNode.name + '] to ' +
@@ -2582,7 +2582,7 @@
                                                     provNode.name + '] to ' +
                                                 '[' + '*NULL'     + ']');
          endif;
- 
+
       /END-FREE
      P                 E
       *
@@ -2602,9 +2602,9 @@
      D  i_hProvNode                        const  like(LOG4RPG_hLogger_t )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return Node_getParent(i_hProvNode);
- 
+
       /END-FREE
      P                 E
       *
@@ -2633,24 +2633,24 @@
      D                                     based(hProvNode)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          LogLog_verbose('Creating provision node [' + i_nodeName + '] ...');
- 
+
          hProvNode = Logger_null();
- 
+
          hProvNode = %alloc(%size(LOG4RPG_logger_t));
- 
+
          clearHandleData(provNode);
- 
+
          initializeProvisionNodeHandle(provNode: i_nodeName);
- 
+
          ProvisionNode_addChild(hProvNode: i_hChild);
- 
+
          LogLog_verbose('+ Allocated memory for provision node [' +
                          i_nodeName + ']');
- 
+
          return hProvNode;
- 
+
       /END-FREE
       *
      P ProvisionNode_makeProvisionNode...
@@ -2682,33 +2682,33 @@
      D                                     based(io_hProvNode)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if not Node_isProvisionNode(io_hProvNode);
             LogLog_error('Illegal node type passed to ' + f_this() +
                          ': [' + provNode.name + '('
                                + %char(provNode.node) + ')] ...');
          endif;
- 
+
          LogLog_verbose('Deleting provision node [' +
                          provNode.name + '] ...');
- 
+
          nodeName = provNode.name;
- 
+
          p_assert(provNode.pAppenderList = AppenderList_null()
                   : 'Did not expect appender list on logger [' +
                      nodeName + ']');
- 
+
          BasicList_delete(provNode.pChildren);
- 
+
          clearHandleData(provNode);
- 
+
          dealloc(N) io_hProvNode;
          io_hProvNode = Logger_null();
- 
+
          LogLog_verbose('- Free memory of provision node [' + nodeName + ']');
- 
+
          return;
- 
+
       /END-FREE
       *
      P ProvisionNode_free...
@@ -2724,7 +2724,7 @@
       *
       *  Returns:
       *   void
- 
+
       *=======================================================================
      P ProvisionNode_moveChildren...
      P                 B                   export
@@ -2749,30 +2749,30 @@
      D                                     based(hChild)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          hProvNode = i_hProvNode;
          hLogger = i_hLogger;
- 
- 
+
+
          p_assert(provNode.node = cLOG4RPG_NODE_PROVISION
                   : 'Expected a provision node');
          p_assert(logger.node = cLOG4RPG_NODE_LOGGER
                   : 'Expected a logger node');
          p_assert(BasicList_getNumE(logger.pChildren) = 0:
                   'Logger must not yet have any hildren');
- 
+
          numChildren = BasicList_getNumE(provNode.pChildren);
          for x = numChildren downto 1;
             hChild = BasicList_getPointer(provNode.pChildren: x);
             ProvisionNode_removeChild(i_hProvNode: x);
             Logger_addChild(i_hLogger: hChild);
          endfor;
- 
+
          p_assert(BasicList_getNumE(provNode.pChildren) = 0:
                   'Provision node must not have any hildren');
          p_assert(BasicList_getNumE(logger.pChildren) = numChildren:
                   'Logger must have ' + %char(numChildren) + ' any children');
- 
+
       /END-FREE
      P                 E
       *
@@ -2795,13 +2795,13 @@
      D                                     based(i_hProvNode)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          p_assert(i_hProvNode = *NULL or
                   provNode.node = cLOG4RPG_NODE_PROVISION
                   : 'Expected a provision node');
- 
+
          return Node_isNull(i_hProvNode);
- 
+
       /END-FREE
      P                 E
       *
@@ -2819,9 +2819,9 @@
      D                 PI                         like(LOG4RPG_hLogger_t )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return Node_null();
- 
+
       /END-FREE
      P                 E
       *
@@ -2839,11 +2839,11 @@
       *  Return value
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          clear io_logger;
- 
+
          return;
- 
+
       /END-FREE
       *
      P clearHandleData...
@@ -2869,24 +2869,24 @@
      D                                     based(i_hLogger)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          logName = logger.name;
- 
+
          if logger.pAppenderList <> AppenderList_null();
             appIter = AppenderList_getIterator(logger.pAppenderList);
- 
+
             dow AppenderList_getNumE(logger.pAppenderList) > 0;
                pAppender = AppenderList_getFirst(appIter);
                Logger_removeAppender(i_hLogger: Appender_getName(pAppender));
             enddo;
- 
+
             AppenderList_delete(logger.pAppenderList);
          endif;
- 
+
          clearHandleData(logger);
- 
+
          return;
- 
+
       /END-FREE
       *
      P deleteLogger...
@@ -2908,27 +2908,27 @@
      D                                     based(i_hLogger)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return to caller if logging is disabled.
          if not Logger_isLogging();
             return cFalse;
          endif;
- 
+
          // Return to caller if logger is NULL
          if Logger_isNull(i_hLogger);
             return cFalse;
          endif;
- 
+
          // Reload properties (if reloading has been enabled)
          Configurator_checkAndReloadPropertiesConfiguration();
- 
+
          // Return to caller if logger does not exist
          if not Repository_existLogger(logger.name);
             return cFalse;
          endif;
- 
+
          return cTrue;
- 
+
       /END-FREE
       *
      P isLoggingEnabled...
@@ -2950,9 +2950,9 @@
      D                                     based(pLogger)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          pLogger = i_hLogger;
- 
+
          dow logger.priority = cLOG4RPG_LEVEL_PARENT;
             if logger.pParent = Logger_null();
                return cLOG4RPG_PRIORITY_NONE;
@@ -2960,9 +2960,9 @@
             endif;
             pLogger = logger.pParent;
          enddo;
- 
+
          return logger.priority;
- 
+
       /END-FREE
       *
      P getPriorityFromHierarchy...
@@ -3012,7 +3012,7 @@
      D  msgFLib                      10A
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          pAppenderList = getAppenderListFromHierarchy(i_hLogger);
          if AppenderList_isNull(pAppenderList);
             if (logger.name = cROOT_LOGGER) and not g_warnRootNoAppender;
@@ -3022,15 +3022,15 @@
             endif;
             return;
          endif;
- 
+
          appIter = AppenderList_getIterator(pAppenderList);
          pAppender = AppenderList_getFirst(appIter);
- 
+
          pLogEvent = LogEvent_new(logger.name
                                   : i_priority
                                   : ''
                                   : i_caller);
- 
+
          if (%parms() >= p_errMsg);
             if (i_errMsg.ID = 'CPF2419');
                CPF2419 = i_errMsg.data;
@@ -3043,30 +3043,30 @@
                isMsgRtvErr = cTrue;
             endif;
          endif;
- 
+
          dow not Appender_isNull(pAppender);
- 
+
             if (isMsgRtvErr);
                LogEvent_setText(pLogEvent: msgRtvErrText);
             else;
                LogEvent_setText(pLogEvent: i_text);
             endif;
- 
+
             Appender_doAppend(pAppender: pLogEvent);
             pAppender = AppenderList_getNext(appIter);
- 
+
             pPropList = LogEvent_getPropertyList(pLogEvent);
             if not PropertyList_isNull(pPropList);
                PropertyList_clear(pPropList);
                LogLog_verbose('> Cleared property list of log event');
             endif;
- 
+
          enddo;
- 
+
          LogEvent_delete(pLogEvent);
- 
+
          return;
- 
+
       /END-FREE
       *
      P logLoggingEvent...
@@ -3088,9 +3088,9 @@
      D                                     based(pLogger)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          pLogger = i_hLogger;
- 
+
          dow logger.pAppenderList = AppenderList_null();
             if logger.pParent = Logger_null();
                return AppenderList_null();
@@ -3098,9 +3098,9 @@
             endif;
             pLogger = logger.pParent;
          enddo;
- 
+
          return logger.pAppenderList;
- 
+
       /END-FREE
       *
      P getAppenderListFromHierarchy...
@@ -3125,22 +3125,22 @@
      D  i_logName                          const  like(LOG4RPG_loggerName_t)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          clearHandleData(io_logger);
- 
+
          io_logger.node         = cLOG4RPG_NODE_LOGGER;  // Logger node
          io_logger.pParent      = Logger_null();         // Parent logger
          io_logger.name         = i_logName;             // Logger name
          io_logger.priority     = cLOG4RPG_LEVEL_PARENT; // Use log level of parent logger
          io_logger.pAppenderList= AppenderList_null();   // Appender list
          io_logger.pChildren    = BasicList_new('*CHILDREN');// Children of logger node
- 
+
          if i_logName = cROOT_LOGGER;
             io_logger.priority = Level_toInt(cLOG4RPG_LEVEL_DEBUG);
          endif;
- 
+
          return;
- 
+
       /END-FREE
       *
      P initializeLoggerHandle...
@@ -3159,18 +3159,18 @@
      D  i_nodeName                         const  like(LOG4RPG_loggerName_t)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          clearHandleData(io_provNode);
- 
+
          io_provNode.node         = cLOG4RPG_NODE_PROVISION; // Provision node
          io_provNode.pParent      = Logger_null();           // No parent logger
          io_provNode.name         = i_nodeName;              // Node name
          io_provNode.priority     = cLOG4RPG_LEVEL_PARENT;   // Use log level of parent logg
          io_provNode.pAppenderList= AppenderList_null();     // No Appender list
          io_provNode.pChildren    = BasicList_new('*CHILDREN');// Children of provision node
- 
+
          return;
- 
+
       /END-FREE
       *
      P initializeProvisionNodeHandle...
@@ -3189,11 +3189,11 @@
      D  i_stubOfs                     3I 0 const
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          g_stubOfs = i_stubOfs;
- 
+
          return;
- 
+
       /END-FREE
       *
      P setStubOfs...
@@ -3214,23 +3214,23 @@
       *  Helper fields
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if g_isInit;
             return;
          endif;
- 
+
          Loglog_verbose('Initializing module ' + sds.modContProc + '...');
- 
+
          Repository_initialize();
- 
+
          if not Repository_existLogger(cROOT_LOGGER);
             // Configurator_loadDefaultConfiguration();
          endif;
- 
+
          g_isInit = cTrue;
- 
+
          return;
- 
+
       /END-FREE
       *
      P initializeModule...
