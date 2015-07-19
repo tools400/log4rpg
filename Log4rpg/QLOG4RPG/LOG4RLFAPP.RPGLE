@@ -37,6 +37,10 @@
       *                            user to specify the ccsid of the log     *
       *                            file.                                    *
       *                                                                     *
+      *  10.05.2015  Th.Raddatz    Changed *_doAppend() to better handle    *
+      *                            unexpected errors when renaming the      *
+      *                            log file.                                *
+      *                                                                     *
       *=====================================================================*
       *   >>PRE-COMPILER<<                                                  *
       *                                                                     *
@@ -136,6 +140,7 @@
      D  isSyncLogMode                  N
      D  syncText                     50A   varying
      D  ccsid                        10U 0
+     D  lastRnmErr                     Z
       *
       * -----------------------------------------
       *  Prototypes
@@ -183,6 +188,22 @@
      D                 PR              N
      D  i_handle                           const  likeds(handle_t )
       *
+      *  Returns cTrue if there is a rename error. Resets the error after
+      *  a reasonable amount of time.
+     D checkAndHandleRenameError...
+     D                 PR              N
+     D  i_pHandle                      *   const
+      *
+      *  Sets the date and time of an error during renaming the output file.
+     D setRenameError...
+     D                 PR
+     D  i_pHandle                      *   const
+      *
+      *  Clears the date and time of an error during renaming the output file.
+     D clearRenameError...
+     D                 PR
+     D  i_pHandle                      *   const
+      *
       *  Loads the configuration parameters from the specified property list.
      D loadConfiguration...
      D                 PR
@@ -192,8 +213,9 @@
       *
       *  Renames exiting log files.
      D renameFiles...
-     D                 PR
+     D                 PR              N
      D  i_handle                           const  likeds(handle_t        )
+     D  o_msg                                     likeds(msg_t           )
       *
       *  Produces a backup file name.
      D getBackupFileName...
@@ -320,6 +342,7 @@
          tempHandle.isSyncLogMode   = cDEFAULT_SYNC_LOG_MODE;
          tempHandle.syncText        = cDEFAULT_SYNC_TEXT;
          tempHandle.ccsid           = cDEFAULT_CCSID;
+         tempHandle.lastRnmErr      = *LOVAL;
  
          // Initialize handle from configuration properties
          if (i_pPropList <> *NULL) and not PropertyList_isNull(i_pPropList);
@@ -397,6 +420,7 @@
      D text            S                   like(LOG4RPG_formattedText_t ) inz
      D isText          S               N                                  inz
      D isNewFile       S               N                                  inz
+     D isRenameError   S               N                                  inz
      D ticket          DS                  likeds(LOG4RPG_syncTicket_t  ) inz
      D msg             DS                  likeds(msg_t       )           inz
       *
@@ -418,47 +442,67 @@
          endif;
  
          // Check if a new file must be started.
-         if isNewFileCondition(handle);
+         if (not checkAndHandleRenameError(i_pHandle) and
+             isNewFileCondition(handle));
  
-            // Start synchronisation with concurrent jobs
-            if (handle.share);
-               if (not Synchronisation_start(handle.qSyncObj.name
-                                             : handle.qSyncObj.lib
-                                             : ticket: msg));
-                  LogLog_errorMsg(msg);
-                  return cFalse;
+            dou '1';
+ 
+               isRenameError = cFalse;
+ 
+               // Start synchronisation with concurrent jobs
+               if (handle.share);
+                  if (not Synchronisation_start(handle.qSyncObj.name
+                                                : handle.qSyncObj.lib
+                                                : ticket: msg));
+                     LogLog_errorMsg(msg);
+                     isRenameError = cTrue;
+                     leave;
+                  endif;
                endif;
-            endif;
  
-            // Determine, whether this job has to create a new file or not.
-            // If a new file has been created by anther job, this job only
-            // has to switch to the new file.
-            if (not handle.share or
-                f_getIfsFileID(handle.path) = handle.fileID);
-               isNewFile = cTrue;
-            else;
-               isNewFile = cFalse;
-            endif;
+               // Determine, whether this job has to create a new file or not.
+               // If a new file has been created by anther job, this job only
+               // has to switch to the new file.
+               if (not handle.share or
+                   f_getIfsFileID(handle.path) = handle.fileID);
+                  isNewFile = cTrue;
+               else;
+                  isNewFile = cFalse;
+               endif;
  
-            if handle.isOpen;
+               if handle.isOpen;
+                  if (isNewFile);
+                     appendFooter(i_pHandle);
+                  endif;
+                  closeAppender(i_pHandle);
+               endif;
+ 
                if (isNewFile);
-                  appendFooter(i_pHandle);
+                  if (not renameFiles(handle: msg));
+                     LogLog_errorMsg(msg);
+                     isRenameError = cTrue;
+                  endif;
                endif;
-               closeAppender(i_pHandle);
+ 
+               openAppender(i_pHandle);
+ 
+               // End synchronisation
+               if (handle.share);
+                  Synchronisation_end(ticket);
+               endif;
+ 
+            enddo;
+ 
+            if (isRenameError);
+               setRenameError(i_pHandle);
+            else;
+               clearRenameError(i_pHandle);
             endif;
  
-            if (isNewFile);
-               renameFiles(handle);
-            endif;
- 
-            if not openAppender(i_pHandle);
+            if (not handle.isOpen);
                return cFalse;
             endif;
  
-            // End synchronisation
-            if (handle.share);
-               Synchronisation_end(ticket);
-            endif;
          endif;
  
          // Write to file. Asking the LogEvent to do wordWrap.
@@ -839,6 +883,77 @@
      P isNewFileCondition...
      P                 E
       *
+      *=====================================================================*
+    R *  *** Private ***
+      *  Returns cTrue if there is a rename error. Resets the error after
+      *  a reasonable amount of time.
+      *=====================================================================*
+     P checkAndHandleRenameError...
+     P                 B
+     D                 PI              N
+     D  i_pHandle                      *   const
+      *
+      *  Appender handle
+     D handle          DS                  likeds(handle_t ) based(i_pHandle)
+      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      /FREE
+ 
+         if (handle.lastRnmErr = *LOVAL);
+            return cFalse;
+         endif;
+ 
+         if (%diff(%timestamp(): handle.lastRnmErr: *DAYS) > 1 or
+             %diff(%timestamp(): handle.lastRnmErr: *SECONDS) > 600);
+            // try again
+            clearRenameError(i_pHandle);
+            return cFalse;
+         endif;
+ 
+         return cTrue;
+ 
+      /END-FREE
+     P                 E
+      *
+      *=====================================================================*
+    R *  *** Private ***
+      *  Sets the date and time of an error during renaming the output file.
+      *=====================================================================*
+     P setRenameError...
+     P                 B
+     D                 PI
+     D  i_pHandle                      *   const
+      *
+      *  Appender handle
+     D handle          DS                  likeds(handle_t ) based(i_pHandle)
+      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      /FREE
+ 
+         if (handle.lastRnmErr = *LOVAL);
+            handle.lastRnmErr = %timestamp();
+         endif;
+ 
+      /END-FREE
+     P                 E
+      *
+      *=====================================================================*
+    R *  *** Private ***
+      *  Clears the date and time of an error during renaming the output file.
+      *=====================================================================*
+     P clearRenameError...
+     P                 B
+     D                 PI
+     D  i_pHandle                      *   const
+      *
+      *  Appender handle
+     D handle          DS                  likeds(handle_t ) based(i_pHandle)
+      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      /FREE
+ 
+         handle.lastRnmErr = *LOVAL;
+ 
+      /END-FREE
+     P                 E
+      *
       *=========================================================================
     R *  *** Private ***
       *  Loads the configuration parameters from the specified property list.
@@ -937,29 +1052,34 @@
      P                 B
       *
      D renameFiles...
-     D                 PI
+     D                 PI              N
      D  i_handle                           const  likeds(handle_t        )
+     D  o_msg                                     likeds(msg_t           )
       *
       *  Helper fields
      D rc              S             10I 0 inz(0)
      D x               S             10I 0 inz
      D tmpPath         S                   like(LOG4RPG_path_t  ) inz
      D target          S                   like(LOG4RPG_path_t  ) inz
-     D msg             DS                  likeds(msg_t         ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
+ 
+         o_msg = f_newMsg(cMsg_ID_OK);
  
          // If maxBackups <= 0, then there is no file renaming to be done.
          if (i_handle.maxBackupIndex <= 0);
             // Instead delete/truncate current log file.
-            f_deleteIfsFile(i_handle.path: *omit);
-            return;
+            if (f_deleteIfsFile(i_handle.path: o_msg) <> 0);
+               return cFalse;
+            else;
+               return cTrue;
+            endif;
          endif;
  
          // Delete the oldest file
          tmpPath = getBackupFileName(i_handle.path: i_handle.maxBackupIndex);
          if (f_isIfsFile(tmpPath: *omit));
-            rc = f_deleteIfsFile(tmpPath: msg);
+            rc = f_deleteIfsFile(tmpPath: o_msg);
          endif;
  
          // Rename remaining files
@@ -969,7 +1089,7 @@
             if (f_isIfsFile(tmpPath: *omit));
                target =
                   f_rtvIfsFileFromPath(getBackupFileName(i_handle.path: x + 1));
-               rc = f_renameIfsFile(tmpPath: target: msg);
+               rc = f_renameIfsFile(tmpPath: target: o_msg);
             endif;
             x = x - 1;
          enddo;
@@ -977,10 +1097,13 @@
          // Rename current log file
          if (rc <> cIFS_ERROR);
             target = f_rtvIfsFileFromPath(getBackupFileName(i_handle.path: 1));
-            rc = f_renameIfsFile(i_handle.path: target: msg);
+            rc = f_renameIfsFile(i_handle.path: target: o_msg);
+            if (rc <> 0);
+               return cFalse;
+            endif;
          endif;
  
-         return;
+         return cTrue;
  
       /END-FREE
       *

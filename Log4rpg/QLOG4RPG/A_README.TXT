@@ -3,6 +3,14 @@
 -----------------------
  
  
+Version 1.12
+------------
+ 
+Fixed:   Changed *_doAppend() to better handle unexpected errors
+         when renaming the log file. (RollingFileAppender and
+         DailyRollingFileAppender)
+ 
+ 
 Version 1.11
 ------------
  
