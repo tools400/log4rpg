@@ -8,6 +8,8 @@
 /* --------------------------------------------------------------- */
              XMLGENINC  XINCLUDE(*YES)
 
+             XMLGENVRS XSRCFILE(QLOG4RPG) XSRCLIB(TOOLS400) XSRCMBR(COPYRIGHT)
+
              XMLGENCND  XMSG('Use *LIBL at runtime? (L_YES, L_NO)') +
                           XVALUES(L_YES L_NO) XVAR(&USELIBL)
 

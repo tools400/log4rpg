@@ -51,7 +51,7 @@
       appblddate CDATA #REQUIRED
      >
      ]>
-<upload  appname="LOG4RPG"  appauthor="Thomas Raddatz"  appblddate=" 3/09/2017">
+<upload  appname="LOG4RPG"  appauthor="Thomas Raddatz"  appblddate="12/20/2018">
 <install_instructions><![CDATA[
      *----------------------------------------------------------------      ------
      *  1. Upload entire XML to your AS/400 to a source file 112 long, into any mbr
@@ -77,6 +77,8 @@
 ]]>  </install_instructions>
 <install_program><![CDATA[
       * /// START OF INSTALL PGM HERE   ************************** ///
+      *---------------------------------------------------------------------------------------
+      * CRTBNDRPG PGM(QTEMP/XMLINST) SRCFILE(ISPHERE/QBUILD) SRCMBR(*PGM)
       *---------------------------------------------------------------------------------------
       * Parse / Install from xml text into source members and objects.
       * Copyright (C) 2001    Craig Rutledge    <craig_rutledge@mohawkind.com>
@@ -442,6 +444,15 @@
       *
       * Set variable &TGTRLS
      C                   callp     setVariable('tgtrls': TgtRls)
+      *
+      * Set variable &XMLFILE
+     C                   callp     setVariable('xmlfile': ParseSrcFile)
+      *
+      * Set variable &XMLLIB
+     C                   callp     setVariable('xmllib': ParseSrcFile)
+      *
+      * Set variable &XMLMBR
+     C                   callp     setVariable('xmlmbr': ParseSrcFile)
       *
       * Override Input file to uploaded text file
      C                   eval      bldexc = 'OVRDBF FILE(XMLINPUT) TOFILE(' +
@@ -841,8 +852,7 @@
       *--------------------------------------------------------------------
      P readElement...
      P                 B
-      *
-     D readElement     PI                        like(bldexc)
+     D                 PI                        like(bldexc)
      D  i_element                     9A   value varying
       *
      D i               S             10I 0 inz
@@ -859,15 +869,13 @@
       *
      C                   Return    value
       *
-     P readElement...
      P                 E
       *--------------------------------------------------------------------
       * Double quotes
       *--------------------------------------------------------------------
      P dblQuotes...
      P                 B
-      *
-     D dblQuotes       PI          2048A         varying
+     D                 PI          2048A         varying
      D  i_string                   2048A   value varying
       *
      D x               S             10I 0         inz
@@ -882,15 +890,12 @@
       *
      C                   Return    string
       *
-     P dblQuotes...
      P                 E
       *---------------------------------------------------------------------------------------------
       *  Get Attribute Data from String
       *---------------------------------------------------------------------------------------------
      P getAttrData...
      P                 B
-      *
-     D getAttrData...
      D                 PI          2000A          varying                       like(string_t)
      D  i_attr                       10a   value
      D  i_string                   2000A   value  varying                       like(string_t)
@@ -926,15 +931,12 @@
       *
      C                   Return    attrData
       *
-     P getAttrData...
      P                 E
       *---------------------------------------------------------------------------------------------
       *  Load condition array
       *---------------------------------------------------------------------------------------------
      P loadConditions...
      P                 B
-      *
-     D loadConditions...
      D                 PI                  dim(32) like(condition)
      D  i_conditions                128A   value
       *
@@ -942,26 +944,42 @@
      D cnd_array       s                   dim(32) inz like(condition)
      D pValue          s               *   inz
      D x               s             10i 0 inz
+     D i               s             10i 0 inz
+     D cnd_value       s            128a   varying
+     D var_name        s             64a   varying
+     D var_value       s             64a   varying
       *-------------------------------------------------------------------*
-     C                   eval      i_conditions = uCase(i_conditions)
-      *
-     C                   eval      pValue = strtok(i_conditions: ';')
-     C                   dow       pValue <> *null
-     C                   eval      x = x + 1
-     C                   eval      cnd_array(x) = %str(pValue)
-     C                   eval      pValue = strtok(*null: ';')
-     C                   enddo
-      *
-     C                   Return    cnd_array
-     P loadConditions...
+      /FREE
+
+         i_conditions = uCase(i_conditions);
+
+         pValue = strtok(i_conditions: ';');
+         dow (pValue <> *null);
+            x = x + 1;
+            cnd_value = %str(pValue);
+            i = %scan('=': cnd_value);
+            if (i = 0);
+               cnd_array(x) = cnd_value;
+            else;
+               var_name = %subst(cnd_value: 1: i-1);
+               if (%subst(var_name: 1: 1) = '&');
+                  var_name = %subst(var_name: 2);
+               endif;
+               var_value = %subst(cnd_value: i+1);
+               setVariable(var_name: var_value);
+               cnd_array(x) = var_value;
+            endif;
+            pValue = strtok(*null: ';');
+         enddo;
+
+         return cnd_array;
+      /END-FREE
      P                 E
       *---------------------------------------------------------------------------------------------
       *  Check for a condition
       *---------------------------------------------------------------------------------------------
      P isCondition...
      P                 B
-      *
-     D isCondition...
      D                 PI              n
      D  i_condList                 2000A   value
       *
@@ -970,6 +988,7 @@
      D pValue          S               *   inz
      D aCondition      S             10a   inz
       *-------------------------------------------------------------------*
+      *
      C                   eval      i_condList = uCase(i_condList)
       *
      C                   if        (i_condList = '*NONE')  or
@@ -996,15 +1015,12 @@
      C                   endif
       *
      C                   Return    isCondition
-     P isCondition...
      P                 E
       *---------------------------------------------------------------------------------------------
       *  Get the current release level of the operation system
       *---------------------------------------------------------------------------------------------
      P getCurrentRelease...
      P                 B
-      *
-     D getCurrentRelease...
      D                 PI            10A
       *
       *  QSZRTVPR API
@@ -1033,18 +1049,17 @@
      D  bytPrv                       10i 0 inz(0)
      D  bytAvl                       10i 0 inz(0)
       *-------------------------------------------------------------------*
+      *
      C                   Callp     QSZRTVPR(prdr0100: %size(prdr0100):
      C                                      'PRDR0100': prdi0100: errCode)
      C                   Return    prdr0100.releaseLvl
-     P getCurrentRelease...
+      *
      P                 E
       *---------------------------------------------------------------------------------------------
       *  Check the release level
       *---------------------------------------------------------------------------------------------
      P isRelease...
      P                 B
-      *
-     D isRelease...
      D                 PI              n
      D  i_os_release                  6A   value
      D  i_release                    10A   value
@@ -1057,6 +1072,7 @@
      D  r_space                4      4a
      D  r_level                5     10a
       *-------------------------------------------------------------------*
+      *
      C                   If        i_release = '*CURRENT'
      C                   Eval      isRelease = *on
      C                   Else
@@ -1083,15 +1099,13 @@
      C                   Endif
       *
      C                   Return    isRelease
-     P isRelease...
+      *
      P                 E
       *---------------------------------------------------------------------------------------------
       *  Replaces the value of a given keyword.
       *---------------------------------------------------------------------------------------------
      P setTargetRelease...
      P                 B
-      *
-     D setTargetRelease...
      D                 PI          2000A          varying
      D  i_keyword                    10A   value  varying
      D  i_string                   2000A   value  varying
@@ -1108,6 +1122,7 @@
      D tmpCmd          S             10A   inz
       *-------------------------------------------------------------------*
       /FREE
+
          tmpKeyword = uCase(%trimR(i_keyword));
          tmpString  = uCase(%trimR(i_string ));
          x = %scan(' ': tmpString);
@@ -1146,49 +1161,47 @@
          string = %replace(tmpKeyword + '(' + %trimR(i_value) + ')'
                            : i_string: x: l);
          Return string;
+
       /END-FREE
-      *
-     P setTargetRelease...
      P                 E
       *---------------------------------------------------------------------------------------------
       *  Store field value.
       *---------------------------------------------------------------------------------------------
      P setVariable...
      P                 B
-      *
-     D setVariable...
      D                 PI
      D  i_fldName                    10A   value  varying
      D  i_value                      64A   value  varying
      D i               s             10I 0 inz
       *-------------------------------------------------------------------*
       /FREE
+
          if (i_fldName = '');
             return;
          endif;
+
          for i = 1 to fld_x;
-            if (uCase('&' + %trim(i_fldName)) = uCase(fld_name(fld_x)));
-               fld_value(fld_x) = i_value;
-               leave;
+            if (uCase('&' + %trim(i_fldName)) = uCase(fld_name(i)));
+               fld_value(i) = i_value;
+               return;
             endif;
          endfor;
+
          if (fld_x >= %elem(fld_name));
             return;
          endif;
+
          fld_x = fld_x + 1;
          fld_name(fld_x)  = uCase('&' + %trim(i_fldName));
          fld_value(fld_x) = i_value;
+
       /END-FREE
-      *
-     P setVariable...
      P                 E
       *---------------------------------------------------------------------------------------------
       *  get variable name from statement.
       *---------------------------------------------------------------------------------------------
      P getVarName...
      P                 B
-      *
-     D getVarName...
      D                 PI            11a          varying
      D  i_bldexc                           value  like(bldexc)
      D  i_pos                        10i 0 value
@@ -1198,47 +1211,47 @@
      D                                      1234567890_'
       *-------------------------------------------------------------------*
       /FREE
+
          dow (i_pos<=%len(i_bldexc) and
               %check(CHARS:%subst(i_bldexc:i_pos:1))=0);
             name = name+%subst(i_bldexc:i_pos:1);
             i_pos=i_pos+1;
          enddo;
+
          return name;
+
       /END-FREE
       *
-     P getVarName...
      P                 E
       *---------------------------------------------------------------------------------------------
       *  get variable value.
       *---------------------------------------------------------------------------------------------
      P getVarValue...
      P                 B
-      *
-     D getVarValue...
      D                 PI            64a          varying
      D  i_name                       11a   value  varying
      D i               s             10i 0 inz
      D value           s             64a   varying inz('?')
       *-------------------------------------------------------------------*
       /FREE
+
          for i=1 to fld_x;
             if (ucase(fld_name(i))=uCase(i_name));
                value=%trimR(fld_value(i));
                leave;
             endif;
          endfor;
+
          return value;
+
       /END-FREE
       *
-     P getVarValue...
      P                 E
       *---------------------------------------------------------------------------------------------
       *  convert to upper case
       *---------------------------------------------------------------------------------------------
      P uCase...
      P                 B
-      *
-     D uCase...
      D                 PI          2000A          varying
      D  i_string                   2000A   value  varying
      D uCase           s           2000A   inz varying
@@ -1246,11 +1259,12 @@
      D UC              C                   CONST('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
       *-------------------------------------------------------------------*
       /FREE
+
          uCase = %xlate(LC:UC:i_string);
+
          return uCase;
+
       /END-FREE
-      *
-     P uCase...
      P                 E
       * /// END   OF INSTALL PGM HERE   ****************************************** ///
       * /// do not copy past this point ///
@@ -1277,7 +1291,7 @@ Installing A_INSTALL  type TXT - in progress.
 <mbr
 mbrname =  "A_INSTALL "
 mbrtype =  "TXT       "
-mbrtext =  "Log4rpg Make File                                 "
+mbrtext =  "Log4rpg - Installer                               "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
@@ -2117,9 +2131,29 @@ srclib  =  "selected  "
 srclen  =  "00112"
 srccssid=  "00273">
 <copysrc><![CDATA[
+LOG4RPG - A Tools/400 Service Program
+-------------------------------------
+
+LOG4RPG is service program providing logging services similar to Log4j.
+In fact, the utility was inspired by Log4j.
+
+Dependencies: BASICS1, IFS
+
+Compile members with the following PDM option:
+
+   STRPREPRC USESRCFILE(&L/&F) USESRCMBR(&N) OPTION(*EVENTF) CHGOBJD(*NO)
+     LIB(&O) OBJ(&N) SRCLIB(&L) SRCFILE(&F) SRCMBR(&N) USER0(&X)
+     USER1(*LIST) USER2(*FULL)
+
+Members of type MAKPGM or BND are used for linking programs (MAKPGM)
+and service programs (BND).
+
+2018, Thomas Raddatz
+
 -----------------------
       History
 -----------------------
+
 
 Version 1.12
 ------------
@@ -2415,6 +2449,194 @@ Version 1.0
 
 Relased: 10.10.2006
 
+]]>  </copysrc>
+</mbr>
+<sendmsg  sendmsgid="CPF9897" sendmsgtype = "*STATUS   "><![CDATA[
+Installing BIND  type CLLE - in progress.
+]]>  </sendmsg>
+<!-- START OF MEMBER  -->
+<mbr
+mbrname =  "BIND      "
+mbrtype =  "CLLE      "
+mbrtext =  "Log4rpg Make File                                 "
+srcfile =  "QLOG4RPG  "
+srclib  =  "selected  "
+srclen  =  "00112"
+srccssid=  "00273">
+<copysrc><![CDATA[
+PGM
+
+DCL        VAR(&FAILED    ) TYPE(*DEC ) LEN(10 0) VALUE(0)
+DCL        VAR(&FAILEDSTR ) TYPE(*CHAR) LEN(10)
+DCL        VAR(&TGTRLS    ) TYPE(*CHAR) LEN(10) VALUE(*CURRENT)
+DCL        VAR(&LIB       ) TYPE(*CHAR) LEN(10) VALUE('RADDATZ')
+DCL        VAR(&BASICS1LIB) TYPE(*CHAR) LEN(10) VALUE('RADDATZ')
+DCL        VAR(&IFSLIB    ) TYPE(*CHAR) LEN(10) VALUE('RADDATZ')
+
+CRTSRVPGM  SRVPGM(&LIB/LOG4RPG) +
+             MODULE(&LIB/LOG4RPG01  +
+                    &LIB/LOG4RPG02  +
+                    &LIB/LOG4RPG03  +
+                    &LIB/LOG4RPG04  +
+                    &LIB/LOG4RPG07  +
+                    &LIB/LOG4RPG08  +
+                    &LIB/LOG4RPG09  +
+                    &LIB/LOG4RPG10  +
+                    &LIB/LOG4RPG11  +
+                    &LIB/LOG4RPG12  +
+                    &LIB/LOG4RPG13  +
+                    &LIB/LOG4RPG14  +
+                    &LIB/LOG4RPG15  +
+                    &LIB/LOG4RPG16  +
+                    &LIB/LOG4RPG17  +
+                    &LIB/LOG4RPG18  +
+                    &LIB/LOG4RPG50  +
+                    &LIB/LOG4RPG51  +
+                    &LIB/LOG4RPG52  +
+                    &LIB/LOG4RPG60  +
+                    &LIB/LOG4RPG61  +
+                    &LIB/LOG4RPG62  +
+                    &LIB/LOG4RPG97  +
+                    &LIB/LOG4RPG98  +
+                    &LIB/LOG4RPG99) +
+             EXPORT(*SRCFILE) SRCFILE(&LIB/QLOG4RPG) SRCMBR(LOG4RPG) +
+             BNDSRVPGM((&IFSLIB/IFS) +
+                       (&BASICS1LIB/BASICS1)) +
+             BNDDIR(QC2LE) ACTGRP(*CALLER) DETAIL(*BASIC) +
+             ALWUPD(*YES) ALWLIBUPD(*YES) TGTRLS(&TGTRLS) +
+             TEXT('Tools/400 - Log4rpg     ')
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTSRVPGM  SRVPGM(&LIB/LOG4RPGS) +
+             MODULE(&LIB/LOG4RPG00) +
+             EXPORT(*SRCFILE) SRCFILE(&LIB/QLOG4RPG) SRCMBR(LOG4RPGS) +
+             BNDSRVPGM(*N) +
+             BNDDIR(QC2LE) ACTGRP(*CALLER) DETAIL(*BASIC) +
+             ALWUPD(*YES) ALWLIBUPD(*YES) TGTRLS(&TGTRLS) +
+             TEXT('Tools/400 - Log4rpg Stub')
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+   /* ------------------------------------------- */
+   /*   Plugins                                   */
+   /* ------------------------------------------- */
+CRTSRVPGM  SRVPGM(&LIB/LOG4HTMLAY) +
+             MODULE(&LIB/LOG4HTMLAY) +
+             EXPORT(*ALL) +
+             BNDSRVPGM(&LIB/LOG4RPG +
+                       &BASICS1LIB/BASICS1 ) +
+             BNDDIR(QC2LE) ACTGRP(*CALLER) DETAIL(*BASIC) +
+             ALWUPD(*YES) ALWLIBUPD(*YES) TGTRLS(&TGTRLS) +
+             TEXT('Tools/400 - Log4rpg HTMLLayout ')
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTSRVPGM  SRVPGM(&LIB/LOG4PROFLT) +
+             MODULE(&LIB/LOG4PROFLT) +
+             EXPORT(*ALL) +
+             BNDSRVPGM(&LIB/LOG4RPG +
+                       &BASICS1LIB/BASICS1 ) +
+             BNDDIR(QC2LE) ACTGRP(*CALLER) DETAIL(*BASIC) +
+             ALWUPD(*YES) ALWLIBUPD(*YES) TGTRLS(&TGTRLS) +
+             TEXT('Tools/400 - Log4rpg HTMLLayout')
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTSRVPGM  SRVPGM(&LIB/LOG4PROFLT) +
+             MODULE(&LIB/LOG4PROFLT) +
+             EXPORT(*ALL) +
+             BNDSRVPGM(&LIB/LOG4RPG +
+                       &BASICS1LIB/BASICS1 ) +
+             BNDDIR(QC2LE) ACTGRP(*CALLER) DETAIL(*BASIC) +
+             ALWUPD(*YES) ALWLIBUPD(*YES) TGTRLS(&TGTRLS) +
+             TEXT('Tools/400 - Log4rpg Property Filter')
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTSRVPGM  SRVPGM(&LIB/LOG4RLFAPP) +
+             MODULE(&LIB/LOG4RLFAPP +
+                    &LIB/LOG4RPG97) +
+             EXPORT(*ALL) +
+             BNDSRVPGM(&LIB/LOG4RPG +
+                       &BASICS1LIB/BASICS1 +
+                       &BASICS1LIB/IFS) +
+             BNDDIR(QC2LE) ACTGRP(*CALLER) DETAIL(*BASIC) +
+             ALWUPD(*YES) ALWLIBUPD(*YES) TGTRLS(&TGTRLS) +
+             TEXT('Tools/400 - Log4rpg RollingFileAppender')
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTSRVPGM  SRVPGM(&LIB/LOG4RLMAPP) +
+             MODULE(&LIB/LOG4RLMAPP +
+                    &LIB/LOG4RPG97) +
+             EXPORT(*ALL) +
+             BNDSRVPGM(&LIB/LOG4RPG +
+                       &BASICS1LIB/BASICS1) +
+             BNDDIR(QC2LE) ACTGRP(*CALLER) DETAIL(*BASIC) +
+             ALWUPD(*YES) ALWLIBUPD(*YES) TGTRLS(&TGTRLS) +
+             TEXT('Tools/400 - Log4rpg RollingMemberAppender')
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTSRVPGM  SRVPGM(&LIB/LOG4SCKAPP) +
+             MODULE(&LIB/LOG4SCKAPP +
+                    &LIB/LOG4SOCK) +
+             EXPORT(*ALL) +
+             BNDSRVPGM(&LIB/LOG4RPG +
+                       &BASICS1LIB/BASICS1) +
+             BNDDIR(QC2LE) ACTGRP(*CALLER) DETAIL(*BASIC) +
+             ALWUPD(*YES) ALWLIBUPD(*YES) TGTRLS(&TGTRLS) +
+             TEXT('Tools/400 - Log4rpg XMLSocketAppender')
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTSRVPGM  SRVPGM(&LIB/LOG4SHBAPP) +
+             MODULE(&LIB/LOG4SHBAPP) +
+             EXPORT(*ALL) +
+             BNDSRVPGM(&LIB/LOG4RPG +
+                       &BASICS1LIB/BASICS1) +
+             BNDDIR(QC2LE) ACTGRP(*CALLER) DETAIL(*BASIC) +
+             ALWUPD(*YES) ALWLIBUPD(*YES) TGTRLS(&TGTRLS) +
+             TEXT('Tools/400 - Log4rpg XMLSocketHubAppender')
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTPGM     PGM(&LIB/LOG4SHBAPC) +
+             MODULE(LIB/LOG4SHBAPC   +
+                    LIB/LOG4SOCK   ) +
+             BNDSRVPGM(&LIB/LOG4RPG   +
+                       &BASICS1LIB/BASICS1 ) +
+             BNDDIR(QC2LE ) ACTGRP(*NEW) DETAIL(*BASIC) +
+             TGTRLS(&TGTRLS) +
+             TEXT('Tools/400 - Log4rpg XMLSocketHubAppender')
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTPGM     PGM(&LIB/LOG4_X1PGM) +
+             MODULE(&LIB/LOG4_X1) +
+             BNDSRVPGM(&LIB/LOG4RPG) +
+             BNDDIR(QC2LE ) ACTGRP(*NEW) DETAIL(*BASIC) +
+             TGTRLS(&TGTRLS) +
+             TEXT('Tools/400 - Log4rpg XMLSocketHubAppender')
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CHGVAR     VAR(&FAILEDSTR) VALUE(&FAILED)
+ADDENVVAR  ENVVAR(QRB_NUMBER_FAILED) VALUE(&FAILEDSTR) REPLACE(*YES)
+
+ENDPGM
 ]]>  </copysrc>
 </mbr>
 <sendmsg  sendmsgid="CPF9897" sendmsgtype = "*STATUS   "><![CDATA[
@@ -3735,6 +3957,331 @@ srccssid=  "00273">
 ]]>  </copysrc>
 </mbr>
 <sendmsg  sendmsgid="CPF9897" sendmsgtype = "*STATUS   "><![CDATA[
+Installing COMPILE  type CLLE - in progress.
+]]>  </sendmsg>
+<!-- START OF MEMBER  -->
+<mbr
+mbrname =  "COMPILE   "
+mbrtype =  "CLLE      "
+mbrtext =  "Log4rpg Make File                                 "
+srcfile =  "QLOG4RPG  "
+srclib  =  "selected  "
+srclen  =  "00112"
+srccssid=  "00273">
+<copysrc><![CDATA[
+PGM
+
+DCL        VAR(&FAILED    ) TYPE(*DEC ) LEN(10 0) VALUE(0)
+DCL        VAR(&FAILEDSTR ) TYPE(*CHAR) LEN(10)
+DCL        VAR(&TGTRLS    ) TYPE(*CHAR) LEN(10) VALUE(*CURRENT)
+DCL        VAR(&LIB       ) TYPE(*CHAR) LEN(10) VALUE('RADDATZ')
+
+CRTRPGMOD  MODULE(&LIB/LOG4RPG00) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RPG01) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RPG02) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RPG03) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RPG04) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RPG07) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RPG08) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RPG09) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RPG10) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RPG11) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RPG12) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RPG13) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RPG14) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RPG15) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RPG16) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RPG17) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RPG18) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RPG50) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RPG51) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RPG52) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RPG60) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RPG61) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RPG62) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RPG50) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RPG51) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RPG97) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RPG98) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RPG99) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+   /* ------------------------------------------- */
+   /*   Plugins                                   */
+   /* ------------------------------------------- */
+CRTRPGMOD  MODULE(&LIB/LOG4HTMLAY) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4PROFLT) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RLFAPP) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4RLMAPP) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4SOCK) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4SCKAPP) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4SHBAPP) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4SHBAPC) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CRTRPGMOD  MODULE(&LIB/LOG4_X1) +
+             SRCFILE(&LIB/QLOG4RPG) SRCMBR(*MODULE) +
+             DBGVIEW(*LIST) TRUNCNBR(*NO) +
+             TGTRLS(&TGTRLS)
+MONMSG     MSGID(CPF0000) EXEC(DO)
+   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+ENDDO
+
+CHGVAR     VAR(&FAILEDSTR) VALUE(&FAILED)
+ADDENVVAR  ENVVAR(QRB_NUMBER_FAILED) VALUE(&FAILEDSTR) REPLACE(*YES)
+
+ENDPGM
+]]>  </copysrc>
+</mbr>
+<sendmsg  sendmsgid="CPF9897" sendmsgtype = "*STATUS   "><![CDATA[
 Installing COPYRIGHT  type RPGLE - in progress.
 ]]>  </sendmsg>
 <!-- START OF MEMBER  -->
@@ -4289,12 +4836,12 @@ srccssid=  "00273">
 ]]>  </copysrc>
 </mbr>
 <sendmsg  sendmsgid="CPF9897" sendmsgtype = "*STATUS   "><![CDATA[
-Installing LOG4_PROPS  type RPGLE - in progress.
+Installing LOG4_PROPS  type PROPS - in progress.
 ]]>  </sendmsg>
 <!-- START OF MEMBER  -->
 <mbr
 mbrname =  "LOG4_PROPS"
-mbrtype =  "RPGLE     "
+mbrtype =  "PROPS     "
 mbrtext =  "Configures various Appenders, Layouts and Filters "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
@@ -4611,7 +5158,7 @@ srccssid=  "00273">
             Logger_debug(hLog1: 'Testnachricht 1.1');
             Logger_debug(hLog1: 'Testnachricht 1.1.1 + Dies ist eine sehr +
                                  lange Nachricht. Sie muss daher bei einem +
-                                 Print Appender Ã¼ber mehrere Zeilen gedruckt +
+                                 Print Appender über mehrere Zeilen gedruckt +
                                  werden.');
             Logger_debug(hLog1: 'Testnachricht 1.2');
             Logger_debug(hLog1: 'Testnachricht 1.3');
@@ -5069,7 +5616,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  07.11.2006  Th.Raddatz    Added missing '</title>' tag.            *
       *                                                                     *
@@ -5776,7 +6323,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -6193,7 +6740,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  31.08.2008  Th.Raddatz    Now correctly passing a file name to     *
       *                            f_renameIfsFile().                       *
@@ -8719,7 +9266,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  13.06.2008  Th.Raddatz    Enhanced the Log4rpg stub module         *
       *                            to optionally load the Log4rpg service   *
@@ -10482,7 +11029,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  17.10.2006  Th.Raddatz    Fixed that Logger_addAppender() failed   *
       *                            when attempting to add an appender to    *
@@ -13735,7 +14282,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -14301,7 +14848,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  26.10.2006  Th.Raddatz    Introduced Filter to Log4rpg.            *
       *                            Added procedure Appender_knowsProperty().*
@@ -15057,7 +15604,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -15624,7 +16171,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  16.10.2006 Th.Raddatz     Fix bug in PropertyList_loadFromUrl().   *
       *                            Now returning cFalse on unknown URL      *
@@ -16900,7 +17447,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  26.10.2006  Th.Raddatz    Introduced Filter to Log4rpg.            *
       *                                                                     *
@@ -18310,7 +18857,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -18471,7 +19018,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  27.10.2006  Th.Raddatz    Added feature to completely enable/      *
       *                            disable Log4rpg. Logger_isLogging().     *
@@ -18540,11 +19087,6 @@ srccssid=  "00273">
      D writeToPrinter...
      D                 PR
      D  i_text                             const  like(LOG4RPG_formattedText_t)
-      *
-      *  Formats the name of the calling procedure.
-     D formatCaller...
-     D                 PR           256A   varying
-     D  i_procName                  256A   const  varying
       *
       * -----------------------------------------
       *  Global constants
@@ -18707,7 +19249,6 @@ srccssid=  "00273">
      D LogLog_debug...
      D                 PI
      D  i_text                             const  like(LOG4RPG_text_t    )
-     D caller          S            128a   varying
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
 
@@ -18720,7 +19261,7 @@ srccssid=  "00273">
          endif;
 
          if g_debugMode <> cLOG4RPG_INT_DEBUG_OFF;
-            streamOut(cPREFIX + formatCaller(f_caller()) + i_text);
+            streamOut(cPREFIX + i_text);
          endif;
 
          return;
@@ -18797,7 +19338,7 @@ srccssid=  "00273">
             return;
          endif;
 
-         streamOut(cERR_PREFIX + formatCaller(f_caller()) + i_text);
+         streamOut(cERR_PREFIX + i_text);
 
          return;
 
@@ -18871,7 +19412,7 @@ srccssid=  "00273">
             return;
          endif;
 
-         streamOut(cWARN_PREFIX + formatCaller(f_caller()) + i_text);
+         streamOut(cWARN_PREFIX + i_text);
 
          return;
 
@@ -18946,7 +19487,7 @@ srccssid=  "00273">
          endif;
 
          if g_debugMode = cLOG4RPG_INT_DEBUG_VERBOSE;
-            streamOut(cPREFIX + formatCaller(f_caller()) + i_text);
+            streamOut(cPREFIX + i_text);
          endif;
 
          return;
@@ -19094,40 +19635,6 @@ srccssid=  "00273">
      P writeToStdout...
      P                 E
       *
-      *=========================================================================
-    R *  *** Private ***
-      *  Formats the name of the calling procedure.
-      *=========================================================================
-     P formatCaller...
-     P                 B
-     D                 PI           256A   varying
-     D  i_procName                  256A   const  varying
-      *
-     D formatted       S            256A   varying
-     D partLen         S             10I 0
-      *
-     D DELIMITERS      C                   '....'
-     D LENGTH          C                   40
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
-
-         if (%len(i_procName) <= LENGTH);
-            formatted = i_procName;
-         else;
-            partLen = %int((LENGTH - %len(DELIMITERS)) / 2);
-            formatted = %subst(i_procName: 1: partLen) + '....' +
-                        %subst(i_procName: %len(i_procName) - partLen + 1);
-         endif;
-
-
-         formatted = ' ' + formatted + '() ';
-         %len(formatted) = LENGTH + 4;
-
-         return formatted;
-
-      /END-FREE
-     P                 E
-      *
 ]]>  </copysrc>
 </mbr>
 <sendmsg  sendmsgid="CPF9897" sendmsgtype = "*STATUS   "><![CDATA[
@@ -19163,7 +19670,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  27.10.2006  Th.Raddatz    Removed return value from procedure      *
       *                            Layout_format().                         *
@@ -19666,7 +20173,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  18.10.2006  Th.Raddatz    Introduced Filter to Log4rpg.            *
       *                                                                     *
@@ -20121,7 +20628,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  25.10.2006  Th.Raddatz    Introduced Filter to Log4rpg.            *
       *                                                                     *
@@ -21294,7 +21801,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -21483,7 +21990,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -21662,7 +22169,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  13.06.2008  Th.Raddatz    Changed Log4rpg to log empty messages.   *
       *                                                                     *
@@ -22407,7 +22914,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -22986,7 +23493,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -23553,7 +24060,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  25.10.2006  Th.Raddatz    Replaced data structure logEvent with    *
       *                            object LogEvent.                         *
@@ -24704,7 +25211,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  25.10.2006  Th.Raddatz    Replaced data structure logEvent with    *
       *                            object LogEvent.                         *
@@ -25555,7 +26062,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  25.10.2006  Th.Raddatz    Replaced data structure logEvent with    *
       *                            object LogEvent.                         *
@@ -25832,7 +26339,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  27.10.2006  Th.Raddatz    Replaced data structure logEvent with    *
       *                            object LogEvent.                         *
@@ -26361,7 +26868,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  27.10.2006  Th.Raddatz    Replaced data structure logEvent with    *
       *                            object LogEvent.                         *
@@ -26598,7 +27105,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  27.10.2006  Th.Raddatz    Replaced data structure logEvent with    *
       *                            object LogEvent.                         *
@@ -26745,7 +27252,7 @@ srccssid=  "00273">
          // Initialize handle
          tempHandle.pSuper        = i_pSuper;   // Handle of the super class 'Layout'
          tempHandle.rplUnprtChars = cFalse;
-         tempHandle.substitutionChar = 'Ã·';
+         tempHandle.substitutionChar = '÷';
          tempHandle.encoding         = '';
 
          // Initialize handle from configuration properties
@@ -27222,7 +27729,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -27537,7 +28044,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -27787,7 +28294,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  08.11.2008  Th.Raddatz    Added procedure: getObject()             *
       *                                                                     *
@@ -28204,7 +28711,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  15.11.2006  Th.Raddatz    Fixed probem that parameter 'ccsid'      *
       *                            was not properly handled. Changed        *
@@ -29127,7 +29634,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -29758,7 +30265,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -30738,7 +31245,7 @@ srccssid=  "00273">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Ã„nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
