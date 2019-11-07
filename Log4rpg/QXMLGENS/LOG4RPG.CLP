@@ -1,11 +1,22 @@
-/* --------------------------------------------------------------- */
-/* LST4RPG    - SCRIPT MEMBER                                      */
-/* Use commands  xmlgenINC (generate text for install pgm)         */
-/*               xmlgenMBR (to define source members               */
-/*               xmlgenCMD (execute qcmdexc at run time            */
-/* Put &TOLIB where you want user selected lib at run time.        */
+/* -------------------------------------------------------------------------- */
+/* LST4RPG    - SCRIPT MEMBER                                                 */
+/* Use commands  xmlgenINC (generate text for install pgm)                    */
+/*               xmlgenMBR (to define source members                          */
+/*               xmlgenCMD (execute qcmdexc at run time                       */
+/* Put &TOLIB where you want user selected lib at run time.                   */
    DCL &TOLIB *CHAR 10
-/* --------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
+/* >>PRE-COMPILER<<                                                           */
+/*   >>CRTCMD<<  XMLGEN  XMLSCRIPT(&SM) SCRIPTSRCF(&SL/&SF);                  */
+/*   >>IMPORTANT<<                                                            */
+/*     >>PARM<<  SRCTOFILE(&LI/QXML);                                         */
+/*     >>PARM<<  XMLMBR(*SCRIPT);                                             */
+/*     >>PARM<<  ENCODING('ISO-8859-1');                                      */
+/*     >>PARM<<  AUTHOR('Thomas Raddatz');                                    */
+/*   >>END-IMPORTANT<<                                                        */
+/*   >>EXECUTE<<                                                              */
+/* >>END-PRE-COMPILER<<                                                       */
+/* -------------------------------------------------------------------------- */
              XMLGENINC  XINCLUDE(*YES)
 
              XMLGENVRS XSRCFILE(QLOG4RPG) XSRCLIB(TOOLS400) XSRCMBR(COPYRIGHT)
