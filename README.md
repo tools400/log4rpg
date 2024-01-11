@@ -1,5 +1,3 @@
-# Log4rpg
-
 Log4rpg - A powerful logging service for RPG on System i
 
 Debugging an application can be a very time consuming task. In particular this is true for applications that are made of small and smallest procedures and when the programmer does not exactly know where the error happens. For every procedure he has to decide whether to step over or step into it. Lots of debugging minutes can get lost because of a little mistake due to low concentration.
