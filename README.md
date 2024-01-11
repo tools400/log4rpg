@@ -15,3 +15,4 @@ That is what Log4rpg is made for. Log4rpg is a powerful logger that was inspired
 
 With Log4rpg it is possible to enable and disable logging just by modifying a configuration file. There is no need for changing code and compiling the program.
 
+© 2024, Thomas Raddatz
