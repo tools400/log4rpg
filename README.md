@@ -60,15 +60,15 @@ Then logon to your IBM i system and follow these steps:
 
 * Compile the installation utility:
 
-  `CRTBNDRPG PGM(QTEMP/INSTALLER) SRCFILE(LOG4RPGDVP/QXML) DFTACTGRP(*NO) ACTGRP(*NEW)`
+  `CRTBNDRPG PGM(QTEMP/INSTALLER) SRCFILE(LOG4RPG/QXML) DFTACTGRP(*NO) ACTGRP(*NEW)`
 
 * Run the following commands and answer the questions with one of the displayed options:
 
-  `CALL PGM(QTEMP/INSTALLER) PARM(('BASICS1') ('QXML') ('LOG4RPGDVP'))` 
+  `CALL PGM(QTEMP/INSTALLER) PARM(('BASICS1') ('QXML') ('LOG4RPG'))` 
 
-  `CALL PGM(QTEMP/INSTALLER) PARM(('IFS') ('QXML') ('LOG4RPGDVP'))` 
+  `CALL PGM(QTEMP/INSTALLER) PARM(('IFS') ('QXML') ('LOG4RPG'))` 
 
-  `CALL PGM(QTEMP/INSTALLER) PARM(('LOG4RPG') ('QXML') ('LOG4RPGDVP'))` 
+  `CALL PGM(QTEMP/INSTALLER) PARM(('LOG4RPG') ('QXML') ('LOG4RPG'))` 
 
   The questions asked by BASICS1 are:
 
