@@ -35,7 +35,7 @@ Both service programs are hosted on Sourceforge.
 
 ### Installation
 
-Start with downloading the XML packages to your PC:
+Start with downloading the XML packages to your PC. Click the link, open the member and click the download link or button:
 
 * [BASICS1](https://sourceforge.net/p/tools400/code/HEAD/tree/rpg-srvpgm/BASICS1/trunk/QXML/)
 * [IFS](https://sourceforge.net/p/tools400/code/HEAD/tree/rpg-srvpgm/BASICS1/trunk/QXML/)
