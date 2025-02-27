@@ -10,7 +10,7 @@
      /*     >>END-IMPORTANT<<                                               */
      /*     >>EXECUTE<<                                                     */
      /*     >>CMD<<    CALL    PGM(QTEMP/A_INSTALL) +                       */
-     /*                        PARM('&LI' '&SL' '&SF' 'L_NO' 'NO');         */
+     /*                        PARM('&TR' '&SF' '&LI' 'L_NO' 'NO');         */
      /*   >>END-PRE-COMPILER<<                                              */
      /* =================================================================== */
              PGM        PARM(&TGTRLS &SRCFILE &TOLIB &USELIBL &CRTTSTPGM)
