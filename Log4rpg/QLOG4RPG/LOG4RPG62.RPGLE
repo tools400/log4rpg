@@ -18,7 +18,7 @@
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Änderung                                 *
+      *  Datum       Name          ï¿½nderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  27.10.2006  Th.Raddatz    Replaced data structure logEvent with    *
       *                            object LogEvent.                         *
@@ -46,7 +46,7 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
-      *       >>PARM<< TGTRLS(V6R1M0  );                                    *
+      *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
       *     >>EXECUTE<<                                                     *
@@ -165,7 +165,7 @@
          // Initialize handle
          tempHandle.pSuper        = i_pSuper;   // Handle of the super class 'Layout'
          tempHandle.rplUnprtChars = cFalse;
-         tempHandle.substitutionChar = '÷';
+         tempHandle.substitutionChar = 'ï¿½';
          tempHandle.encoding         = '';
  
          // Initialize handle from configuration properties
