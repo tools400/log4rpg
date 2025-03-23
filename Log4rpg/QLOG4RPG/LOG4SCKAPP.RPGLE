@@ -252,7 +252,7 @@
      D  i_prefix                           const  like(LOG4RPG_prefix_t        )
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  Helper fields
      D tmpHIconv       DS                  likeds(iconv_t  ) inz
@@ -268,7 +268,7 @@
 
          // Initialize handle
          tmpHandle.pSuper          = i_pSuper;   // Handle of the super class 'Appender'
-         tmpHandle.isOpen          = cFalse;
+         tmpHandle.isOpen          = *off;
          tmpHandle.host            = '';
          tmpHandle.IP              = 0;
          tmpHandle.port            = 4448;
@@ -277,7 +277,7 @@
          tmpHandle.connTimeout     = 5000;      // measured in milliseconds
          tmpHandle.reConnDelay     = 30000;     // measured in milliseconds
          tmpHandle.lastConnTime    = *loval;
-         tmpHandle.isIconv         = cFalse;
+         tmpHandle.isIconv         = *off;
          tmpHandle.hIconv          = tmpHIconv;
 
          // Initialize handle from configuration properties
@@ -321,7 +321,7 @@
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
 
-         return cTrue;
+         return *on;
 
       /END-FREE
       *
@@ -370,7 +370,7 @@
 
          // Return if there is no text
          if LogEvent_textLength(i_pLogEvent) = 0;
-            return cTrue;
+            return *on;
          endif;
 
          // Open the appender for output if it is not yet open
@@ -381,10 +381,10 @@
                   LogLog_error('Trying to connect to host again in ' +
                                %char(%int(handle.reConnDelay)) + ' ms.');
                   handle.lastConnTime = %timestamp();
-                  return cFalse;
+                  return *off;
                endif;
             else;
-               return cFalse;
+               return *off;
             endif;
          endif;
 
@@ -439,10 +439,10 @@
                endif;
             endif;
 
-            return cFalse;
+            return *off;
          endif;
 
-         return cTrue;
+         return *on;
 
       /END-FREE
       *
@@ -487,7 +487,7 @@
 
             if handle.isIconv;
                if iconv_close(handle.hIconv) = 0;
-                  handle.isIconv = cFalse;
+                  handle.isIconv = *off;
                endif;
             endif;
 
@@ -522,7 +522,7 @@
      D  io_pHandle                     *
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  Appender handle
      D handle          DS                  likeds(handle_t ) based(io_pHandle)
@@ -539,7 +539,7 @@
          // End character conversion
          if handle.isIconv;
             iconv_close(handle.hIconv);
-            handle.isIconv = cFalse;
+            handle.isIconv = *off;
          endif;
 
          // Clear handle data
@@ -550,7 +550,7 @@
 
          LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
 
-         isDone = cTrue;
+         isDone = *on;
 
          return isDone;
 
@@ -603,7 +603,7 @@
                   if (tmpHost = '');
                      LogLog_error('Failed to resolve  host [' +
                                    handle.host + ']');
-                     return cFalse;
+                     return *off;
                   endif;
                   tmpIPLong = inet_addr(tmpHost);
                else;
@@ -611,7 +611,7 @@
                   if pHostent = *NULL;
                      LogLog_error('Failed to resolve  host [' +
                                    handle.host + ']');
-                     return cFalse;
+                     return *off;
                   endif;
 
                   tmpIPLong = hostAdr;
@@ -627,7 +627,7 @@
          if rc < 0;
             LogLog_error('Failed to create socket for connection to host [' +
                           handle.host + ':' + %char(handle.port) + ']');
-            return cFalse;
+            return *off;
          endif;
 
          tmpSockDesc = rc;
@@ -672,7 +672,7 @@
                                ' ms when trying to connect to +
                                 host [' + handle.host + ':' +
                                           %char(handle.port) + ']');
-                  return cFalse;
+                  return *off;
                when rc > 0;   // Connected!
                   optLen = %size(errVal);
                   getsockopt(tmpSockDesc: SOL_SOCKET: SO_ERROR
@@ -683,7 +683,7 @@
                                    handle.host + ':' + %char(handle.port) +']');
                      LogLog_error('--> ' + %char(errVal) + ': ' +
                                            f_strerror(errVal) );
-                     return cFalse;
+                     return *off;
                   endif;
                other;         // Error
                   closeSocket(tmpSockDesc);
@@ -691,7 +691,7 @@
                                 handle.host + ':' + %char(handle.port) + ']');
                   LogLog_error('--> ' + %char(f_errno()) + ': ' +
                                         f_strerror(f_errno()) );
-                  return cFalse;
+                  return *off;
                endsl;
             else;
                closeSocket(tmpSockDesc);
@@ -699,7 +699,7 @@
                              handle.host + ':' + %char(handle.port) + ']');
                LogLog_error('--> ' + %char(f_errno()) + ': ' +
                                      f_strerror(f_errno()) );
-               return cFalse;
+               return *off;
             endif;
          endif;
 
@@ -720,9 +720,9 @@
 
          // Set return value
          handle.sockDesc = tmpSockDesc;
-         handle.isOpen   = cTrue;
+         handle.isOpen   = *on;
 
-         return cTrue;
+         return *on;
 
       /END-FREE
       *
@@ -741,7 +741,7 @@
      D  i_pHandle                      *   const
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  Appender handle
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
@@ -749,9 +749,9 @@
       /FREE
 
          if closeSocket(handle.sockDesc) = 0;
-            handle.isOpen   = cFalse;
+            handle.isOpen   = *off;
             handle.sockDesc = cSOCKET_NULL;
-            isDone = cTrue;
+            isDone = *on;
             LogLog_debug('Disconnected from host [' + handle.host  + ':' +
                                                       %char(handle.port) + ']');
          else;
@@ -759,7 +759,7 @@
                           handle.host + ':' + %char(handle.port) + ']');
             LogLog_error('--> ' + %char(f_errno()) + ': ' +
                                   f_strerror(f_errno()) );
-            isDone = cFalse;
+            isDone = *off;
          endif;
 
          return isDone;
@@ -781,7 +781,7 @@
      D  io_handle                                 likeds(handle_t )
       *
       *  Return value
-     D isIconv         S               N   inz(cFalse)
+     D isIconv         S               N   inz(*off)
       *
       *  Local fields
      D tmpHIconv       DS                  likeds(iconv_t  ) inz
@@ -816,11 +816,11 @@
             LogLog_error('Failed to initialize character conversion');
             msg = f_cvtErrnoToMsg(f_errno());
             LogLog_errorMsg(msg);
-            io_handle.isIconv = cFalse;
+            io_handle.isIconv = *off;
          else;
             LogLog_debug('Initialized character translation for CCSID=' +
                          %char(io_handle.ccsid));
-            io_handle.isIconv = cTrue;
+            io_handle.isIconv = *on;
             io_handle.hIconv  = tmpHIconv;
          endif;
 

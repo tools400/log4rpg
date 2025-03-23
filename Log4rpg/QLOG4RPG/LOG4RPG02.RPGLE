@@ -446,7 +446,7 @@
      D  io_pLogList                               like(LOG4RPG_pLoggerList_t )
       *
       *  Return value
-     D isDeleted       S               N   inz(cFalse)
+     D isDeleted       S               N   inz(*off)
       *
       *  Helper fields
      D logIter         DS                  likeds(LOG4RPG_Logger...
@@ -460,7 +460,7 @@
       /FREE
 
          if BasicMap_isNull(logList.pMap);
-            return cTrue;
+            return *on;
          endif;
 
          LogLog_verbose('Deleting logger list ...');
@@ -478,9 +478,9 @@
          enddo;
 
          if BasicMap_delete(logList.pMap) = 0;
-            isDeleted = cTrue;
+            isDeleted = *on;
          else;
-            isDeleted = cFalse;
+            isDeleted = *off;
          endif;
 
          io_pLogList = LoggerList_null();
@@ -518,7 +518,7 @@
       /FREE
 
          if i_pLogList = LoggerList_null();
-            return cTrue;
+            return *on;
          else;
             return BasicMap_isNull(logList.pMap);
          endif;

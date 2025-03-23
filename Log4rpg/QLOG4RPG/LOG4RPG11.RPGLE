@@ -371,7 +371,7 @@
      D  io_pLayout                                like(LOG4RPG_pLayout_t      )
       *
       *  Return value
-     D isDeleted       S               N   inz(cFalse)
+     D isDeleted       S               N   inz(*off)
       *
       *  Layout handle
      D layout          DS                  likeds(handle_t    )
@@ -419,7 +419,7 @@
 
          select;
          other;
-            return cFalse;
+            return *off;
          endsl;
 
       /END-FREE
@@ -446,14 +446,14 @@
      D  i_pLayout                          const  like(LOG4RPG_pLayout_t       )
       *
       *  Return value
-     D isNull          S               N   inz(cFalse)
+     D isNull          S               N   inz(*off)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
 
          if i_pLayout = Layout_null();
-            isNull = cTrue;
+            isNull = *on;
          else;
-            isNull = cFalse;
+            isNull = *off;
          endif;
 
          return isNull;

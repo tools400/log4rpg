@@ -117,8 +117,8 @@
       * -----------------------------------------
       *  Global fields
       * -----------------------------------------
-     D g_isInit        S               N   inz(cFalse)
-     D g_isShutdown    S               N   inz(cFalse)
+     D g_isInit        S               N   inz(*off)
+     D g_isShutdown    S               N   inz(*off)
       *
      D g_loggerRepos   S                   like(LOG4RPG_pLoggerList_t   ) inz
      D g_appendRepos   S                   like(LOG4RPG_pAppenderList_t ) inz
@@ -203,10 +203,10 @@
       /FREE
 
          if (not LoggerList_exist(g_loggerRepos: i_logName));
-            return cFalse;
+            return *off;
          endif;
 
-         return cTrue;
+         return *on;
 
       /END-FREE
       *
@@ -782,7 +782,7 @@
       /FREE
 
          // Set repository SHUTDOWN-mode
-         Repository_setShutdown(cTrue);
+         Repository_setShutdown(*on);
 
          // -------------------------------------------- //
          //   Delete logger                              //
@@ -1118,7 +1118,7 @@
          Loglog_verbose('Initializing module ' + sds.modContProc + '...');
 
          // Disable Repository SHUTDOWN-mode
-         Repository_setShutdown(cFalse);
+         Repository_setShutdown(*off);
 
          // Register activation group exit procedure
          CEE4RAGE(%paddr('LOG4RPG13_PRIVATE_onActivationGroupEnd'): *OMIT);
@@ -1153,7 +1153,7 @@
          LogLog_verbose('+ Initialized repository.');
 
          // Ready!
-         g_isInit = cTrue;
+         g_isInit = *on;
 
          return;
 

@@ -276,21 +276,21 @@
          // ... from stream file
          when Url_getProtocol(i_url) = 'file';
             if not loadPropertiesFromStmf(propList.pMap: Url_getPath(i_url));
-               return cFalse;
+               return *off;
             endif;
             propList.url = i_url;
          when Url_getProtocol(i_url) = 'mbr';
             if not loadPropertiesFromMbr(propList.pMap: Url_getPath(i_url));
-               return cFalse;
+               return *off;
             endif;
             propList.url = 'mbr:' + %trim(g_file) + '.' + %trim(g_mbr);
          other;
             LogLog_warning('Unknown URL protocol: ' +
                             Url_getProtocol(i_url));
-            return cFalse;
+            return *off;
          endsl;
 
-         return cTrue;
+         return *on;
 
       /END-FREE
       *
@@ -700,7 +700,7 @@
      D  io_pPropList                              like(LOG4RPG_pPropertyList_t )
       *
       *  Return value
-     D isDeleted       S               N   inz(cFalse)
+     D isDeleted       S               N   inz(*off)
       *
       *  Property list handle
      D propList        DS                  likeds(handle_t    )
@@ -723,7 +723,7 @@
 
          LogLog_verbose('- Freed memory of properties list.');
 
-         isDeleted = cTrue;
+         isDeleted = *on;
 
          return isDeleted;
 
@@ -757,7 +757,7 @@
       /FREE
 
          if i_pPropList = PropertyList_null();
-            return cTrue;
+            return *on;
          else;
             return BasicMap_isNull(propList.pMap);
          endif;
@@ -803,7 +803,7 @@
      D  i_path                             const  like(LOG4RPG_path_t       )
       *
       *  Return value
-     D isLoaded        S               N   inz(cFalse)
+     D isLoaded        S               N   inz(*off)
       *
       *  Helper fields
      D hFile           S                   like(ifs_hFile_t ) inz
@@ -845,7 +845,7 @@
 
          LogLog_verbose('Loaded properties from file [' + i_path + '].');
 
-         isLoaded = cTrue;
+         isLoaded = *on;
 
          return isLoaded;
 
@@ -867,14 +867,14 @@
      D  i_path                             const  like(LOG4RPG_path_t       )
       *
       *  Return value
-     D isLoaded        S               N   inz(cFalse)
+     D isLoaded        S               N   inz(*off)
       *
       *  Helper fields
      D file            S             10A   inz
      D lib             S             10A   inz
      D member          S             10A   inz
      D length          S             10I 0 inz
-     D warnLength      S               N   inz(cFalse)
+     D warnLength      S               N   inz(*off)
       *
      D inBufMbr        DS                  qualified
      D  data                        512A
@@ -960,7 +960,7 @@
                      // LogLog_warning('Record length of properties file +
                      //                 exceeded maximum of ' +
                      //                 %char(%len(inBufMbr.data)) + ' byte.');
-                     warnLength = cTrue;
+                     warnLength = *on;
                   endif;
                else;
                   length = g_mbrInf.rcdLength;
@@ -975,7 +975,7 @@
 
          LogLog_verbose('Loaded properties from member [' + i_path + '].');
 
-         isLoaded = cTrue;
+         isLoaded = *on;
 
          return isLoaded;
 
@@ -997,7 +997,7 @@
      D  i_pString                      *   const  options(*string           )
       *
       *  Return value
-     D isLoaded        S               N   inz(cFalse)
+     D isLoaded        S               N   inz(*off)
       *
       *  Helper fields
      D pToken          S               *   inz
@@ -1014,7 +1014,7 @@
 
          LogLog_verbose('Loaded properties from string.');
 
-         isLoaded = cTrue;
+         isLoaded = *on;
 
          return isLoaded;
 
@@ -1254,7 +1254,7 @@
 
          clear objInf;
          clear listInf;
-         errCode = f_newApiErrCode(cTrue);
+         errCode = f_newApiErrCode(*on);
 
          monitor;
             QGYOLOBJ(objInf: 0: listInf: -1: sortInf: qObj: '*ALL':

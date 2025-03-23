@@ -607,7 +607,7 @@
          endif;
 
          if logEvent.startPos > 0;
-            o_isText = cTrue;
+            o_isText = *on;
             return f_wordWrap(logEvent.text
                               : i_width
                               : logEvent.startPos
@@ -615,7 +615,7 @@
                                 cWORDWRAP_PARAGRAPH_TRIMR);
          endif;
 
-         o_isText = cFalse;
+         o_isText = *off;
 
          return '';
 
@@ -684,7 +684,7 @@
      D  i_pLogEvent                        const  like(LOG4RPG_pLogEvent_t     )
       *
       *  Return value
-     D isNull          S               N   inz(cFalse)
+     D isNull          S               N   inz(*off)
       *
       *  LogEvent handle
      D logEvent        DS                  likeds(handle_t)
@@ -693,9 +693,9 @@
       /FREE
 
          if i_pLogEvent = LogEvent_null();
-            isNull = cTrue;
+            isNull = *on;
          else;
-            isNull = cFalse;
+            isNull = *off;
          endif;
 
          return isNull;

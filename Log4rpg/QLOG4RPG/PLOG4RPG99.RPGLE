@@ -63,7 +63,7 @@
      D                                     ')
      D  i_logName                          const  like(LOG4RPG_loggerName_t)
       *
-      *  Returns cTrue, if the given object name is valid, else cFalse.
+      *  Returns *ON if the given object name is valid, else *OFF.
      D isValidObjectName...
      D                 PR              N
      D                                     extproc('LOG4RPG99+

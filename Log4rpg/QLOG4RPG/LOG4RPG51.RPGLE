@@ -232,7 +232,7 @@
      D  i_prefix                           const  like(LOG4RPG_prefix_t        )
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  Helper fields
      D tempHandle      DS                  likeds(handle_t          ) inz
@@ -246,7 +246,7 @@
 
          // Initialize handle
          tempHandle.pSuper          = i_pSuper;
-         tempHandle.isOpen          = cFalse;
+         tempHandle.isOpen          = *off;
          tempHandle.hFile           = *NULL;
          tempHandle.outQ            = '*N/LOG4RPG';
          tempHandle.splfname        = 'LOG4RPG';
@@ -298,7 +298,7 @@
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
 
-         return cTrue;
+         return *on;
 
       /END-FREE
       *
@@ -325,7 +325,7 @@
      D  i_pLogEvent                        const like(LOG4RPG_pLogEvent_t )
       *
       *  Return value
-     D isDone          S               N   inz(cFalse)
+     D isDone          S               N   inz(*off)
       *
       *  Helper fields
      D isText          S               N   inz
@@ -341,7 +341,7 @@
 
          // Return if there is no text
          if LogEvent_textLength(i_pLogEvent) = 0;
-            return cTrue;
+            return *on;
          endif;
 
          // Open the appender for output is it is not yet open
@@ -375,13 +375,13 @@
                text = text;
                pRIOFB = Rwrite(handle.hFile: %addr(text)+2: %len(text));
                if RIOFB.numByt = 0;
-                  isDone = cFalse;
+                  isDone = *off;
                else;
-                  isDone = cTrue;
+                  isDone = *on;
                endif;
             on-error;
                p_rmvPgmMsg(cMsg_Rmv_All: *omit: cMsg_Same: cMsg_ToMyself);
-               isDone = cFalse;
+               isDone = *off;
             endmon;
 
             text = LogEvent_getNextLineOfText(i_pLogEvent: isText: pageWidth);
@@ -456,7 +456,7 @@
      D  io_pHandle                     *
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  Appender handle
      D handle          DS                  likeds(handle_t ) based(io_pHandle)
@@ -476,7 +476,7 @@
 
          LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
 
-         isDone = cTrue;
+         isDone = *on;
 
          return isDone;
 
@@ -497,7 +497,7 @@
      D  i_pHandle                      *   const
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  Appender handle
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
@@ -525,10 +525,10 @@
             handle.hFile = Ropen('*LIBL/QSYSPRT': 'wr');
 
             if handle.hFile = *NULL;
-               isDone = cFalse;
+               isDone = *off;
             else;
-               isDone = cTrue;
-               handle.isOpen = cTrue;
+               isDone = *on;
+               handle.isOpen = *on;
             endif;
 
          endif;
@@ -552,7 +552,7 @@
      D  i_pHandle                      *   const
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  Appender handle
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
@@ -560,11 +560,11 @@
       /FREE
 
          if Rclose(handle.hFile) = 0;
-            handle.isOpen = cFalse;
+            handle.isOpen = *off;
             handle.hFile  = *NULL;
-            isDone = cTrue;
+            isDone = *on;
          else;
-            isDone = cFalse;
+            isDone = *off;
          endif;
 
          return isDone;
@@ -586,7 +586,7 @@
      D  i_handle                           const  likeds(handle_t )
       *
       *  Return value
-     D isNewFile       S               N   inz(cFalse)
+     D isNewFile       S               N   inz(*off)
       *
       *  Helper fields
      D cmpDateValue    S                   like(i_handle.dateValue  ) inz
@@ -596,9 +596,9 @@
          cmpdateValue = replaceVariables(i_handle.datePattern);
 
          if i_handle.dateValue <> cmpDateValue;
-            isNewFile = cTrue;
+            isNewFile = *on;
          else;
-            isNewFile = cFalse;
+            isNewFile = *off;
          endif;
 
          return isNewFile;

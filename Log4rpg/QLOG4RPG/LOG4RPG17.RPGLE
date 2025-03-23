@@ -89,7 +89,7 @@
       * -----------------------------------------
       *  Global fields
       * -----------------------------------------
-     D g_isInit        S               N   inz(cFalse)
+     D g_isInit        S               N   inz(*off)
       *
       * -----------------------------------------
       *  Program status data structure
@@ -393,7 +393,7 @@
      D  io_pFilter                                like(LOG4RPG_pFilter_t       )
       *
       *  Return value
-     D isDeleted       S               N   inz(cFalse)
+     D isDeleted       S               N   inz(*off)
       *
       *  Helper fields
      D name            S                   like(filter.name  ) inz
@@ -408,7 +408,7 @@
 
          if not Repository_existFilter(filter.name);
             io_pFilter = Filter_null();
-            return cTrue;
+            return *on;
          endif;
 
          LogLog_verbose('Deleting filter [' + filter.name + '] ...');
@@ -457,9 +457,9 @@
          select;
          when i_parameter = cPARAMETER_NEXT_FILTER or
               f_startsWith(cPARAMETER_NEXT_FILTER + '.': i_parameter);
-            return cTrue;
+            return *on;
          other;
-            return cFalse;
+            return *off;
          endsl;
 
       /END-FREE
@@ -485,7 +485,7 @@
      D  i_pFilter                          const  like(LOG4RPG_pFilter_t       )
       *
       *  Return value
-     D isNull          S               N   inz(cFalse)
+     D isNull          S               N   inz(*off)
       *
       *  Filter handle
      D filter          DS                  likeds(handle_t)
@@ -494,9 +494,9 @@
       /FREE
 
          if i_pFilter = Filter_null();
-            isNull = cTrue;
+            isNull = *on;
          else;
-            isNull = cFalse;
+            isNull = *off;
          endif;
 
          return isNull;
@@ -554,7 +554,7 @@
 
          Repository_initialize();
 
-         g_isInit = cTrue;
+         g_isInit = *on;
 
          return;
 

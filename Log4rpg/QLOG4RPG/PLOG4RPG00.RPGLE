@@ -158,7 +158,7 @@
      D  i_level                            const  like(LOG4RPG_level_t)
      D  i_msg                              const  likeds(LOG4RPG_msg_t)
       *
-      *  Returns cTrue if 'DEBUG' log events are logged.
+      *  Returns *ON if 'DEBUG' log events are logged.
      D Impl_Logger_isDebugEnabled...
      D                 PR              N
      D                                     extproc(
@@ -166,7 +166,7 @@
      D                                     )
      D  i_hLogger                          const  like(LOG4RPG_hLogger_t)
       *
-      *  Returns cTrue if 'INFO' log events are logged.
+      *  Returns *ON if 'INFO' log events are logged.
       *  (Including DEBUG log events)
      D Impl_Logger_isInfoEnabled...
      D                 PR              N
@@ -175,7 +175,7 @@
      D                                     )
      D  i_hLogger                          const  like(LOG4RPG_hLogger_t)
       *
-      *  Returns cTrue if 'WARN' log events are logged.
+      *  Returns *ON if 'WARN' log events are logged.
       *  (Including INFO and DEBUG log events)
      D Impl_Logger_isWarnEnabled...
      D                 PR              N
@@ -184,7 +184,7 @@
      D                                     )
      D  i_hLogger                          const  like(LOG4RPG_hLogger_t)
       *
-      *  Returns cTrue if 'ERROR' log events are logged.
+      *  Returns *ON if 'ERROR' log events are logged.
       *  (Including WARN, INFO and DEBUG log events)
      D Impl_Logger_isErrorEnabled...
      D                 PR              N
@@ -193,7 +193,7 @@
      D                                     )
      D  i_hLogger                          const  like(LOG4RPG_hLogger_t)
       *
-      *  Returns cTrue if 'FATAL' log events are logged.
+      *  Returns *ON if 'FATAL' log events are logged.
       *  (Including ERROR, WARN, INFO and DEBUG log events)
      D Impl_Logger_isFatalEnabled...
      D                 PR              N

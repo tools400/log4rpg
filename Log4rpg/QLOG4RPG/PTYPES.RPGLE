@@ -18,11 +18,13 @@
      D cROOT_LOGGER...
      D                 C                   'root'
       *
+      * @deprecated, use *on instead
       /IF NOT DEFINED(cTrue)
       /DEFINE cTrue
      D cTrue           C                   *on
       /ENDIF
       *
+      * @deprecated, use *off instead
       /IF NOT DEFINED(cFalse)
       /DEFINE cFalse
      D cFalse          C                   *off

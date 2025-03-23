@@ -130,7 +130,7 @@
      D                 PR
      D  i_hLogger                          const  like(LOG4RPG_hLogger_t   )
       *
-      *  Returns cTrue if logging is enabled.
+      *  Returns *ON if logging is enabled.
      D isLoggingEnabled...
      D                 PR              N
      D  i_hLogger                          const  like(LOG4RPG_hLogger_t )
@@ -198,10 +198,10 @@
       * -----------------------------------------
       *  Global fields
       * -----------------------------------------
-     D g_isLogging     S               N   inz(cTrue)
-     D g_isInit        S               N   inz(cFalse)
+     D g_isLogging     S               N   inz(*on)
+     D g_isInit        S               N   inz(*off)
      D g_warnRootNoAppender...
-     D                 S               N   inz(cFalse)
+     D                 S               N   inz(*off)
      D g_stubOfs       S              3I 0 inz(0)
       *
       * -----------------------------------------
@@ -232,10 +232,10 @@
       /FREE
 
          if i_isLogging;
-            g_isLogging = cTrue;
+            g_isLogging = *on;
             LogLog_verbose('LOG4RPG is enabled now.');
          else;
-            g_isLogging = cFalse;
+            g_isLogging = *off;
             LogLog_verbose('LOG4RPG is disabled now.');
          endif;
 
@@ -264,9 +264,9 @@
       /FREE
 
          if g_isLogging;
-            return cTrue;
+            return *on;
          else;
-            return cFalse;
+            return *off;
          endif;
 
       /END-FREE
@@ -443,14 +443,14 @@
      P                 E
       *
       *=========================================================================
-      *  Returns cTrue if 'DEBUG' log events are logged.
+      *  Returns *ON if 'DEBUG' log events are logged.
       *=========================================================================
       *  Parameters:
       *   i_hLogger     - Handle of the logger as it was returned by
       *                   Logger_getLogger() or Logger_getRootLogger().
       *
       *  Returns:
-      *   isEnabled     - cTrue if 'DEBUG' log events are logged, else cFalse.
+      *   isEnabled     - *ON if 'DEBUG' log events are logged, else *OFF.
       *=========================================================================
      P Logger_isDebugEnabled...
      P                 B                   export
@@ -460,7 +460,7 @@
      D  i_hLogger                          const  like(LOG4RPG_hLogger_t )
       *
       *  Return value
-     D isEnabled       S               N   inz(cFalse)
+     D isEnabled       S               N   inz(*off)
       *
       *  Logger handle
      D logger          DS                  likeds(LOG4RPG_logger_t)
@@ -470,7 +470,7 @@
 
          // Return to caller if logging is disabled.
          if (not isLoggingEnabled(i_hLogger));
-            return cFalse;
+            return *off;
          endif;
 
          isEnabled =
@@ -584,7 +584,7 @@
      P                 E
       *
       *=========================================================================
-      *  Returns cTrue if 'INFO' log events are logged.
+      *  Returns *ON if 'INFO' log events are logged.
       *  (Including DEBUG log events)
       *=========================================================================
       *  Parameters:
@@ -592,7 +592,7 @@
       *                   Logger_getLogger() or Logger_getRootLogger().
       *
       *  Returns:
-      *   isEnabled     - cTrue if 'INFO' log events are logged, else cFalse.
+      *   isEnabled     - *ON if 'INFO' log events are logged, else *OFF.
       *=========================================================================
      P Logger_isInfoEnabled...
      P                 B                   export
@@ -602,7 +602,7 @@
      D  i_hLogger                          const  like(LOG4RPG_hLogger_t )
       *
       *  Return value
-     D isEnabled       S               N   inz(cFalse)
+     D isEnabled       S               N   inz(*off)
       *
       *  Logger handle
      D logger          DS                  likeds(LOG4RPG_logger_t)
@@ -612,7 +612,7 @@
 
          // Return to caller if logging is disabled.
          if (not isLoggingEnabled(i_hLogger));
-            return cFalse;
+            return *off;
          endif;
 
          isEnabled =
@@ -726,7 +726,7 @@
      P                 E
       *
       *=========================================================================
-      *  Returns cTrue if 'WARN' log events are logged.
+      *  Returns *ON if 'WARN' log events are logged.
       *  (Including INFO and DEBUG log events)
       *=========================================================================
       *  Parameters:
@@ -734,7 +734,7 @@
       *                   Logger_getLogger() or Logger_getRootLogger().
       *
       *  Returns:
-      *   isEnabled     - cTrue if 'WARN' log events are logged, else cFalse.
+      *   isEnabled     - *ON if 'WARN' log events are logged, else *OFF.
       *=========================================================================
      P Logger_isWarnEnabled...
      P                 B                   export
@@ -744,7 +744,7 @@
      D  i_hLogger                          const  like(LOG4RPG_hLogger_t )
       *
       *  Return value
-     D isEnabled       S               N   inz(cFalse)
+     D isEnabled       S               N   inz(*off)
       *
       *  Logger handle
      D logger          DS                  likeds(LOG4RPG_logger_t)
@@ -754,7 +754,7 @@
 
          // Return to caller if logging is disabled.
          if (not isLoggingEnabled(i_hLogger));
-            return cFalse;
+            return *off;
          endif;
 
          isEnabled =
@@ -868,7 +868,7 @@
      P                 E
       *
       *=========================================================================
-      *  Returns cTrue if 'ERROR' log events are logged.
+      *  Returns *ON if 'ERROR' log events are logged.
       *  (Including WARN, INFO and DEBUG log events)
       *=========================================================================
       *  Parameters:
@@ -876,7 +876,7 @@
       *                   Logger_getLogger() or Logger_getRootLogger().
       *
       *  Returns:
-      *   isEnabled     - cTrue if 'ERROR' log events are logged, else cFalse.
+      *   isEnabled     - *ON if 'ERROR' log events are logged, else *OFF.
       *=========================================================================
      P Logger_isErrorEnabled...
      P                 B                   export
@@ -886,7 +886,7 @@
      D  i_hLogger                          const  like(LOG4RPG_hLogger_t )
       *
       *  Return value
-     D isEnabled       S               N   inz(cFalse)
+     D isEnabled       S               N   inz(*off)
       *
       *  Logger handle
      D logger          DS                  likeds(LOG4RPG_logger_t)
@@ -896,7 +896,7 @@
 
          // Return to caller if logging is disabled.
          if (not isLoggingEnabled(i_hLogger));
-            return cFalse;
+            return *off;
          endif;
 
          isEnabled =
@@ -1010,7 +1010,7 @@
      P                 E
       *
       *=========================================================================
-      *  Returns cTrue if 'FATAL' log events are logged.
+      *  Returns *ON if 'FATAL' log events are logged.
       *  (Including ERROR, WARN, INFO and DEBUG log events)
       *=========================================================================
       *  Parameters:
@@ -1018,7 +1018,7 @@
       *                   Logger_getLogger() or Logger_getRootLogger().
       *
       *  Returns:
-      *   isEnabled     - cTrue if 'FATAL' log events are logged, else cFalse.
+      *   isEnabled     - *ON if 'FATAL' log events are logged, else *OFF.
       *=========================================================================
      P Logger_isFatalEnabled...
      P                 B                   export
@@ -1028,7 +1028,7 @@
      D  i_hLogger                          const  like(LOG4RPG_hLogger_t )
       *
       *  Return value
-     D isEnabled       S               N   inz(cFalse)
+     D isEnabled       S               N   inz(*off)
       *
       *  Logger handle
      D logger          DS                  likeds(LOG4RPG_logger_t)
@@ -1038,7 +1038,7 @@
 
          // Return to caller if logging is disabled.
          if (not isLoggingEnabled(i_hLogger));
-            return cFalse;
+            return *off;
          endif;
 
          isEnabled =
@@ -1908,14 +1908,14 @@
 
          // Return to caller if logger is NULL
          if Node_isNull(i_hNode);
-            return cFalse;
+            return *off;
          else;
             if logger.node <> cLOG4RPG_NODE_PROVISION;
-               return cFalse;
+               return *off;
             endif;
          endif;
 
-         return cTrue;
+         return *on;
 
       /END-FREE
       *
@@ -1950,14 +1950,14 @@
 
          // Return to caller if logger is NULL
          if Node_isNull(i_hNode);
-            return cFalse;
+            return *off;
          else;
             if logger.node <> cLOG4RPG_NODE_LOGGER;
-               return cFalse;
+               return *off;
             endif;
          endif;
 
-         return cTrue;
+         return *on;
 
       /END-FREE
       *
@@ -2268,10 +2268,10 @@
       /FREE
 
          if i_hNode = Node_null();
-            return cTrue;
+            return *on;
          endif;
 
-         return cFalse;
+         return *off;
 
       /END-FREE
      P                 E
@@ -2895,7 +2895,7 @@
       *
       *=========================================================================
     R *  *** Private ***
-      *  Returns cTrue if logging is enabled.
+      *  Returns *ON if logging is enabled.
       *=========================================================================
      P isLoggingEnabled...
      P                 B
@@ -2912,12 +2912,12 @@
 
          // Return to caller if logging is disabled.
          if not Logger_isLogging();
-            return cFalse;
+            return *off;
          endif;
 
          // Return to caller if logger is NULL
          if Logger_isNull(i_hLogger);
-            return cFalse;
+            return *off;
          endif;
 
          // Reload properties (if reloading has been enabled)
@@ -2925,10 +2925,10 @@
 
          // Return to caller if logger does not exist
          if not Repository_existLogger(logger.name);
-            return cFalse;
+            return *off;
          endif;
 
-         return cTrue;
+         return *on;
 
       /END-FREE
       *
@@ -2990,7 +2990,7 @@
      D p_errMsg        C                   5
       *
       *  Helper fields
-     D isMsgRtvErr     S               N   inz(cFalse)
+     D isMsgRtvErr     S               N   inz(*off)
      D msgRtvErrText   S            128A   inz
       *
      D x               S             10I 0 inz
@@ -3019,7 +3019,7 @@
             if (logger.name = cROOT_LOGGER) and not g_warnRootNoAppender;
                LogLog_warning('No appenders could be found for logger [root]');
                LogLog_warning('Please initialize the log4rpg system properly.');
-               g_warnRootNoAppender = cTrue;
+               g_warnRootNoAppender = *on;
             endif;
             return;
          endif;
@@ -3041,7 +3041,7 @@
                                 %trim(CPF2419.msgFLib) + '/' +
                                 %trim(CPF2419.msgF);
                LogLog_error(msgRtvErrText);
-               isMsgRtvErr = cTrue;
+               isMsgRtvErr = *on;
             endif;
          endif;
 
@@ -3228,7 +3228,7 @@
             // Configurator_loadDefaultConfiguration();
          endif;
 
-         g_isInit = cTrue;
+         g_isInit = *on;
 
          return;
 

@@ -165,10 +165,10 @@
       *=========================================================================
       *  Converts a given property to a RPG boolean value.
       *=========================================================================
-      *  Example:   0     ->   cFalse
-      *             1     ->   cTrue
-      *             false ->   cFalse
-      *             true  ->   cTrue
+      *  Example:   0     ->   *OFF
+      *             1     ->   *ON
+      *             false ->   *OFF
+      *             true  ->   *ON
       *=========================================================================
      P OptionConverter_toBoolean...
      P                 B                   export
@@ -193,9 +193,9 @@
 
          select;
          when (string = '1' or string = 'true');
-            return cTrue;
+            return *on;
          when (string = '0' or string = 'false');
-            return cFalse;
+            return *off;
          endsl;
 
          return i_default;

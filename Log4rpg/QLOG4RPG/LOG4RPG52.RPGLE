@@ -110,7 +110,7 @@
      D  i_prefix                           const  like(LOG4RPG_prefix_t        )
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  Appender handle
      D handle          DS                  likeds(handle_t ) based(io_pHandle)
@@ -148,7 +148,7 @@
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
 
-         return cFalse;
+         return *off;
 
       /END-FREE
       *
@@ -175,14 +175,14 @@
      D  i_pLogEvent                        const like(LOG4RPG_pLogEvent_t )
       *
       *  Return value
-     D isDone          S               N   inz(cFalse)
+     D isDone          S               N   inz(*off)
       *
       *  Appender handle
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
 
-         isDone = cTrue;
+         isDone = *on;
 
          return isDone;
 
@@ -243,7 +243,7 @@
      D  io_pHandle                     *
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  Appender handle
      D handle          DS                  likeds(handle_t ) based(io_pHandle)
@@ -252,7 +252,7 @@
 
          LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
 
-         isDone = cTrue;
+         isDone = *on;
 
          return isDone;
 

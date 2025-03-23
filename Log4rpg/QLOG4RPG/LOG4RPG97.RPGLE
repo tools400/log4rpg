@@ -75,7 +75,7 @@
      D  reserved_4                    4A
      D  alcTime                        Z
       *
-     D g_isLogMode     S               N   inz(cFalse)
+     D g_isLogMode     S               N   inz(*off)
      D g_objectDesc    S             50A   varying inz
       *
       * -----------------------------------------
@@ -143,7 +143,7 @@
      D                                            options(*nopass: *omit)
       *
       *  Return value
-     D isStarted       S               N   inz(cFalse)
+     D isStarted       S               N   inz(*off)
       *
       *  Parameter positions
      D p_msg           C                   const(4)
@@ -197,7 +197,7 @@
 
             o_ticket.jobName = g_syncData.jobName;
             o_ticket.alcTime = g_syncData.alcTime;
-            isStarted = cTrue;
+            isStarted = *on;
          enddo;
 
          if (msg.ID <> cMSG_ID_OK);

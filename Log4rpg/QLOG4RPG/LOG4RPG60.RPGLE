@@ -131,7 +131,7 @@
      D  i_prefix                           const  like(LOG4RPG_prefix_t        )
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  Helper fields
      D tempHandle      DS                  likeds(handle_t ) inz
@@ -388,7 +388,7 @@
      D  io_pHandle                     *
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  PatternLayout handle
      D handle          DS                  likeds(handle_t ) based(io_pHandle)
@@ -403,7 +403,7 @@
 
          LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
 
-         isDone = cTrue;
+         isDone = *on;
 
          return isDone;
 
@@ -492,7 +492,7 @@
          qjob.name = '*';
          qjob.user = '';
          qjob.nbr  = '';
-         errCode = f_newApiErrCode(cTrue);
+         errCode = f_newApiErrCode(*on);
          QUSRJOBI(jobi0600: %size(jobi0600): 'JOBI0600': qJob: '': errCode);
 
          return jobi0600;

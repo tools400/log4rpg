@@ -151,7 +151,7 @@
      D  i_prefix                           const  like(LOG4RPG_prefix_t        )
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  Helper fields
      D tempHandle      DS                  likeds(handle_t          ) inz
@@ -165,7 +165,7 @@
 
          // Initialize handle
          tempHandle.pSuper        = i_pSuper;   // Handle of the super class 'Layout'
-         tempHandle.rplUnprtChars = cFalse;
+         tempHandle.rplUnprtChars = *off;
          tempHandle.substitutionChar = '�';
          tempHandle.encoding         = '';
 
@@ -208,7 +208,7 @@
       *
       *  Helper fields
      D xmlString       S                   like(LOG4RPG_formattedText_t) inz
-     D isStarted       S               N   inz(cFalse)
+     D isStarted       S               N   inz(*off)
      D pPropList       S                   like(LOG4RPG_pPropertyList_t ) inz
      D caller          DS                  likeds(LOG4RPG_caller_t      ) inz
      D property        DS                  likeds(LOG4RPG_property_t    ) inz
@@ -295,14 +295,14 @@
 
             propIter = PropertyList_getIterator(pPropList);
 
-            isStarted = cFalse;
+            isStarted = *off;
             property = PropertyList_getFirst(propIter);
 
             dow property.key <> '';
 
                if not isStarted;
                   xmlString = xmlString + '<log4j:properties>';
-                  isStarted = cTrue;
+                  isStarted = *on;
                endif;
 
                xmlString = xmlString +
@@ -471,7 +471,7 @@
      D  io_pHandle                     *
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  XMLLayout handle
      D handle          DS                  likeds(handle_t ) based(io_pHandle)
@@ -486,7 +486,7 @@
 
          LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
 
-         isDone = cTrue;
+         isDone = *on;
 
          return isDone;
 
@@ -533,9 +533,9 @@
                select;
                when parameter = cPARAMETER_REPLACE_UNPRINTABLE_CHARACTERS;
                   if property.value = '1' or f_lcase(property.value) = 'true';
-                     io_handle.rplUnprtChars = cTrue;
+                     io_handle.rplUnprtChars = *on;
                   else;
-                     io_handle.rplUnprtChars = cFalse;
+                     io_handle.rplUnprtChars = *off;
                   endif;
                when parameter = cPARAMETER_SUBSTITUTION_CHARACTER;
                   io_handle.substitutionChar = property.value;

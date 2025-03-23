@@ -168,7 +168,7 @@
      D  i_string                           const  like(handle_t.datePattern )
      D  i_time                         Z   const
       *
-      *  Returns cTrue if there is a rename error. Resets the error after
+      *  Returns *ON if there is a rename error. Resets the error after
       *  a reasonable amount of time.
      D checkAndHandleRenameError...
      D                 PR              N
@@ -280,7 +280,7 @@
      D  i_prefix                           const  like(LOG4RPG_prefix_t        )
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  Helper fields
      D tempHandle      DS                  likeds(handle_t          ) inz
@@ -295,7 +295,7 @@
 
          // Initialize handle
          tempHandle.pSuper          = i_pSuper;   // Handle of the super class 'Appender'
-         tempHandle.isOpen          = cFalse;
+         tempHandle.isOpen          = *off;
          tempHandle.hFile           = 0;
          tempHandle.path            = 'log4rpg.log';
          tempHandle.datePattern     = '.yyyy-MM-dd';
@@ -351,7 +351,7 @@
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
 
-         return cTrue;
+         return *on;
 
       /END-FREE
       *
@@ -378,7 +378,7 @@
      D  i_pLogEvent                        const like(LOG4RPG_pLogEvent_t )
       *
       *  Return value
-     D isDone          S               N   inz(cFalse)
+     D isDone          S               N   inz(*off)
       *
       *  Helper fields
      D archive         S                   like(LOG4RPG_path_t)           inz
@@ -398,13 +398,13 @@
 
          // Return if there is no text
          if LogEvent_textLength(i_pLogEvent) = 0;
-            return cTrue;
+            return *on;
          endif;
 
          // Open the appender for output is it is not yet open
          if not handle.isOpen;
             if not openAppender(i_pHandle);
-               return cFalse;
+               return *off;
             endif;
          endif;
 
@@ -414,7 +414,7 @@
 
             dou '1';
 
-               isRenameError = cFalse;
+               isRenameError = *off;
 
                // Start synchronisation with concurrent jobs
                if (handle.share);
@@ -422,7 +422,7 @@
                                                 : handle.qSyncObj.lib
                                                 : ticket: msg));
                      LogLog_errorMsg(msg);
-                     isRenameError = cTrue;
+                     isRenameError = *on;
                      leave;
                   endif;
                endif;
@@ -432,9 +432,9 @@
                // has to switch to the new file.
                if (not handle.share or
                    f_getIfsFileID(handle.path) = handle.fileID);
-                  isNewFile = cTrue;
+                  isNewFile = *on;
                else;
-                  isNewFile = cFalse;
+                  isNewFile = *off;
                endif;
 
                if handle.isOpen;
@@ -448,7 +448,7 @@
                   archive =%trimR(f_rtvIfsFileFromPath(getArchivePath(handle)));
                   if (f_renameIfsFile(handle.path: archive: msg) <> 0);
                      LogLog_errorMsg(msg);
-                     isRenameError = cTrue;
+                     isRenameError = *on;
                   endif;
                endif;
 
@@ -468,7 +468,7 @@
             endif;
 
             if (not handle.isOpen);
-               return cFalse;
+               return *off;
             endif;
 
          endif;
@@ -486,9 +486,9 @@
                LogLog_error('Failed to write logEevent to file [' +
                             handle.path + ']');
                LogLog_errorMsg(msg);
-               isDone = cFalse;
+               isDone = *off;
             else;
-               isDone = cTrue;
+               isDone = *on;
             endif;
             text = LogEvent_getNextLineOfText(i_pLogEvent: isText: lineLength);
          enddo;
@@ -554,7 +554,7 @@
      D  io_pHandle                     *
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  Appender handle
      D handle          DS                  likeds(handle_t ) based(io_pHandle)
@@ -574,7 +574,7 @@
 
          LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
 
-         isDone = cTrue;
+         isDone = *on;
 
          return isDone;
 
@@ -595,7 +595,7 @@
      D  i_pHandle                      *   const
       *
       *  Helper fields
-     D isNewFile       S               N   inz(cFalse)
+     D isNewFile       S               N   inz(*off)
      D crtTime         S               Z   inz
      D SHARE_MODE      S             10I 0 inz
      D msg             DS                  likeds(msg_t          ) inz
@@ -629,7 +629,7 @@
                                                  : *omit: msg);
          if handle.hFile = cIFS_ERROR;
             LogLog_errorMsg(msg);
-            return cFalse;
+            return *off;
          endif;
 
          // Set end of livetime of file
@@ -637,7 +637,7 @@
          handle.dateValue = replaceVariables(handle.datePattern: crtTime);
 
          // Mark file as "open"
-         handle.isOpen = cTrue;
+         handle.isOpen = *on;
 
          // Remember the unique file ID
          handle.fileID = f_getIfsFileIDH(handle.hFile);
@@ -647,7 +647,7 @@
             appendHeader(i_pHandle);
          endif;
 
-         return cTrue;
+         return *on;
 
       /END-FREE
       *
@@ -666,7 +666,7 @@
      D  i_pHandle                      *   const
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  Appender handle
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
@@ -674,11 +674,11 @@
       /FREE
 
          if f_closeIfsFile(handle.hFile) = 0;
-            handle.isOpen = cFalse;
+            handle.isOpen = *off;
             handle.hFile  = 0;
-            isDone = cTrue;
+            isDone = *on;
          else;
-            isDone = cFalse;
+            isDone = *off;
          endif;
 
          return isDone;
@@ -700,7 +700,7 @@
      D  i_pHandle                      *   const
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  Helper fields
      D header          S                   like(LOG4RPG_header_t ) inz
@@ -743,7 +743,7 @@
      D  i_pHandle                      *   const
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  Helper fields
      D footer          S                   like(LOG4RPG_footer_t ) inz
@@ -787,7 +787,7 @@
      D  i_text                             const  like(LOG4RPG_formattedText_t )
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  Helper fields
      D text            S                   like(i_text           ) inz
@@ -842,7 +842,7 @@
      D  i_handle                           const  likeds(handle_t )
       *
       *  Return value
-     D isNewFile       S               N   inz(cFalse)
+     D isNewFile       S               N   inz(*off)
       *
       *  Helper fields
      D cmpDateValue    S                   like(i_handle.dateValue  ) inz
@@ -853,9 +853,9 @@
 
          if i_handle.dateValue <> cmpDateValue or
             not f_isIfsFile(i_handle.path: *omit);
-            isNewFile = cTrue;
+            isNewFile = *on;
          else;
-            isNewFile = cFalse;
+            isNewFile = *off;
          endif;
 
          return isNewFile;
@@ -919,7 +919,7 @@
       *
       *=====================================================================*
     R *  *** Private ***
-      *  Returns cTrue if there is a rename error. Resets the error after
+      *  Returns *ON if there is a rename error. Resets the error after
       *  a reasonable amount of time.
       *=====================================================================*
      P checkAndHandleRenameError...
@@ -933,17 +933,17 @@
       /FREE
 
          if (handle.lastRnmErr = *LOVAL);
-            return cFalse;
+            return *off;
          endif;
 
          if (%diff(%timestamp(): handle.lastRnmErr: *DAYS) > 1 or
              %diff(%timestamp(): handle.lastRnmErr: *SECONDS) > 600);
             // try again
             clearRenameError(i_pHandle);
-            return cFalse;
+            return *off;
          endif;
 
-         return cTrue;
+         return *on;
 
       /END-FREE
      P                 E

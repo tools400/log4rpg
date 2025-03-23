@@ -243,10 +243,10 @@
       * -----------------------------------------
       *  Global fields
       * -----------------------------------------
-     D g_isInit        S               N   inz(cFalse)
+     D g_isInit        S               N   inz(*off)
       *
      D g_autoReload    DS                  qualified
-     D  isAutoReload                   N   inz(cFalse)
+     D  isAutoReload                   N   inz(*off)
      D  waitTime                     10I 0 inz
      D  unit                         10A   inz
      D  reloadURL                          like(url_t ) inz
@@ -284,7 +284,7 @@
      D                 PI              N
       *
       *  Return value
-     D isConfigured    S               N   inz(cFalse)
+     D isConfigured    S               N   inz(*off)
       *
       *  Helper fields
      D property        DS                  likeds(LOG4RPG_Property_t    ) inz
@@ -345,7 +345,7 @@
          LogLog_debug('Finished loading default configuration.');
          LogLog_debug('LOG4RPG is configured, now.');
 
-         isConfigured = cTrue;
+         isConfigured = *on;
 
          return isConfigured;
 
@@ -376,7 +376,7 @@
      D  i_path                             const  like(LOG4RPG_path_t   )
       *
       *  Return value
-     D isConfigured    S               N   inz(cFalse)
+     D isConfigured    S               N   inz(*off)
       *
       *  Helper fields
      D realPath        S                   like(LOG4RPG_path_t          ) inz
@@ -395,7 +395,7 @@
             return isConfigured;
          endif;
 
-         isConfigured = cTrue;
+         isConfigured = *on;
 
          return isConfigured;
 
@@ -428,7 +428,7 @@
      D  i_unit                       10A   const  options(*nopass)
       *
       *  Return value
-     D isConfigured    S               N   inz(cFalse)
+     D isConfigured    S               N   inz(*off)
       *
       *  Parameter positions
      D p_waitTime      C                   const(2)
@@ -477,11 +477,11 @@
             return isConfigured;
          endif;
 
-         if (g_autoReload.isAutoReload = cTrue and i_path <> realPath);
+         if (g_autoReload.isAutoReload = *on and i_path <> realPath);
             AutoReload_enable(realPath: waitTime: unit);
          endif;
 
-         isConfigured = cTrue;
+         isConfigured = *on;
 
          return isConfigured;
 
@@ -577,14 +577,14 @@
      P                 E
       *
       *=========================================================================
-      *  Returns cTrue if automatic reloading of the configuration is
-      *  enabled, else cFalse.
+      *  Returns *ON if automatic reloading of the configuration is
+      *  enabled, else *OFF.
       *=========================================================================
       *  Parameters:
       *   void
       *
       *  Returns:
-      *   isAutoReload  - Returns cTrue if auto-reload is enabled, else cFalse.
+      *   isAutoReload  - Returns *ON if auto-reload is enabled, else *OFF.
       *=========================================================================
      P Configurator_isAutoReload...
      P                 B                   export
@@ -614,10 +614,10 @@
      D  o_realPath                                like(LOG4RPG_path_t   )
       *
       *  Return value
-     D isConfigured    S               N   inz(cFalse)
+     D isConfigured    S               N   inz(*off)
       *
       *  Helper fields
-     D isLoaded        S               N   inz(cFalse)
+     D isLoaded        S               N   inz(*off)
      D url             S                   like(url_t                   ) inz
      D pPropList       S                   like(LOG4RPG_pPropertyList_t ) inz
      D msg             DS                  likeds(msg_t                 ) inz
@@ -654,7 +654,7 @@
                       URL_toString(url));
          LogLog_debug('LOG4RPG is configured, now.');
 
-         isConfigured = cTrue;
+         isConfigured = *on;
 
          return isConfigured;
 
@@ -798,11 +798,11 @@
             value = f_lcase(PropertyList_get(i_pPropList: cPROPERTY_LOG4RPG));
             select;
             when (value = '1') or (value = 'true') or (value = 'on');
-               Logger_setLogging(cTrue);
+               Logger_setLogging(*on);
             when (value = '0') or (value = 'false') or (value = 'off');
                LogLog_debug('Log4rpg disabled. +
                              Stopped configuration procedure.');
-               Logger_setLogging(cFalse);
+               Logger_setLogging(*off);
                return;
             other;
                LogLog_warning('Invalid value specified for property ''' +
@@ -1065,7 +1065,7 @@
      D nextFilterName  S                   like(LOG4RPG_filterName_t    ) inz
      D key             S                   like(LOG4RPG_property_key_t  ) inz
      D isLocalFilterMap...
-     D                 S               N   inz(cFalse)
+     D                 S               N   inz(*off)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
 
@@ -1089,10 +1089,10 @@
 
          if %parms() >= p_pFilterMap;
             pFilterMap = i_pFilterMap;
-            isLocalFilterMap = cFalse;
+            isLocalFilterMap = *off;
          else;
             pFilterMap = BasicMap_new();
-            isLocalFilterMap = cTrue;
+            isLocalFilterMap = *on;
          endif;
 
          BasicMap_put(pFilterMap: i_filterName: '*');
@@ -1188,7 +1188,7 @@
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
 
-         g_autoReload.isAutoReload = cFalse;
+         g_autoReload.isAutoReload = *off;
          g_autoReload.waitTime     = 0;
          g_autoReload.unit         = '*N';
          g_autoReload.reloadURL    = '';
@@ -1228,7 +1228,7 @@
             return;
          endif;
 
-         g_autoReload.isAutoReload = cTrue;
+         g_autoReload.isAutoReload = *on;
          g_autoReload.waitTime     = i_time;
          g_autoReload.reloadURL    = i_url;
          g_autoReload.unit         = i_unit;
@@ -1390,7 +1390,7 @@
 
          Repository_initialize();
 
-         g_isInit = cTrue;
+         g_isInit = *on;
 
          return;
 

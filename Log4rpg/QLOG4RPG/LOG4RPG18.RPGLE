@@ -440,7 +440,7 @@
      D  io_pFltList                               like(LOG4RPG_pFilterList_t )
       *
       *  Return value
-     D isDeleted       S               N   inz(cFalse)
+     D isDeleted       S               N   inz(*off)
       *
       *  Helper fields
      D name            S                   like(LOG4RPG_filterName_t  ) inz
@@ -455,7 +455,7 @@
       /FREE
 
          if BasicMap_isNull(fltList.pMap);
-            return cTrue;
+            return *on;
          endif;
 
          LogLog_verbose('Deleting filter list ...');
@@ -474,9 +474,9 @@
          enddo;
 
          if BasicMap_delete(fltList.pMap) = 0;
-            isDeleted = cTrue;
+            isDeleted = *on;
          else;
-            isDeleted = cFalse;
+            isDeleted = *off;
          endif;
 
          clear fltList;
@@ -517,7 +517,7 @@
       /FREE
 
          if i_pFltList = FilterList_null();
-            return cTrue;
+            return *on;
          else;
             return BasicMap_isNull(fltList.pMap);
          endif;

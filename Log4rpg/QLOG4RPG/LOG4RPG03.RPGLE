@@ -108,7 +108,7 @@
       * -----------------------------------------
       *  Global fields
       * -----------------------------------------
-     D g_isInit        S               N   inz(cFalse)
+     D g_isInit        S               N   inz(*off)
       *
       * -----------------------------------------
       *  Program status data structure
@@ -238,7 +238,7 @@
      D  i_pLogEvent                        const  like(LOG4RPG_pLogEvent_t     )
       *
       *  Return value
-     D isAppended      S               N   inz(cFalse)
+     D isAppended      S               N   inz(*off)
       *
       *  Helper fields
      D decision        S             10I 0 inz
@@ -256,7 +256,7 @@
             decision = Filter_decide(pFilter: i_pLogEvent);
             select;
             when decision = cFILTER_DENY;
-               return cFalse;
+               return *off;
             when decision = cFILTER_ACCEPT;
                leave;
             when decision = cFILTER_NEUTRAL;
@@ -402,7 +402,7 @@
      D  io_pAppender                              like(LOG4RPG_pAppender_t     )
       *
       *  Return value
-     D isDeleted       S               N   inz(cFalse)
+     D isDeleted       S               N   inz(*off)
       *
       *  Helper fields
      D name            S                   like(appender.name  ) inz
@@ -417,7 +417,7 @@
 
          if not Repository_existAppender(appender.name);
             io_pAppender = Appender_null();
-            return cTrue;
+            return *on;
          endif;
 
          LogLog_verbose('Deleting appender [' + appender.name + '] ...');
@@ -472,7 +472,7 @@
      D  i_pAppender                        const  like(LOG4RPG_pAppender_t     )
       *
       *  Return value
-     D reqLayout       S               N   inz(cFalse)
+     D reqLayout       S               N   inz(*off)
       *
       *  Appender handle
      D appender        DS                  likeds(handle_t)
@@ -518,7 +518,7 @@
 
          appender.pLayout = i_pLayout;
 
-         return cTrue;
+         return *on;
 
       /END-FREE
       *
@@ -555,7 +555,7 @@
          if Filter_isNull(i_pFilter);
             LogLog_warning('Filter is NULL. Please check call from [' +
                            f_caller() + '] to [' + f_this() + '].');
-            return cFalse;
+            return *off;
          endif;
 
          filterName = Filter_getName(i_pFilter);
@@ -563,7 +563,7 @@
          if not Repository_existFilter(filterName);
             LogLog_warning('Filter [' + filterName +
                            '] does not exist in repository.');
-            return cFalse;
+            return *off;
          endif;
 
          appender.pFilter = i_pFilter;
@@ -571,7 +571,7 @@
          LogLog_debug('Filter [' + filterName +
                       '] attached to appender [' + appender.name + '].');
 
-         return cTrue;
+         return *on;
 
       /END-FREE
       *
@@ -631,12 +631,12 @@
          select;
          when i_parameter = cPARAMETER_LAYOUT or
               f_startsWith(cPARAMETER_LAYOUT + '.': i_parameter);
-            return cTrue;
+            return *on;
          when i_parameter = cPARAMETER_FILTER or
               f_startsWith(cPARAMETER_FILTER + '.': i_parameter);
-            return cTrue;
+            return *on;
          other;
-            return cFalse;
+            return *off;
          endsl;
 
       /END-FREE
@@ -662,7 +662,7 @@
      D  i_pAppender                        const  like(LOG4RPG_pAppender_t     )
       *
       *  Return value
-     D isNull          S               N   inz(cFalse)
+     D isNull          S               N   inz(*off)
       *
       *  Appender handle
      D appender        DS                  likeds(handle_t)
@@ -671,9 +671,9 @@
       /FREE
 
          if i_pAppender = Appender_null();
-            isNull = cTrue;
+            isNull = *on;
          else;
-            isNull = cFalse;
+            isNull = *off;
          endif;
 
          return isNull;
@@ -731,7 +731,7 @@
 
          Repository_initialize();
 
-         g_isInit = cTrue;
+         g_isInit = *on;
 
          return;
 

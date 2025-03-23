@@ -143,7 +143,7 @@
      D                                           likeds(LOG4RPG_classAppender_t)
       *
       *  Return value
-     D isResolved      S               N   inz(cFalse)
+     D isResolved      S               N   inz(*off)
       *
       *  Helper fields
      D srvPgm          DS                  likeds(qObj_t                 ) inz
@@ -219,7 +219,7 @@
 
          o_classAppender = tempClassAppender;
 
-         isResolved = cTrue;
+         isResolved = *on;
 
          return isResolved;
 
@@ -249,7 +249,7 @@
      D  o_classLayout                            likeds(LOG4RPG_classLayout_t  )
       *
       *  Return value
-     D isResolved      S               N   inz(cFalse)
+     D isResolved      S               N   inz(*off)
       *
       *  Helper fields
      D srvPgm          DS                  likeds(qObj_t                 ) inz
@@ -333,7 +333,7 @@
 
          o_classLayout = tempClassLayout;
 
-         isResolved = cTrue;
+         isResolved = *on;
 
          return isResolved;
 
@@ -363,7 +363,7 @@
      D  o_classFilter                            likeds(LOG4RPG_classFilter_t  )
       *
       *  Return value
-     D isResolved      S               N   inz(cFalse)
+     D isResolved      S               N   inz(*off)
       *
       *  Helper fields
      D srvPgm          DS                  likeds(qObj_t                 ) inz
@@ -430,7 +430,7 @@
 
          o_classFilter = tempClassFilter;
 
-         isResolved = cTrue;
+         isResolved = *on;
 
          return isResolved;
 

@@ -283,7 +283,7 @@
      D  i_prefix                           const  like(LOG4RPG_prefix_t        )
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  Helper fields
      D tmpHIconv       DS                  likeds(iconv_t  ) inz
@@ -299,11 +299,11 @@
 
          // Initialize handle
          tmpHandle.pSuper          = i_pSuper;   // Handle of the super class 'Appender'
-         tmpHandle.isOpen          = cFalse;
+         tmpHandle.isOpen          = *off;
          tmpHandle.port            = cDEFAULT_PORT;
          tmpHandle.pipeWrite       = cDESC_NULL;
          tmpHandle.ccsid           = cDEFAULT_CCSID;
-         tmpHandle.isIconv         = cFalse;
+         tmpHandle.isIconv         = *off;
          tmpHandle.hIconv          = tmpHIconv;
          tmpHandle.childProcess.nbr  = '';
          tmpHandle.childProcess.user = '';
@@ -350,7 +350,7 @@
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
 
-         return cTrue;
+         return *on;
 
       /END-FREE
       *
@@ -399,13 +399,13 @@
 
          // Return if there is no text
          if LogEvent_textLength(i_pLogEvent) = 0;
-            return cTrue;
+            return *on;
          endif;
 
          // Open the appender for output if it is not yet open
          if not handle.isOpen;
             if not openAppender(i_pHandle);
-               return cFalse;
+               return *off;
             endif;
          endif;
 
@@ -453,10 +453,10 @@
             if handle.isOpen;
                closeAppender(i_pHandle);
             endif;
-            return cFalse;
+            return *off;
          endif;
 
-         return cTrue;
+         return *on;
 
       /END-FREE
       *
@@ -501,7 +501,7 @@
 
             if handle.isIconv;
                if iconv_close(handle.hIconv) = 0;
-                  handle.isIconv = cFalse;
+                  handle.isIconv = *off;
                endif;
             endif;
 
@@ -536,7 +536,7 @@
      D  io_pHandle                     *
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  Appender handle
      D handle          DS                  likeds(handle_t ) based(io_pHandle)
@@ -551,7 +551,7 @@
          // End character conversion
          if handle.isIconv;
             iconv_close(handle.hIconv);
-            handle.isIconv = cFalse;
+            handle.isIconv = *off;
          endif;
 
          // Clear handle data
@@ -562,7 +562,7 @@
 
          LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
 
-         isDone = cTrue;
+         isDone = *on;
 
          return isDone;
 
@@ -590,12 +590,12 @@
       /FREE
 
          if not createChildProcess(handle);
-            return cFalse;
+            return *off;
          endif;
 
-         handle.isOpen = cTrue;
+         handle.isOpen = *on;
 
-         return cTrue;
+         return *on;
 
       /END-FREE
       *
@@ -619,12 +619,12 @@
       /FREE
 
          if not endChildProcess(handle);
-            return cFalse;
+            return *off;
          endif;
 
-         handle.isOpen = cFalse;
+         handle.isOpen = *off;
 
-         return cTrue;
+         return *on;
 
       /END-FREE
       *
@@ -643,7 +643,7 @@
      D  io_handle                                 likeds(handle_t )
       *
       *  Return value
-     D isIconv         S               N   inz(cFalse)
+     D isIconv         S               N   inz(*off)
       *
       *  Local fields
      D tmpHIconv       DS                  likeds(iconv_t  ) inz
@@ -678,11 +678,11 @@
             LogLog_error('Failed to initialize character conversion');
             msg = f_cvtErrnoToMsg(f_errno());
             LogLog_errorMsg(msg);
-            io_handle.isIconv = cFalse;
+            io_handle.isIconv = *off;
          else;
             LogLog_debug('Initialized character translation for CCSID=' +
                          %char(io_handle.ccsid));
-            io_handle.isIconv = cTrue;
+            io_handle.isIconv = *on;
             io_handle.hIconv  = tmpHIconv;
          endif;
 
@@ -707,7 +707,7 @@
      D  io_handle                                 likeds(handle_t )
       *
       *  Return value
-     D isCreated       S               N   inz(cFalse)
+     D isCreated       S               N   inz(*off)
       *
       *  Local fields
      D rc              S             10I 0 inz
@@ -820,7 +820,7 @@
                           %trim(io_handle.childProcess.name) +
                           ']');
 
-            isCreated = cTrue;
+            isCreated = *on;
          enddo;
 
          return isCreated;
@@ -842,7 +842,7 @@
      D  io_handle                                 likeds(handle_t )
       *
       *  Return value
-     D isStopped       S               N   inz(cFalse)
+     D isStopped       S               N   inz(*off)
       *
       *  Helper fields
      D rc              S             10I 0 inz

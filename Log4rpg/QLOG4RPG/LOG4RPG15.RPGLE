@@ -153,9 +153,9 @@
 
          if (i_debugOutput = cLOG4RPG_DEBUG_OUTPUT_PRINTER) or
             (i_debugOutput = cLOG4RPG_DEBUG_OUTPUT_STDOUT);
-            return cTrue;
+            return *on;
          else;
-            return cFalse;
+            return *off;
          endif;
 
       /END-FREE

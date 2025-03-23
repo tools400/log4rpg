@@ -152,7 +152,7 @@
      D i_FDSet                             value  like(socket_fdSet_t)
       *
       *  Funktionswert
-     D isSet           S               N   inz(cFalse)
+     D isSet           S               N   inz(*off)
       *
       *  Helper fields
      D x               S              5I 0
