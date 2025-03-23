@@ -19,20 +19,10 @@
       *     notice, this list of conditions and the following disclaimer in the
       *     documentation and/or other materials provided with the distribution.
       *
-      *
-      *
-      *
-      *
-      *
-      *
-      *
-      *
-      *
-      *
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Änderung                                 *
+      *  Datum       Name          ï¿½nderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -45,7 +35,8 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
-      *       >>PARM<< TGTRLS(V6R1M0  );                                    *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
+      *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
       *     >>EXECUTE<<                                                     *
@@ -68,6 +59,7 @@
       *  Prototypes
       * -----------------------------------------
       /COPY QLOG4RPG,PTYPES                        Private type definitions
+      /COPY QLOG4RPG,QUSRJOBI                      Retrieve Job Information (QUSRJOBI) API
       *
       * -----------------------------------------
       *  Private prototypes
@@ -106,13 +98,13 @@
      D FDSet           S             10U 0 dim(7) based(pFDSet)
       * ---------------------------------------------------------
       /FREE
- 
+
          pFDSet =%addr(io_FDSet);
          x = (i_FD / 32) + 1;
          FDSet(x) = %bitor(FDSet(x): mask(i_FD));
- 
+
          return;
- 
+
       /END-FREE
       *
      P FD_SET...
@@ -135,13 +127,13 @@
      D FDSet           S             10U 0 dim(7) based(pFDSet)
       * ---------------------------------------------------------
       /FREE
- 
+
          pFDSet =%addr(io_FDSet);
          x = (i_FD / 32) + 1;
          FDSet(x) = %bitand(FDSet(x): %bitnot(mask(i_FD)));
- 
+
          return;
- 
+
       /END-FREE
       *
      P FD_CLR...
@@ -167,13 +159,13 @@
      D FDSet           S             10U 0 dim(7) based(pFDSet)
       * ---------------------------------------------------------
       /FREE
- 
+
          pFDSet =%addr(i_FDSet);
          x = (i_FD / 32) + 1;
          isSet = %bitand(FDSet(x): mask(i_FD)) = mask(i_FD);
- 
+
          return isSet;
- 
+
       /END-FREE
       *
      P FD_ISSET...
@@ -191,11 +183,11 @@
      D io_FDSet                                   like(socket_fdSet_t)
       * ---------------------------------------------------------
       /FREE
- 
+
          io_FDSet = *ALLx'00';
- 
+
          return;
- 
+
       /END-FREE
       *
      P FD_ZERO...
@@ -210,22 +202,11 @@
       *
      D Job_getTcpIpAddr...
      D                 PI            15A          varying
-     D  i_qJob                             const  likeds(qJob_t   )
+     D  i_qJob                             const  likeds(LOG4RPG_qJob_t)
      D                                            options(*nopass)
       *
       *  Parameter positions
      D p_qJob          C                   1
-      *
-      *  Retrieve Job Information (QUSRJOBI) API
-     D QUSRJOBI...
-     D                 PR                  extpgm('QUSRJOBI')
-     D  o_rcvVar                  65535A          options(*varsize)
-     D  i_rcvVarLen                  10I 0 const
-     D  i_format                      8A   const
-     D  i_qJob                       26A   const
-     D  i_intJobID                   16A   const
-     D  io_errCode                65535A          options(*nopass: *varsize)    OptGrp 1
-     D  i_resPrfStat                  1A   const  options(*nopass)              OptGrp 2
       *
      D qJob            DS                  likeds(i_qJob   )
       *
@@ -251,20 +232,20 @@
      D  bytAvl                       10I 0
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (%parms() >= p_qJob);
             qJob = i_qJob;
          else;
             clear qJob;
             qJob.name = '*';
          endif;
- 
+
          QUSRJOBI(jobi0600:%size(jobi0600):'JOBI0600':qJob:'':errCode);
- 
+
          QDCRDEVD(devd0600:%size(devd0600):'DEVD0600':jobi0600.device:errCode);
- 
+
          return %trim(devd0600.tcpIpDotAddr);
- 
+
       /END-FREE
       *
      P Job_getTcpIpAddr...
@@ -284,9 +265,9 @@
       *  Helper fields
       * ---------------------------------------------------------
       /FREE
- 
+
          return %int(2 ** %rem(i_FD : 32));
- 
+
       /END-FREE
       *
      P mask...

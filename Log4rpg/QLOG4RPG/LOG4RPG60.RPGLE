@@ -18,7 +18,7 @@
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Änderung                                 *
+      *  Datum       Name          ï¿½nderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  27.10.2006  Th.Raddatz    Replaced data structure logEvent with    *
       *                            object LogEvent.                         *
@@ -37,7 +37,8 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
-      *       >>PARM<< TGTRLS(V6R1M0  );                                    *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
+      *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
       *     >>EXECUTE<<                                                     *
@@ -55,9 +56,6 @@
       * -----------------------------------------
       *  Type definitions
       * -----------------------------------------
-      /COPY QLOG4RPG,FDQJOB
-      /COPY QLOG4RPG,FDJOBI0600
-      *
      D handle_t...
      D                 DS                  qualified           based(pDummy)
      D  pSuper                             like(LOG4RPG_pLayout_t  )
@@ -71,15 +69,7 @@
       /COPY QLOG4RPG,PLOG4RPG09                    Level
       /COPY QLOG4RPG,PLOG4RPG10                    LogLog
       /COPY QLOG4RPG,PLOG4RPG99                    Helper
-      *
-      *  Retrieve Job Information (QUSRJOBI) API
-     D QUSRJOBI        PR                  extpgm('QUSRJOBI')
-     D  o_rcvVar                  32767A          options(*varsize)
-     D  i_lenRcvVar                  10I 0 const
-     D  i_format                      8A   const
-     D  i_qJob                       26A   const
-     D  i_intJobID                   16A   const
-     D  io_errCode                                like(errCode_t )
+      /COPY QLOG4RPG,QUSRJOBI                      Retrieve Job Information (QUSRJOBI) API
       *
       * -----------------------------------------
       *  Private prototypes
@@ -150,25 +140,25 @@
      D handle          DS                  likeds(handle_t ) based(io_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          clear tempHandle;
- 
+
          // Initialize handle
          tempHandle.pSuper  = i_pSuper;   // Handle of the super class 'Layout'
          tempHandle.pattern = '%z [%M.%F]  %-5p  %S - %m';
- 
+
          // Initialize handle from configuration properties
          if (i_pPropList <> *NULL) and not PropertyList_isNull(i_pPropList);
             loadConfiguration(tempHandle: i_pPropList: i_prefix);
          endif;
- 
+
          io_pHandle = %alloc(%size(tempHandle));
          handle = tempHandle;
- 
+
          LogLog_debug('Loaded instance of [' + cTHIS_CLASS + '].');
- 
+
          return isDone;
- 
+
       /END-FREE
       *
      P PatternLayout_new...
@@ -248,18 +238,18 @@
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Load return message text with pattern layout
          string = handle.pattern;
- 
+
          // Search for patterns and replace them
          x = %scan('%': string: 1);
          dow x > 0 and x < %len(string);
- 
+
             lengthStr = '';
             length    = 0;
             pattern   = '';
- 
+
             // get length if specified
             y = x + 1;
             if (%subst(string: y: 1) = '-') and (y < %len(string));
@@ -270,13 +260,13 @@
                   y = y + 1;
                enddo;
             endif;
- 
+
             // get pattern
             pattern = %subst(string: y: 1);
- 
+
             // get length
             length = atoi(lengthStr);
- 
+
             // replace pattern
             select;
             when pattern = 'p';      // priority/level
@@ -318,27 +308,27 @@
             other;
                tmpText = '';
             endsl;
- 
+
             if pattern <> '';
                if (length > 0) and (length < cTMPTEXTMAXLEN);
                   %len(tmpText) = length;
                endif;
- 
+
                string = %replace(tmpText: string: x: y-x+1);
             endif;
- 
+
             if x < %len(string);
                x = %scan('%': string: y);
             else;
                x = 0;
             endif;
- 
+
          enddo;
- 
+
          LogEvent_setText(i_pLogEvent: string);
- 
+
          return;
- 
+
       /END-FREE
       *
      P PatternLayout_format...
@@ -370,11 +360,11 @@
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          loadConfiguration(handle: i_pPropList: i_prefix);
- 
+
          return;
- 
+
       /END-FREE
       *
      P PatternLayout_setProperties...
@@ -404,19 +394,19 @@
      D handle          DS                  likeds(handle_t ) based(io_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Clear handle data
          clear handle;
- 
+
          // Free handle memory
          dealloc(N) io_pHandle;
- 
+
          LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
- 
+
          isDone = cTrue;
- 
+
          return isDone;
- 
+
       /END-FREE
       *
      P PatternLayout_delete...
@@ -443,20 +433,20 @@
      D                                                    ListIterator_t) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          prefix = f_lcase(i_prefix);
- 
+
          propIter = PropertyList_getIterator(i_pPropList);
- 
+
          property = PropertyList_getFirst(propIter);
- 
+
          dow property.key <> '';
- 
+
             if (prefix = '') or (f_startsWith(prefix: property.key) and
                                  %len(property.key) > %len(prefix));
- 
+
                parameter = f_lcase(%subst(property.key: %len(prefix) + 1));
- 
+
                select;
                when parameter = cPARAMETER_CONVERSION_PATTERN;
                   io_handle.pattern = property.value;
@@ -467,14 +457,14 @@
                                   property.key            +
                                  '] in [' + cTHIS_CLASS + ']');
                endsl;
- 
+
             endif;
- 
+
             property = PropertyList_getNext(propIter);
          enddo;
- 
+
          return;
- 
+
       /END-FREE
       *
      P loadConfiguration...
@@ -488,25 +478,25 @@
      P                 B
       *
      D rtvJobInf...
-     D                 PI                         likeds(jobi0600_t  )
+     D                 PI                         likeds(jobi0600_t)
       *
       *  Return value
-     D jobi0600        DS                  likeds(jobi0600_t  ) inz
+     D jobi0600        DS                  likeds(jobi0600_t) inz
       *
       *  Local fields
-     D qJob            DS                  likeds(qJob_t      ) inz
-     D errCode         DS                  likeds(errCode_t   ) inz
+     D qJob            DS                  likeds(LOG4RPG_qJob_t) inz
+     D errCode         DS                  likeds(errCode_t) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          qjob.name = '*';
          qjob.user = '';
          qjob.nbr  = '';
          errCode = f_newApiErrCode(cTrue);
          QUSRJOBI(jobi0600: %size(jobi0600): 'JOBI0600': qJob: '': errCode);
- 
+
          return jobi0600;
- 
+
       /END-FREE
       *
      P rtvJobInf...

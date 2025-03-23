@@ -1,9 +1,9 @@
       /if not defined(COPYRIGHT_DSPEC)
      H COPYRIGHT('+
-     HLOG4RPG V1.12 - 19.07.2015 - mailto:thomas.raddatz@tools400.de')
+     HLOG4RPG V1.13 - 23.03.2025 - mailto:thomas.raddatz@tools400.de')
       /eof
       /endif
      D cLOG4RPG_VERSION...
-     D                 C                   '1.12'
+     D                 C                   '1.13'
      D cLOG4RPG_DATE...
-     D                 C                   '19.07.2015'
+     D                 C                   '23.03.2025'

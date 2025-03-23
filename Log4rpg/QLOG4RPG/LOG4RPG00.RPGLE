@@ -18,7 +18,7 @@
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Änderung                                 *
+      *  Datum       Name          ï¿½nderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  13.06.2008  Th.Raddatz    Enhanced the Log4rpg stub module         *
       *                            to optionally load the Log4rpg service   *
@@ -49,7 +49,8 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
-      *       >>PARM<< TGTRLS(V6R1M0  );                                    *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
+      *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
       *     >>EXECUTE<<                                                     *
@@ -198,7 +199,7 @@
      D  io_errCode                32767A           options(*omit: *varsize)
       *
       *  Type definitions
-     D actInf_t        DS                  qualified      based(pDummy)
+     D actInf_t        DS                  qualified template
      D  bytRet                 1      4I 0
      D  bytAvl                 5      8I 0
      D  reserved_1             9     16A
@@ -230,20 +231,20 @@
       *  Type Definitions
       * ------------------------------------
       *
-     D actSrvPgm_t     DS                  qualified      based(pDummy)
+     D actSrvPgm_t     DS                  qualified template
      D  procptr                        *   procptr
      D  actMark                      10I 0
      D  name                         10A
      D  lib                          10A
       *
-     D actProc_t       DS                  qualified      based(pDummy)
+     D actProc_t       DS                  qualified template
      D  procptr                        *   procptr
      D  actMark                      10I 0
      D  name                        256A   varying
      D  srvPgm                       10A
      D  lib                          10A
-      *
-     D errCode_t       DS                  qualified           based(pDummy)
+      *  API error code                                               *
+     D errCode_t       DS                  qualified template
      D  bytPrv                       10I 0
      D  bytAvl                       10I 0
      D  excID                         7A
@@ -253,11 +254,8 @@
       * ------------------------------------
       *  Imported prototypes
       * ------------------------------------
-      /DEFINE LOGGER_STUB
-      /COPY QLOG4RPG,PLOG4RPG
       *
-      /UNDEFINE PLOG4RPG
-      /UNDEFINE LOGGER_STUB
+      /DEFINE TYPES_ONLY
       /COPY QLOG4RPG,PLOG4RPG
       *
       * ------------------------------------
@@ -290,7 +288,7 @@
       *  Global fields & constants
       * ------------------------------------
       *
-     D g_isLoaded      S               N   inz(cFalse)
+     D g_isLoaded      S               N   inz(*off )
       *
      D g_procptr       DS                  qualified
      D  setStubOfs                     *   procptr
@@ -371,7 +369,7 @@
      D actSrvPgm       DS                  likeds(actSrvPgm_t ) static inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          for x = 1 to 2;
             if (actSrvPgm.procptr = *NULL);
                actSrvPgm = activateSrvPgm('LOG4RPG': '*LIBL');
@@ -384,7 +382,7 @@
                   return;
                endif;
             endif;
- 
+
             monitor;
                setStubOfs(1);
                leave;
@@ -392,68 +390,68 @@
                actSrvPgm.procptr = *NULL;
             endmon;
          endfor;
- 
+
          g_procptr.setLogging =
             getProcPtrByName('LOG4RPG01_Logger_setLogging' : actSrvPgm);
          g_procptr.isLogging  =
             getProcPtrByName('LOG4RPG01_Logger_isLogging'  : actSrvPgm);
- 
+
          g_procptr.getRootLogger =
             getProcPtrByName('LOG4RPG01_Logger_getRootLogger': actSrvPgm);
          g_procptr.getLogger     =
             getProcPtrByName('LOG4RPG01_Logger_getLogger'    : actSrvPgm);
- 
+
          g_procptr.debug    =
             getProcPtrByName('LOG4RPG01_Logger_debug'    : actSrvPgm);
          g_procptr.debugMsg =
             getProcPtrByName('LOG4RPG01_Logger_debugMsg' : actSrvPgm);
          g_procptr.isDebugEnabled =
             getProcPtrByName('LOG4RPG01_Logger_isDebugEnabled' : actSrvPgm);
- 
+
          g_procptr.info     =
             getProcPtrByName('LOG4RPG01_Logger_info'     : actSrvPgm);
          g_procptr.infoMsg  =
             getProcPtrByName('LOG4RPG01_Logger_infoMsg'  : actSrvPgm);
          g_procptr.isInfoEnabled =
             getProcPtrByName('LOG4RPG01_Logger_isInfoEnabled' : actSrvPgm);
- 
+
          g_procptr.warn     =
             getProcPtrByName('LOG4RPG01_Logger_warn'     : actSrvPgm);
          g_procptr.warnMsg  =
             getProcPtrByName('LOG4RPG01_Logger_warnMsg'  : actSrvPgm);
          g_procptr.isWarnEnabled =
             getProcPtrByName('LOG4RPG01_Logger_isWarnEnabled' : actSrvPgm);
- 
+
          g_procptr.error    =
             getProcPtrByName('LOG4RPG01_Logger_error'    : actSrvPgm);
          g_procptr.errorMsg =
             getProcPtrByName('LOG4RPG01_Logger_errorMsg' : actSrvPgm);
          g_procptr.isErrorEnabled =
             getProcPtrByName('LOG4RPG01_Logger_isErrorEnabled' : actSrvPgm);
- 
+
          g_procptr.fatal    =
             getProcPtrByName('LOG4RPG01_Logger_fatal'    : actSrvPgm);
          g_procptr.fatalMsg =
             getProcPtrByName('LOG4RPG01_Logger_fatalMsg' : actSrvPgm);
          g_procptr.isFatalEnabled =
             getProcPtrByName('LOG4RPG01_Logger_isFatalEnabled' : actSrvPgm);
- 
+
          g_procptr.forcedLog    =
             getProcPtrByName('LOG4RPG01_Logger_forcedLog'    : actSrvPgm);
          g_procptr.forcedLogMsg =
             getProcPtrByName('LOG4RPG01_Logger_forcedLogMsg' : actSrvPgm);
- 
+
          g_procptr.getName      =
             getProcPtrByName('LOG4RPG01_Logger_getName'      : actSrvPgm);
- 
+
          g_procptr.isNull =
             getProcPtrByName('LOG4RPG01_Logger_isNull' : actSrvPgm);
          g_procptr.null   =
             getProcPtrByName('LOG4RPG01_Logger_null'   : actSrvPgm);
- 
+
          g_procptr.setLevel =
             getProcPtrByName('LOG4RPG01_Logger_setLevel' : actSrvPgm);
- 
+
          g_procptr.setInternalDebugging =
             getProcPtrByName(
                'LOG4RPG01_Logger_setInternalDebugging'
@@ -466,7 +464,7 @@
             getProcPtrByName(
                'LOG4RPG01_Logger_getInternalDebugOutput'
                : actSrvPgm);
- 
+
          g_procptr.loadDefaultConfiguration =
             getProcPtrByName(
                'LOG4RPG08_Configurator_loadDefaultConfiguration'
@@ -523,11 +521,11 @@
             getProcPtrByName(
                'LOG4RPG17_Filter_setNext'
                : actSrvPgm);
- 
-         g_isLoaded = cTrue;
- 
+
+         g_isLoaded = *on ;
+
          return;
- 
+
       /END-FREE
       *
      P LoggerStub_loadSrvPgm...
@@ -544,20 +542,20 @@
      D  i_isLogging                    N   const
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
-            return cFalse;
+            return *off ;
          endif;
- 
+
          return Impl_Logger_setLogging(i_isLogging);
- 
+
       /END-FREE
       *
      P Logger_setLogging...
      P                 E
       *
       *=========================================================================
-      *  Returns cTRUE if logging is enabled.
+      *  Returns *on  if logging is enabled.
       *=========================================================================
      P Logger_isLogging...
      P                 B                   export
@@ -566,13 +564,13 @@
      D                 PI              N
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
-            return cFalse;
+            return *off ;
          endif;
- 
+
          return Impl_Logger_isLogging();
- 
+
       /END-FREE
       *
      P Logger_isLogging...
@@ -588,13 +586,13 @@
      D                 PI                         like(LOG4RPG_hLogger_t   )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return *NULL;
          endif;
- 
+
          return Impl_Logger_getRootLogger();
- 
+
       /END-FREE
       *
      P Logger_getRootLogger...
@@ -611,13 +609,13 @@
      D  i_logName                          const  like(LOG4RPG_loggerName_t)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return *NULL;
          endif;
- 
+
          return Impl_Logger_getLogger(i_logName);
- 
+
       /END-FREE
       *
      P Logger_getLogger...
@@ -635,15 +633,15 @@
      D  i_text                             const  like(LOG4RPG_text_t    )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return;
          endif;
- 
+
          Impl_Logger_debug(i_hLogger: i_text);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_debug...
@@ -661,22 +659,22 @@
      D  i_msg                              const  likeds(LOG4RPG_msg_t   )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return;
          endif;
- 
+
          Impl_Logger_debugMsg(i_hLogger: i_msg);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_debugMsg...
      P                 E
       *
       *=========================================================================
-      *  Returns cTrue if 'DEBUG' log events are logged.
+      *  Returns *on  if 'DEBUG' log events are logged.
       *=========================================================================
      P Logger_isDebugEnabled...
      P                 B                   export
@@ -686,13 +684,13 @@
      D  i_hLogger                          const  like(LOG4RPG_hLogger_t )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
-            return cFalse;
+            return *off ;
          endif;
- 
+
          return Impl_Logger_isDebugEnabled(i_hLogger);
- 
+
       /END-FREE
       *
      P Logger_isDebugEnabled...
@@ -710,15 +708,15 @@
      D  i_text                             const  like(LOG4RPG_text_t    )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return;
          endif;
- 
+
          Impl_Logger_info(i_hLogger: i_text);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_info...
@@ -736,22 +734,22 @@
      D  i_msg                              const  likeds(LOG4RPG_msg_t   )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return;
          endif;
- 
+
          Impl_Logger_infoMsg(i_hLogger: i_msg);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_infoMsg...
      P                 E
       *
       *=========================================================================
-      *  Returns cTrue if 'INFO' log events are logged.
+      *  Returns *on  if 'INFO' log events are logged.
       *  (Including DEBUG log events)
       *=========================================================================
      P Logger_isInfoEnabled...
@@ -762,13 +760,13 @@
      D  i_hLogger                          const  like(LOG4RPG_hLogger_t )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
-            return cFalse;
+            return *off ;
          endif;
- 
+
          return Impl_Logger_isInfoEnabled(i_hLogger);
- 
+
       /END-FREE
       *
      P Logger_isInfoEnabled...
@@ -786,15 +784,15 @@
      D  i_text                             const  like(LOG4RPG_text_t    )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return;
          endif;
- 
+
          Impl_Logger_warn(i_hLogger: i_text);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_warn...
@@ -812,22 +810,22 @@
      D  i_msg                              const  likeds(LOG4RPG_msg_t   )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return;
          endif;
- 
+
          Impl_Logger_warnMsg(i_hLogger: i_msg);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_warnMsg...
      P                 E
       *
       *=========================================================================
-      *  Returns cTrue if 'WARN' log events are logged.
+      *  Returns *on  if 'WARN' log events are logged.
       *  (Including INFO and DEBUG log events)
       *=========================================================================
      P Logger_isWarnEnabled...
@@ -838,13 +836,13 @@
      D  i_hLogger                          const  like(LOG4RPG_hLogger_t )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
-            return cFalse;
+            return *off ;
          endif;
- 
+
          return Impl_Logger_isWarnEnabled(i_hLogger);
- 
+
       /END-FREE
       *
      P Logger_isWarnEnabled...
@@ -862,15 +860,15 @@
      D  i_text                             const  like(LOG4RPG_text_t    )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return;
          endif;
- 
+
          Impl_Logger_error(i_hLogger: i_text);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_error...
@@ -888,22 +886,22 @@
      D  i_msg                              const  likeds(LOG4RPG_msg_t   )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return;
          endif;
- 
+
          Impl_Logger_errorMsg(i_hLogger: i_msg);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_errorMsg...
      P                 E
       *
       *=========================================================================
-      *  Returns cTrue if 'ERROR' log events are logged.
+      *  Returns *on  if 'ERROR' log events are logged.
       *  (Including WARN, INFO and DEBUG log events)
       *=========================================================================
      P Logger_isErrorEnabled...
@@ -914,13 +912,13 @@
      D  i_hLogger                          const  like(LOG4RPG_hLogger_t )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
-            return cFalse;
+            return *off ;
          endif;
- 
+
          return Impl_Logger_isErrorEnabled(i_hLogger);
- 
+
       /END-FREE
       *
      P Logger_isErrorEnabled...
@@ -938,15 +936,15 @@
      D  i_text                             const  like(LOG4RPG_text_t    )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return;
          endif;
- 
+
          Impl_Logger_fatal(i_hLogger: i_text);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_fatal...
@@ -964,22 +962,22 @@
      D  i_msg                              const  likeds(LOG4RPG_msg_t   )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return;
          endif;
- 
+
          Impl_Logger_fatalMsg(i_hLogger: i_msg);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_fatalMsg...
      P                 E
       *
       *=========================================================================
-      *  Returns cTrue if 'FATAL' log events are logged.
+      *  Returns *on  if 'FATAL' log events are logged.
       *  (Including ERROR, WARN, INFO and DEBUG log events)
       *=========================================================================
      P Logger_isFatalEnabled...
@@ -990,13 +988,13 @@
      D  i_hLogger                          const  like(LOG4RPG_hLogger_t )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
-            return cFalse;
+            return *off ;
          endif;
- 
+
          return Impl_Logger_isFatalEnabled(i_hLogger);
- 
+
       /END-FREE
       *
      P Logger_isFatalEnabled...
@@ -1015,15 +1013,15 @@
      D  i_text                             const  like(LOG4RPG_text_t    )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return;
          endif;
- 
+
          Impl_Logger_forcedLog(i_hLogger: i_level: i_text);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_forcedLog...
@@ -1042,15 +1040,15 @@
      D  i_msg                              const  likeds(LOG4RPG_msg_t   )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return;
          endif;
- 
+
          Impl_Logger_forcedLogMsg(i_hLogger: i_level: i_msg);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_forcedLogMsg...
@@ -1067,20 +1065,20 @@
      D  i_hLogger                          const  like(LOG4RPG_hLogger_t   )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return '';
          endif;
- 
+
          return Impl_Logger_getName(i_hLogger);
- 
+
       /END-FREE
       *
      P Logger_getName...
      P                 E
       *
       *=========================================================================
-      *  Returns cTRUE if the specified logger handle is NULL.
+      *  Returns *on  if the specified logger handle is NULL.
       *=========================================================================
      P Logger_isNull...
      P                 B                   export
@@ -1090,13 +1088,13 @@
      D  i_hLogger                          const  like(LOG4RPG_hLogger_t )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
-            return cTrue;
+            return *on ;
          endif;
- 
+
          return Impl_Logger_isNull(i_hLogger);
- 
+
       /END-FREE
       *
      P Logger_isNull...
@@ -1112,13 +1110,13 @@
      D                 PI                         like(LOG4RPG_hLogger_t )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return *NULL;
          endif;
- 
+
          return Impl_Logger_null();
- 
+
       /END-FREE
       *
      P Logger_null...
@@ -1136,15 +1134,15 @@
      D  i_level                            const  like(LOG4RPG_level_t   )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return;
          endif;
- 
+
          Impl_Logger_setLevel(i_hLogger: i_level);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_setLevel...
@@ -1166,19 +1164,19 @@
      D p_output        C                   2
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return;
          endif;
- 
+
          if (%parms() >= p_output);
             Impl_Logger_setInternalDebugging(i_debugMode: i_output);
          else;
             Impl_Logger_setInternalDebugging(i_debugMode);
          endif;
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_setInternalDebugging...
@@ -1194,13 +1192,13 @@
      D                 PI                         like(LOG4RPG_debugMode_t  )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return '';
          endif;
- 
+
          return Impl_Logger_getInternalDebugMode();
- 
+
       /END-FREE
       *
      P Logger_getInternalDebugMode...
@@ -1216,13 +1214,13 @@
      D                 PI                         like(LOG4RPG_debugOutput_t)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return '';
          endif;
- 
+
          return Impl_Logger_getInternalDebugOutput();
- 
+
       /END-FREE
       *
      P Logger_getInternalDebugOutput...
@@ -1238,13 +1236,13 @@
      D                 PI              N
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
-            return cFalse;
+            return *off ;
          endif;
- 
+
          return Impl_Configurator_loadDefaultConfiguration();
- 
+
       /END-FREE
       *
      P Configurator_loadDefaultConfiguration...
@@ -1261,13 +1259,13 @@
      D  i_path                             const  like(LOG4RPG_path_t   )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
-            return cFalse;
+            return *off ;
          endif;
- 
+
          return Impl_Configurator_loadPropertiesConfiguration(i_path);
- 
+
       /END-FREE
       *
      P Configurator_loadPropertiesConfiguration...
@@ -1291,11 +1289,11 @@
      D p_unit          C                   3
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
-            return cFalse;
+            return *off ;
          endif;
- 
+
          select;
          when %parms() >= p_unit;         // 3 Parameters
             return Impl_Configurator_loadAndWatchPropertiesConfiguration(
@@ -1307,7 +1305,7 @@
             return Impl_Configurator_loadAndWatchPropertiesConfiguration(
                                                  i_path);
          endsl;
- 
+
       /END-FREE
       *
      P Configurator_loadAndWatchPropertiesConfiguration...
@@ -1323,15 +1321,15 @@
      D                 PI
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return;
          endif;
- 
+
          Impl_Configurator_clearConfiguration();
- 
+
          return;
- 
+
       /END-FREE
       *
      P Configurator_clearConfiguration...
@@ -1353,17 +1351,17 @@
      D p_pPropString   C                   2
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return *NULL;
          endif;
- 
+
          if (%parms() >= p_pPropString);
             return Impl_Layout_new(i_layoutImpl: i_pPropString);
          else;
             return Impl_Layout_new(i_layoutImpl);
          endif;
- 
+
       /END-FREE
       *
      P Layout_new...
@@ -1379,13 +1377,13 @@
      D                 PI                         like(LOG4RPG_pLayout_t       )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return *NULL;
          endif;
- 
+
          return Impl_Layout_null();
- 
+
       /END-FREE
       *
      P Layout_null...
@@ -1408,17 +1406,17 @@
      D p_pPropString   C                   3
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return *NULL;
          endif;
- 
+
          if (%parms() >= p_pPropString);
             return Impl_Appender_new(i_appName: i_appImpl: i_pPropString);
          else;
             return Impl_Appender_new(i_appName: i_appImpl);
          endif;
- 
+
       /END-FREE
       *
      P Appender_new...
@@ -1434,13 +1432,13 @@
      D                 PI                         like(LOG4RPG_pAppender_t     )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return *NULL;
          endif;
- 
+
          return Impl_Appender_null();
- 
+
       /END-FREE
       *
      P Appender_null...
@@ -1458,13 +1456,13 @@
      D  i_pLayout                          const  like(LOG4RPG_pLayout_t       )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
-            return cFalse;
+            return *off ;
          endif;
- 
+
          return Impl_Appender_setLayout(i_pAppender: i_pLayout);
- 
+
       /END-FREE
       *
      P Appender_setLayout...
@@ -1482,13 +1480,13 @@
      D  i_pFilter                          const  like(LOG4RPG_pFilter_t       )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
-            return cFalse;
+            return *off ;
          endif;
- 
+
          return Impl_Appender_setFilter(i_pAppender: i_pFilter);
- 
+
       /END-FREE
       *
      P Appender_setFilter...
@@ -1506,15 +1504,15 @@
      D  i_hAppender                        const  like(LOG4RPG_pAppender_t     )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return;
          endif;
- 
+
          Impl_Logger_addAppender(i_hLogger: i_hAppender);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Logger_addAppender...
@@ -1537,17 +1535,17 @@
      D p_pPropString   C                   3
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return *NULL;
          endif;
- 
+
          if (%parms() >= p_pPropString);
             return Impl_Filter_new(i_fltName: i_fltImpl: i_pPropString);
          else;
             return Impl_Filter_new(i_fltName: i_fltImpl);
          endif;
- 
+
       /END-FREE
       *
      P Filter_new...
@@ -1563,13 +1561,13 @@
      D                 PI                         like(LOG4RPG_pFilter_t       )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return *NULL;
          endif;
- 
+
          return Impl_Filter_null();
- 
+
       /END-FREE
       *
      P Filter_null...
@@ -1587,15 +1585,15 @@
      D  i_pNextFilter                      const  like(LOG4RPG_pFilter_t     )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not g_isLoaded);
             return;
          endif;
- 
+
          Impl_Filter_setNext(i_pFilter: i_pNextFilter);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Filter_setNext...
@@ -1641,10 +1639,10 @@
      D errCode         DS                  likeds(errCode_t      ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Initialize return value
          clear actSrvPgm;
- 
+
          // Process optional parameter values ...
          // ... i_lib
          if (%parms() >= p_lib and %addr(i_lib) <> *NULL);
@@ -1652,34 +1650,34 @@
          else;
             lib = '*LIBL';
          endif;
- 
+
          // Get system pointer
          monitor;
             pSrvPgm = rslvsp(WLI_SRVPGM: i_srvPgm: lib: AUTH_OBJ_MGMT);
          on-error;
             pSrvPgm = *NULL;
          endmon;
- 
+
          // Actiate service program
          if (pSrvPgm <> *NULL);
             clear errCode;
             errCode.bytPrv = %size(errCode);
             QleActBndPgm(pSrvPgm: actMark: actInf: %size(actInf): errCode);
- 
+
             if (errCode.bytAvl <> 0);
                pSrvPgm = *NULL;
             endif;
          endif;
- 
+
          if (pSrvPgm <> *NULL);
             actSrvPgm.procptr = pSrvPgm;
             actSrvPgm.actMark = actMark;
             actSrvPgm.name    = i_srvPgm;
             actSrvPgm.lib     = lib;
          endif;
- 
+
          return actSrvPgm;
- 
+
       /END-FREE
       *
      P activateSrvPgm...
@@ -1718,10 +1716,10 @@
      D errCode         DS                  likeds(errCode_t      ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Initialize return value
          clear actProc;
- 
+
          // Get procedure pointer by name
          clear errCode;
          errCode.bytPrv = %size(errCode);
@@ -1730,7 +1728,7 @@
          if (errCode.bytAvl <> 0);
             pExpItem = *NULL;
          endif;
- 
+
          if (pExpItem <> *NULL);
             actproc.procptr = pExpItem;
             actproc.actMark = i_actSrvPgm.actMark;
@@ -1738,9 +1736,9 @@
             actproc.srvPgm  = i_actSrvPgm.name;
             actproc.lib     = i_actSrvPgm.lib;
          endif;
- 
+
          return actproc.procptr;
- 
+
       /END-FREE
       *
      P getProcPtrByName...

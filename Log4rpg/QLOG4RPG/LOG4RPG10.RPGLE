@@ -18,7 +18,7 @@
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Änderung                                 *
+      *  Datum       Name          ï¿½nderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  27.10.2006  Th.Raddatz    Added feature to completely enable/      *
       *                            disable Log4rpg. Logger_isLogging().     *
@@ -37,7 +37,8 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
-      *       >>PARM<< TGTRLS(V6R1M0  );                                    *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
+      *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
       *     >>EXECUTE<<                                                     *
@@ -47,6 +48,11 @@
       /COPY QLOG4RPG,H_SPEC
       *=====================================================================*
      FLOG4RPG   O    F  132        PRINTER usropn
+      *
+      * -----------------------------------------
+      *  Imported functions
+      * -----------------------------------------
+      /COPY QLOG4RPG,PLOG4RPG                      Public API Specification
       *
       * -----------------------------------------
       *  Exported functions
@@ -148,15 +154,15 @@
      D mode            S                   like(i_debugMode ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if %parms() >= p_output;
             output = f_lcase(i_output);
          else;
             output = cLOG4RPG_DEBUG_OUTPUT_PRINTER;
          endif;
- 
+
          mode = f_lcase(i_debugMode);
- 
+
          if DebugMode_isValid(mode);
             g_debugMode = DebugMode_toInt(mode);
          else;
@@ -165,7 +171,7 @@
                           '] passed for parameter ''debug mode'' to +
                           procedure [' + f_this + ']');
          endif;
- 
+
          if DebugOutput_isValid(output);
             g_output = DebugOutput_toInt(output);
          else;
@@ -174,13 +180,13 @@
                           '] passed for parameter ''output'' to +
                           procedure [' + f_this + ']');
          endif;
- 
+
          if (g_output <> cLOG4RPG_INT_DEBUG_OUTPUT_PRINTER) and %open(LOG4RPG);
             close LOG4RPG;
          endif;
- 
+
          return;
- 
+
       /END-FREE
       *
      P LogLog_setInternalDebugging...
@@ -202,9 +208,9 @@
      D                 PI                         like(LOG4RPG_debugMode_t  )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return DebugMode_toString(g_debugMode);
- 
+
       /END-FREE
       *
      P LogLog_getInternalDebugMode...
@@ -226,9 +232,9 @@
      D                 PI                         like(LOG4RPG_debugOutput_t)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return DebugOutput_toString(g_output);
- 
+
       /END-FREE
       *
      P LogLog_getInternalDebugOutput...
@@ -251,21 +257,21 @@
      D  i_text                             const  like(LOG4RPG_text_t    )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if not Logger_isLogging();
             return;
          endif;
- 
+
          if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
             return;
          endif;
- 
+
          if g_debugMode <> cLOG4RPG_INT_DEBUG_OFF;
             streamOut(cPREFIX + i_text);
          endif;
- 
+
          return;
- 
+
       /END-FREE
       *
      P LogLog_debug...
@@ -291,22 +297,22 @@
      D text            S                   like(LOG4RPG_text_t    ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if not Logger_isLogging();
             return;
          endif;
- 
+
          if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
             return;
          endif;
- 
+
          if g_debugMode <> cLOG4RPG_INT_DEBUG_OFF;
             text = %trimR(f_rtvMsgText(i_msg: *omit));
             LogLog_debug(text);
          endif;
- 
+
          return;
- 
+
       /END-FREE
       *
      P LogLog_debugMsg...
@@ -329,19 +335,19 @@
      D  i_text                             const  like(LOG4RPG_text_t    )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if not Logger_isLogging();
             return;
          endif;
- 
+
          if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
             return;
          endif;
- 
+
          streamOut(cERR_PREFIX + i_text);
- 
+
          return;
- 
+
       /END-FREE
       *
      P LogLog_error...
@@ -367,20 +373,20 @@
      D text            S                   like(LOG4RPG_text_t    ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if not Logger_isLogging();
             return;
          endif;
- 
+
          if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
             return;
          endif;
- 
+
          text = %trimR(f_rtvMsgText(i_msg: *omit));
          LogLog_error(text);
- 
+
          return;
- 
+
       /END-FREE
       *
      P LogLog_errorMsg...
@@ -403,19 +409,19 @@
      D  i_text                             const  like(LOG4RPG_text_t    )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if not Logger_isLogging();
             return;
          endif;
- 
+
          if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
             return;
          endif;
- 
+
          streamOut(cWARN_PREFIX + i_text);
- 
+
          return;
- 
+
       /END-FREE
       *
      P LogLog_warning...
@@ -441,20 +447,20 @@
      D text            S                   like(LOG4RPG_text_t    ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if not Logger_isLogging();
             return;
          endif;
- 
+
          if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
             return;
          endif;
- 
+
          text = %trimR(f_rtvMsgText(i_msg: *omit));
          LogLog_warning(text);
- 
+
          return;
- 
+
       /END-FREE
       *
      P LogLog_warningMsg...
@@ -477,21 +483,21 @@
      D  i_text                             const  like(LOG4RPG_text_t    )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if not Logger_isLogging();
             return;
          endif;
- 
+
          if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
             return;
          endif;
- 
+
          if g_debugMode = cLOG4RPG_INT_DEBUG_VERBOSE;
             streamOut(cPREFIX + i_text);
          endif;
- 
+
          return;
- 
+
       /END-FREE
       *
      P LogLog_verbose...
@@ -517,22 +523,22 @@
      D text            S                   like(LOG4RPG_text_t    ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if not Logger_isLogging();
             return;
          endif;
- 
+
          if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
             return;
          endif;
- 
+
          if g_debugMode = cLOG4RPG_INT_DEBUG_VERBOSE;
             text = %trimR(f_rtvMsgText(i_msg: *omit));
             LogLog_verbose(text);
          endif;
- 
+
          return;
- 
+
       /END-FREE
       *
      P LogLog_verboseMsg...
@@ -550,16 +556,16 @@
      D  i_text                             const  like(LOG4RPG_formattedText_t)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          select;
          when g_output = cLOG4RPG_INT_DEBUG_OUTPUT_PRINTER;
             writeToPrinter(i_text);
          when g_output = cLOG4RPG_INT_DEBUG_OUTPUT_STDOUT;
             writeToStdout(i_text);
          endsl;
- 
+
          return;
- 
+
       /END-FREE
       *
      P streamOut...
@@ -581,17 +587,17 @@
      D startPos        S             10U 0 inz(1)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if i_text = '';
             return;
          endif;
- 
+
          if not %open(LOG4RPG);
             system('OVRPRTF FILE(LOG4RPG) +
                     TOFILE(QSYS/QSYSPRT) OVRSCOPE(*CALLLVL)');
             open LOG4RPG;
          endif;
- 
+
          dow   startPos > 0;
             g_printText = f_wordWrap(i_text
                                      : %len(g_printText)
@@ -599,9 +605,9 @@
                                      : cWORDWRAP_PARAGRAPH_TEXT);
             except printLine;
          enddo;
- 
+
          return;
- 
+
       /END-FREE
       *
      P writeToPrinter...
@@ -625,11 +631,11 @@
      D  i_fmtString                    *   value  options(*string)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          printf(i_text + cESC_NEW_LINE);
- 
+
          return;
- 
+
       /END-FREE
       *
      P writeToStdout...

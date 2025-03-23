@@ -32,6 +32,7 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
       *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
@@ -106,21 +107,20 @@
       *  Type definitions
       * -----------------------------------------
       /COPY QLOG4RPG,PLOG4RPG                     Public interface & type definitions
-      /COPY QLOG4RPG,FDQJOB
       *
      D handle_t...
-     D                 DS                  qualified           based(pDummy)
+     D                 DS                  qualified template
      D  pSuper                             like(LOG4RPG_pAppender_t)
      D  isOpen                         N
-     D  port                               like(port_t   )
-     D  pipeWrite                          like(desc_t   )
+     D  port                               like(port_t)
+     D  pipeWrite                          like(desc_t)
      D  ccsid                        10I 0
      D  isIconv                        N
-     D  hIconv                             likeds(iconv_t )
-     D  childProcess                       likeds(qJob_t  )
+     D  hIconv                             likeds(iconv_t)
+     D  childProcess                       likeds(LOG4RPG_qJob_t)
       *
-     D port_t          S             10U 0                     based(pDummy)
-     D desc_t          S             10I 0                     based(pDummy)
+     D port_t          S             10U 0 template
+     D desc_t          S             10I 0 template
       *
       * -----------------------------------------
       *  Prototypes
@@ -293,10 +293,10 @@
      D handle          DS                  likeds(handle_t ) based(io_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          clear tmpHandle;
          clear tmpHIconv;
- 
+
          // Initialize handle
          tmpHandle.pSuper          = i_pSuper;   // Handle of the super class 'Appender'
          tmpHandle.isOpen          = cFalse;
@@ -308,23 +308,23 @@
          tmpHandle.childProcess.nbr  = '';
          tmpHandle.childProcess.user = '';
          tmpHandle.childProcess.name = '';
- 
+
          // Initialize handle from configuration properties
          if (i_pPropList <> *NULL) and not PropertyList_isNull(i_pPropList);
             loadConfiguration(tmpHandle: i_pPropList: i_prefix);
          endif;
- 
+
          // Initialize Character Conversion
          initIconv(tmpHandle);
- 
+
          // Create appender handle
          io_pHandle = %alloc(%size(tmpHandle));
          handle = tmpHandle;
- 
+
          LogLog_debug('Loaded instance of [' + cTHIS_CLASS + '].');
- 
+
          return isDone;
- 
+
       /END-FREE
       *
      P XMLSocketHubAppender_new...
@@ -349,9 +349,9 @@
      D  i_pHandle                      *   const
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return cTrue;
- 
+
       /END-FREE
       *
      P XMLSocketHubAppender_requiresLayout...
@@ -396,24 +396,24 @@
      D CRLF            C                   const(x'0D25')
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return if there is no text
          if LogEvent_textLength(i_pLogEvent) = 0;
             return cTrue;
          endif;
- 
+
          // Open the appender for output if it is not yet open
          if not handle.isOpen;
             if not openAppender(i_pHandle);
                return cFalse;
             endif;
          endif;
- 
+
          monitor;
- 
+
             // Add CRLF to log Event
             LogEvent_appendText(i_pLogEvent: CRLF);
- 
+
             // Copy log event text to buffer
             inpLength = LogEvent_textLength(i_pLogEvent);
             pInpBuf   = LogEvent_getTextPointer(i_pLogEvent);
@@ -428,22 +428,22 @@
             if rc_iconv <> 0;
                LogLog_error('iconv() returned with rc = ' + %char(rc_iconv));
             endif;
- 
+
             // Write to pipe => child process.
             rc = write(handle.pipeWrite: pOutBuf: outLength - outBufLen);
          on-error;
             // Do nothing here
          endmon;
- 
+
          // Free temporary working area
          if pInpBuf <> *NULL;
             dealloc(N) pInpBuf;
          endif;
- 
+
          if pOutBuf <> *NULL;
             dealloc(N) pOutBuf;
          endif;
- 
+
          // Check return code of send() procedure
          if rc < 0;
             errno = f_errno();
@@ -455,9 +455,9 @@
             endif;
             return cFalse;
          endif;
- 
+
          return cTrue;
- 
+
       /END-FREE
       *
      P XMLSocketHubAppender_doAppend...
@@ -492,27 +492,27 @@
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          oldCcsid = handle.ccsid;
- 
+
          loadConfiguration(handle: i_pPropList: i_prefix);
- 
+
          if oldCcsid <> handle.ccsid;
- 
+
             if handle.isIconv;
                if iconv_close(handle.hIconv) = 0;
                   handle.isIconv = cFalse;
                endif;
             endif;
- 
+
             if not handle.isIconv;
                initIconv(handle);
             endif;
- 
+
          endif;
- 
+
          return;
- 
+
       /END-FREE
       *
      P XMLSocketHubAppender_setProperties...
@@ -542,30 +542,30 @@
      D handle          DS                  likeds(handle_t ) based(io_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Close socket if it is left open
          if handle.isOpen;
             closeAppender(io_pHandle);
          endif;
- 
+
          // End character conversion
          if handle.isIconv;
             iconv_close(handle.hIconv);
             handle.isIconv = cFalse;
          endif;
- 
+
          // Clear handle data
          clear handle;
- 
+
          // Free handle memory
          dealloc(N) io_pHandle;
- 
+
          LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
- 
+
          isDone = cTrue;
- 
+
          return isDone;
- 
+
       /END-FREE
       *
      P XMLSocketHubAppender_delete...
@@ -588,15 +588,15 @@
       *  Helper fields
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if not createChildProcess(handle);
             return cFalse;
          endif;
- 
+
          handle.isOpen = cTrue;
- 
+
          return cTrue;
- 
+
       /END-FREE
       *
      P openAppender...
@@ -617,15 +617,15 @@
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if not endChildProcess(handle);
             return cFalse;
          endif;
- 
+
          handle.isOpen = cFalse;
- 
+
          return cTrue;
- 
+
       /END-FREE
       *
      P closeAppender...
@@ -652,9 +652,9 @@
      D msg             DS                  likeds(msg_t    ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          clear tmpHIconv;
- 
+
          clear fromCode;
          fromCode.ccsid         = 0;
          fromCode.conversionA   = 0;
@@ -663,7 +663,7 @@
          fromCode.inpLenOpt     = 0;
          fromCode.errOptMxdDta  = 1;
          fromCode.reserved      = *ALLx'00';
- 
+
          clear toCode;
          toCode.ccsid         = io_handle.ccsid;
          toCode.conversionA   = 0;
@@ -672,7 +672,7 @@
          toCode.inpLenOpt     = 0;
          toCode.errOptMxdDta  = 0;
          toCode.reserved      =   *ALLx'00';
- 
+
          tmpHIconv = QtqIconv_open(toCode: fromCode);
          if tmpHIconv.return_value = -1;
             LogLog_error('Failed to initialize character conversion');
@@ -685,11 +685,11 @@
             io_handle.isIconv = cTrue;
             io_handle.hIconv  = tmpHIconv;
          endif;
- 
+
          isIconv = io_handle.isIconv;
- 
+
          return isIconv;
- 
+
       /END-FREE
       *
      P initIconv...
@@ -733,14 +733,14 @@
      D                 DS                  likeds(QP0W_Job_ID_t  )        inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          tmpFildes(cPIPE_READ)  = -1;
          tmpFildes(cPIPE_WRITE) = -1;
- 
+
          clear tmpChildProcess;
- 
+
          dou 1=1;
- 
+
             // Create communication pipe to child process:
             // ... create pipe
             if pipe(tmpFildes) < 0;
@@ -749,11 +749,11 @@
                              f_strerror(f_errno()));
                leave;
             endif;
- 
+
             LogLog_verbose('Created pipe: ' +
                               'read  = ' + %char(tmpFildes(cPIPE_READ )) + ' ' +
                               'write = ' + %char(tmpFildes(cPIPE_WRITE)));
- 
+
             // Set write descriptor to non-blocking mode
             rc = fcntl(tmpFildes(cPIPE_WRITE): F_SETFL: O_NONBLOCK);
             if rc < 0;
@@ -762,33 +762,33 @@
                              f_strerror(f_errno()));
                leave;
             endif;
- 
+
             // Create child process:
             // ... set inheritance
             inheritance = *ALLx'00';
             inheritance.pGroup = 0;
- 
+
             // ... prepare program parameter values
             argv.pipe      = '0';
             argv.port      = %char(io_handle.port);
             argv.debugMode = Logger_getInternalDebugMode();
             argv.output    = Logger_getInternalDebugOutput();
- 
+
             spw.path = '/QSYS.LIB/' +
                         %trimR(sds.pgmLib) + '.LIB/LOG4SHBAPC.PGM' + x'00';
             spw.fd_count  = 1;
             spw.fd_map(1) = tmpFildes(cPIPE_READ);
- 
+
             spw.pArgv(1) = %addr(spw.path);
             spw.pArgv(2) = %addr(argv.pipe);
             spw.pArgv(3) = %addr(argv.port);
             spw.pArgv(4) = %addr(argv.debugMode);
             spw.pArgv(5) = %addr(argv.output);
             spw.pArgv(6) = *NULL;
- 
+
             // ... set environment variables
             spw.pEnvp(1) = *NULL;
- 
+
             // ... spawn child process
             pid = spawn(spw.path: spw.fd_count: %addr(spw.fd_map)
                         : inheritance
@@ -799,32 +799,32 @@
                              f_strerror(f_errno()));
                leave;
             endif;
- 
+
             // ... retrieve qualified job name of child process
             Qp0wGetJobID(pid: tmpChildProcess);
- 
+
             io_handle.childProcess.nbr  = tmpChildProcess.nbr;
             io_handle.childProcess.user = tmpChildProcess.user;
             io_handle.childProcess.name = tmpChildProcess.name;
             clear tmpChildProcess;
- 
+
             io_handle.pipeWrite    = tmpFildes(cPIPE_WRITE);
             tmpFildes(cPIPE_WRITE) = cDESC_NULL;
- 
+
             rc = close(tmpFildes(cPIPE_READ));
             tmpFildes(cPIPE_READ ) = cDESC_NULL;
- 
+
             LogLog_debug('Spawned child process. [' +
                           io_handle.childProcess.nbr + '/' +
                           %trim(io_handle.childProcess.user) + '/' +
                           %trim(io_handle.childProcess.name) +
                           ']');
- 
+
             isCreated = cTrue;
          enddo;
- 
+
          return isCreated;
- 
+
       /END-FREE
       *
      P createChildProcess...
@@ -851,36 +851,36 @@
      D msg             DS                  likeds(msg_t    ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Close pipe
          if io_handle.pipeWrite <> cDESC_NULL;
             rc = close(io_handle.pipeWrite);
             io_handle.pipeWrite = cDESC_NULL;
          endif;
- 
+
          // End child process
          if io_handle.childProcess.name <> '';
- 
+
             cmd = 'ENDJOB JOB(' + io_handle.childProcess.nbr         + '/' +
                                   %trim(io_handle.childProcess.user) + '/' +
                                   %trim(io_handle.childProcess.name) + ') ' +
                      'OPTION(*CNTRLD) LOGLMT(0) DELAY(60)';
- 
+
             if not f_execute(cmd: *omit: msg);
                LogLog_errorMsg(msg);
             endif;
- 
+
             LogLog_debug('Stopped child process. [' +
                           io_handle.childProcess.nbr + '/' +
                           %trim(io_handle.childProcess.user) + '/' +
                           %trim(io_handle.childProcess.name) +
                           ']');
- 
+
             clear io_handle.childProcess;
          endif;
- 
+
          return isStopped;
- 
+
       /END-FREE
       *
      P endChildProcess...
@@ -907,20 +907,20 @@
      D                                                    ListIterator_t) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          prefix = f_lcase(i_prefix);
- 
+
          propIter = PropertyList_getIterator(i_pPropList);
- 
+
          property = PropertyList_getFirst(propIter);
- 
+
          dow property.key <> '';
- 
+
             if (prefix = '') or (f_startsWith(prefix: property.key) and
  B03                             %len(property.key) > %len(prefix));
- 
+
                parameter = f_lcase(%subst(property.key: %len(prefix) + 1));
- 
+
                select;
                when parameter = cPARAMETER_PORT;
                   io_handle.port =
@@ -937,14 +937,14 @@
                                   property.key            +
                                  '] in [' + cTHIS_CLASS + ']');
                endsl;
- 
+
             endif;
- 
+
             property = PropertyList_getNext(propIter);
          enddo;
- 
+
          return;
- 
+
       /END-FREE
       *
      P loadConfiguration...
