@@ -72,4 +72,24 @@
      D  i_name                       10A   const  varying
      D  o_pos                        10I 0        options(*nopass)
       *
+      *  Resolves the library name.
+     D rslvLibName...
+     D                 PR            10A
+     D                                     extproc('LOG4RPG99+
+     D                                     _rslvLibName+
+     D                                     ')
+     D  i_obj                        10A   const
+     D  i_lib                        10A   const
+     D  i_objType                    10A   const
+      *
+      *  Resolve member name.
+     D rslvMbrName...
+     D                 PR            10A
+     D                                     extproc('LOG4RPG99+
+     D                                     _rslvMbrName+
+     D                                     ')
+     D  i_file                       10A   const
+     D  i_lib                        10A   const
+     D  i_mbr                        10A   const
+      *
       /ENDIF

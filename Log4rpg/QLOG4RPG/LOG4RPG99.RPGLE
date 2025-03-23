@@ -32,6 +32,7 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
       *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
@@ -55,6 +56,7 @@
       *  Prototypes
       * -----------------------------------------
       /COPY QBASICS1,PBASICS1                      Basic RPG Extensions
+      /COPY QBASICS1,BASICS1R0                     SrvPgm: Basic Routines - Declarations        cpyb
       /COPY QLOG4RPG,PLOG4RPG10                    LogLog
       *
       * -----------------------------------------
@@ -100,9 +102,9 @@
      D value           S                   like(i_value  ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          value = i_value;
- 
+
          // Get library name ...
          x = %scan('/': value);
          if x > 1;
@@ -113,7 +115,7 @@
          else;
             srvPgm.lib = '*LIBL';
          endif;
- 
+
          // Get service program name ...
          x = %scan('(': value);
          if x > 1;
@@ -121,9 +123,9 @@
          else;
             srvPgm.name = sds.pgmContProc;
          endif;
- 
+
          return srvPgm;
- 
+
       /END-FREE
       *
      P getSrvPgm...
@@ -151,7 +153,7 @@
      D length          S             10I 0                 inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Get procedure prefix ...
          start = %scan('(': i_value);
          if start > 0 and start < %len(i_value);
@@ -164,15 +166,15 @@
             start  = 1;
             length = %len(i_value);
          endif;
- 
+
          if length > 0;
             procedure = %subst(i_value: start: length);
          else;
             procedure = '';
          endif;
- 
+
          return procedure;
- 
+
       /END-FREE
       *
      P getProcedure...
@@ -201,9 +203,9 @@
      D value           S                   like(i_value  ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          value = %trimR(i_value);
- 
+
          x = %scan('/': value);
          if (x = 0);
             qObj.name = value;
@@ -215,7 +217,7 @@
                qObj.name = %subst(value: x+1);
             endif;
          endif;
- 
+
          // Remove trailing comments from object name e.g.:
          //    QGPL/QRPGLESRC; a comment
          //    QGPL/QRPGLESRC  # a comment
@@ -230,9 +232,9 @@
                endif;
             endif;
          endfor;
- 
+
          return qObj;
- 
+
       /END-FREE
       *
      P getObject...
@@ -308,7 +310,7 @@
      D procName        S            256A               based(pProcName)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Materialize call stack
          clear errCode;
          clear jidf0100;
@@ -319,14 +321,14 @@
          jidf0100.reserved_1 = *ALLx'00';
          jidf0100.thdInd     = 1;
          jidf0100.thdID      = *ALLx'00';
- 
+
          // Check, how much memory we need.
          // Get an initial buffer of 4k.
          // Actually we should need about 2300 byte.
          memSize = 4096;
          pCstk0100 = %alloc(memsize);
          QWVRCSTK(cstk0100: memSize: 'CSTK0100': jidf0100: 'JIDF0100': errCode);
- 
+
          // Call API again, providing enough memory for it
          if cstk0100.bytRet < cstk0100.bytAvl;
             memSize = cstk0100.bytAvl;
@@ -336,7 +338,7 @@
                           Needed to reallocate memory to get +
                           full stack information.');
          endif;
- 
+
          // Spin through the call stack entries searching for the caller
          clear me;
          clear caller;
@@ -346,10 +348,10 @@
             else;
                pStackE = pStackE + stackE.length;
             endif;
- 
+
             pStmtID   = pStackE + stackE.disStmtID;
             pProcName = pStackE + stackE.disProcName;
- 
+
             if (stackE.pgmName = sds.pgmContProc) and
                (stackE.pgmLibName = sds.pgmLib  );
                me.name        = stackE.pgmName;
@@ -370,11 +372,11 @@
                endif;
             endif;
          endfor;
- 
+
          dealloc(N) pCstk0100;
- 
+
          return caller;
- 
+
       /END-FREE
       *
      P getCallingProcedure...
@@ -391,11 +393,91 @@
      D  i_logName                          const  like(LOG4RPG_loggerName_t)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return %xlate('/\': '..': f_lcase(i_logName));
- 
+
       /END-FREE
       *
      P translateLoggerName...
+     P                 E
+      *
+      *===============================================================*
+      *  Resolve library name.
+      *===============================================================*
+     P rslvLibName...
+     P                 B                   export
+     D                 PI            10A
+     D  i_obj                        10A   const
+     D  i_lib                        10A   const
+     D  i_objType                    10A   const
+      *
+     D qObj            DS                  likeds(qObj_t) inz
+     D objd0100        DS                  likeds(objd0100_t) inz
+     D errCode         DS                  likeds(errCode_t) inz
+      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      /FREE
+
+         if (not f_startsWith('*': i_lib));
+           return i_lib;
+         endif;
+
+         clear qObj;
+         qObj.name = i_obj;
+         qObj.lib = i_lib;
+
+         clear errCode;
+         errCode.bytPrv = %size(errCode);
+         QUSROBJD(objd0100: %size(objd0100): 'OBJD0100'
+                  : qObj: i_objType: errCode);
+
+         if (errCode.bytAvl = 0);
+           return objd0100.rtnLib;
+         else;
+           return i_lib;
+         endif;
+
+      /END-FREE
+      *
+     P                 E
+      *
+      *===============================================================*
+      *  Resolve member name.
+      *===============================================================*
+     P rslvMbrName...
+     P                 B                   export
+     D                 PI            10A
+     D  i_file                       10A   const
+     D  i_lib                        10A   const
+     D  i_mbr                        10A   const
+      *
+     D mbr             s             10A
+      *
+     D qFile           DS                  likeds(qObj_t) inz
+     D mbrd0100        DS                  likeds(mbrd0100_t) inz
+     D errCode         DS                  likeds(errCode_t) inz
+      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      /FREE
+
+         if (not f_startsWith('*': i_mbr));
+           return i_mbr;
+         endif;
+
+         clear qFile;
+         qFile.name = i_file;
+         qFile.lib = i_lib;
+
+         clear errCode;
+         errCode.bytPrv = %size(errCode);
+         QUSRMBRD(mbrd0100: %size(mbrd0100): 'MBRD0100'
+                  : qFile: i_mbr: '0': errCode);
+
+         if (errCode.bytAvl = 0);
+           return mbrd0100.mbr;
+         else;
+           return i_mbr;
+         endif;
+
+      /END-FREE
+      *
      P                 E
       *
