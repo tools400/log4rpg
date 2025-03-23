@@ -33,6 +33,7 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
       *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
@@ -220,31 +221,31 @@
      D handle          DS                  likeds(handle_t ) based(io_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          clear tmpHandle;
- 
+
          // Initialize handle
          tmpHandle.pSuper    = i_pSuper;   // Handle of the super class 'Layout'
          tmpHandle.title     = 'Log4rpg Log Messages';
- 
+
          tmpHandle.color.info  = '';
          tmpHandle.color.debug = '#339933';              // green
          tmpHandle.color.warn  = '#FFCC00; strong';      // orange
          tmpHandle.color.error = '#CC3300; strong';      // red
          tmpHandle.color.fatal = '#993300; strong';      // dark red
- 
+
          // Initialize handle from configuration properties
          if (i_pPropList <> *NULL) and not PropertyList_isNull(i_pPropList);
             loadConfiguration(tmpHandle: i_pPropList: i_prefix);
          endif;
- 
+
          io_pHandle = %alloc(%size(tmpHandle));
          handle = tmpHandle;
- 
+
          LogLog_debug('Loaded instance of [' + cTHIS_CLASS + '].');
- 
+
          return isDone;
- 
+
       /END-FREE
       *
      P HTMLLayout_new...
@@ -281,39 +282,39 @@
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Start log event ...
          htmlString = Layout_newLine() + '<tr>' + Layout_newLine();
- 
+
          // ... adding time
          htmlString = htmlString +
             '<td title="Time">' +
                %char(LogEvent_getTime(i_pLogEvent)) +
             '</td>' + Layout_newLine();
- 
+
          // ... adding job (thread)
          htmlString = htmlString +
             '<td title="Qualified job name">' + %editc(sds.nbr: 'X') + '/' +
                                                 %trimR(sds.user)     + '/' +
                                                 %trimR(sds.job )           +
             '</td>' + Layout_newLine();
- 
+
          // ... adding level
          htmlString = htmlString +
             '<td title="Level">';
- 
+
          colorAttr = getColorAttr(handle: LogEvent_getLevel(i_pLogEvent));
- 
+
          pToken = strtok(colorAttr: ';');
          if pToken <> *NULL;
             color = %trim(%str(pToken));
             pToken = strtok(*NULL: ';');
          endif;
- 
+
          if pToken <> *NULL;
             strong = %trim(%str(pToken));
          endif;
- 
+
          if color = '';
             htmlString = htmlString + LogEvent_getLevel(i_pLogEvent);
          else;
@@ -327,37 +328,37 @@
             endif;
             htmlString = htmlString +  '</font>';
          endif;
- 
+
          htmlString = htmlString +
             '</td>' + Layout_newLine();
- 
+
          // ... adding logger name
          htmlString = htmlString +
             '<td title="Logger name">' +
                LogEvent_getLoggerName(i_pLogEvent) +
             '</td>' + Layout_newLine();
- 
+
          // ... adding caller information
          caller = LogEvent_getCaller(i_pLogEvent);
- 
+
          htmlString = htmlString +
             '<td title="Procedure:Line">' +
                caller.procedure + ':' + caller.stmtID +
             '</td>' + Layout_newLine();
- 
+
          // ... adding message
          htmlString = htmlString +
             '<td title="Message">' +
                LogEvent_getText(i_pLogEvent) +
             '</td>' + Layout_newLine();
- 
+
          // ... close.
          htmlString = htmlString + '</tr>'  + Layout_newLine();
- 
+
          LogEvent_setText(i_pLogEvent: htmlString);
- 
+
          return;
- 
+
       /END-FREE
       *
      P HTMLLayout_format...
@@ -387,89 +388,89 @@
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          htmlString =                                                                       //RADDAT
             '<!DOCTYPE HTML PUBLIC "-// 3C//DTD HTML 4.01 Transitional//EN" +
              "http://www.w3.org/TR/html4/loose.dtd">' + Layout_newLine();
- 
+
          htmlString = htmlString +                                                          //RADDAT
             '<html>' + Layout_newLine();
- 
+
          htmlString = htmlString +                                                          //RADDAT
             '<head>' + Layout_newLine();
- 
+
          htmlString = htmlString +                                                          //RADDAT
             '<title>' + handle.title + '</title>' + Layout_newLine();
- 
+
          htmlString = htmlString +                                                          //RADDAT
             '<style type="text/css">' + Layout_newLine();
- 
+
          htmlString = htmlString +                                                          //RADDAT
             '<!--' + Layout_newLine();
- 
+
          htmlString = htmlString +                                                          //RADDAT
             'body, table {font-family: arial,sans-serif; font-size: x-small;}' +
              Layout_newLine();
- 
+
          htmlString = htmlString +                                                          //RADDAT
             'th {background: #336699; color: #FFFFFF; text-align: left;}' +
              Layout_newLine();
- 
+
          htmlString = htmlString +                                                          //RADDAT
             '-->' + Layout_newLine();
- 
+
          htmlString = htmlString +                                                          //RADDAT
             '</style>' + Layout_newLine();
- 
+
          htmlString = htmlString +                                                          //RADDAT
             '</head>' + Layout_newLine();
- 
+
          htmlString = htmlString +                                                          //RADDAT
             '<body bgcolor="#FFFFFF" topmargin="6" leftmargin="6">' +
              Layout_newLine();
- 
+
          htmlString = htmlString +                                                          //RADDAT
             '<hr size="1" noshade>' + Layout_newLine();
- 
+
          htmlString = htmlString +                                                          //RADDAT
             'Log session start time ' + %char(%date: *JOBRUN) + ', ' +
                                         %char(%time: *JOBRUN) +
              '<br>' + Layout_newLine();
- 
+
          htmlString = htmlString +                                                          //RADDAT
             '<br>' + Layout_newLine();
- 
+
          htmlString = htmlString +                                                          //RADDAT
             '<table cellspacing="0" cellpadding="4" border="1" +
              bordercolor="#224466" width="100%">' +
              Layout_newLine();
- 
+
          htmlString = htmlString +                                                          //RADDAT
             '<tr>' + Layout_newLine();
- 
+
          htmlString = htmlString +                                                          //RADDAT
             '<th>Time</th>' + Layout_newLine();
- 
+
          htmlString = htmlString +                                                          //RADDAT
             '<th>Job</th>' + Layout_newLine();
- 
+
          htmlString = htmlString +                                                          //RADDAT
             '<th>Level</th>' + Layout_newLine();
- 
+
          htmlString = htmlString +                                                          //RADDAT
             '<th>Logger</th>' + Layout_newLine();
- 
+
          htmlString = htmlString +                                                          //RADDAT
             '<th>Proc:Line</th>' + Layout_newLine();
- 
+
          htmlString = htmlString +                                                          //RADDAT
             '<th>Message</th>' + Layout_newLine();
- 
+
          htmlString = htmlString +                                                          //RADDAT
             '</tr>' + Layout_newLine();
- 
+
          return htmlString;
- 
+
       /END-FREE
       *
      P HTMLLayout_getHeader...
@@ -499,18 +500,18 @@
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          htmlString =
             '</table>' + Layout_newLine();
- 
+
          htmlString = htmlString +                                                          //RADDAT
             '<br>' + Layout_newLine();
- 
+
          htmlString = htmlString +                                                          //RADDAT
             '</body></html>' + Layout_newLine();
- 
+
          return htmlString;
- 
+
       /END-FREE
       *
      P HTMLLayout_getFooter...
@@ -542,11 +543,11 @@
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          loadConfiguration(handle: i_pPropList: i_prefix);
- 
+
          return;
- 
+
       /END-FREE
       *
      P HTMLLayout_setProperties...
@@ -576,19 +577,19 @@
      D handle          DS                  likeds(handle_t ) based(io_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Clear handle data
          clear handle;
- 
+
          // Free handle memory
          dealloc(N) io_pHandle;
- 
+
          LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
- 
+
          isDone = cTrue;
- 
+
          return isDone;
- 
+
       /END-FREE
       *
      P HTMLLayout_delete...
@@ -616,20 +617,20 @@
      D                                                    ListIterator_t) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          prefix = f_lcase(i_prefix);
- 
+
          propIter = PropertyList_getIterator(i_pPropList);
- 
+
          property = PropertyList_getFirst(propIter);
- 
+
          dow property.key <> '';
- 
+
             if (prefix = '') or (f_startsWith(prefix: property.key) and
  B03                             %len(property.key) > %len(prefix));
- 
+
                parameter = %subst(property.key: %len(prefix) + 1);
- 
+
                select;
                when Layout_knowsProperty(parameter);
                   // Ignore all parameters known by super Layout class
@@ -638,14 +639,14 @@
                                   property.key            +
                                  '] in [' + cTHIS_CLASS + ']');
                endsl;
- 
+
             endif;
- 
+
             property = PropertyList_getNext(propIter);
          enddo;
- 
+
          return;
- 
+
       /END-FREE
       *
      P loadConfiguration...
@@ -667,7 +668,7 @@
      D colorAttr       S                   like(LOG4RPG_colorAttr_t) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          select;
          when i_level = cLOG4RPG_LEVEL_DEBUG;
             colorAttr = i_handle.color.debug;
@@ -682,9 +683,9 @@
          other;
             colorAttr = '';
          endsl;
- 
+
          return colorAttr;
- 
+
       /END-FREE
       *
      P getColorAttr...

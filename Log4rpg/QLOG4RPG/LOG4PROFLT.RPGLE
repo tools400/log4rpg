@@ -32,6 +32,7 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
       *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
@@ -176,25 +177,25 @@
      D handle          DS                  likeds(handle_t ) based(io_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          clear tmpHandle;
- 
+
          // Initialize handle
          tmpHandle.pSuper    = i_pSuper;   // Handle of the super class 'Filter'
          tmpHandle.hPropList = PropertyList_new();
- 
+
          // Initialize handle from configuration properties
          if (i_pPropList <> *NULL) and not PropertyList_isNull(i_pPropList);
             loadConfiguration(tmpHandle: i_pPropList: i_prefix);
          endif;
- 
+
          io_pHandle = %alloc(%size(tmpHandle));
          handle = tmpHandle;
- 
+
          LogLog_debug('Loaded instance of [' + cTHIS_CLASS + '].');
- 
+
          return isDone;
- 
+
       /END-FREE
       *
      P PropertyFilter_new...
@@ -229,27 +230,27 @@
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return if there are no properties to add
          if PropertyList_getNumE(handle.hPropList) = 0;
             return cFILTER_NEUTRAL;
          endif;
- 
+
          // Get property list of log event
          hPropList = LogEvent_getPropertyList(i_pLogEvent);
- 
+
          // Add attributes to log event
          propIter = PropertyList_getIterator(handle.hPropList);
- 
+
          property = PropertyList_getFirst(propIter);
- 
+
          dow property.key <> '';
             PropertyList_put(hPropList: property);
             property = PropertyList_getNext(propIter);
          enddo;
- 
+
          return cFILTER_NEUTRAL;
- 
+
       /END-FREE
       *
      P PropertyFilter_decide...
@@ -281,11 +282,11 @@
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          loadConfiguration(handle: i_pPropList: i_prefix);
- 
+
          return;
- 
+
       /END-FREE
       *
      P PropertyFilter_setProperties...
@@ -315,24 +316,24 @@
      D handle          DS                  likeds(handle_t ) based(io_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Delete property list
          if not PropertyList_isNull(handle.hPropList);
             PropertyList_delete(handle.hPropList);
          endif;
- 
+
          // Clear handle data
          clear handle;
- 
+
          // Free handle memory
          dealloc(N) io_pHandle;
- 
+
          LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
- 
+
          isDone = cTrue;
- 
+
          return isDone;
- 
+
       /END-FREE
       *
      P PropertyFilter_delete...
@@ -360,20 +361,20 @@
      D                                                    ListIterator_t) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          prefix = f_lcase(i_prefix);
- 
+
          propIter = PropertyList_getIterator(i_pPropList);
- 
+
          property = PropertyList_getFirst(propIter);
- 
+
          dow property.key <> '';
- 
+
             if (prefix = '') or (f_startsWith(prefix: property.key) and
  B03                             %len(property.key) > %len(prefix));
- 
+
                parameter = %subst(property.key: %len(prefix) + 1);
- 
+
                select;
                when f_startsWith(cPARAMETER_PROPERTY: parameter);
                   tmpProperty.key = %subst(parameter
@@ -387,14 +388,14 @@
                                   property.key            +
                                  '] in [' + cTHIS_CLASS + ']');
                endsl;
- 
+
             endif;
- 
+
             property = PropertyList_getNext(propIter);
          enddo;
- 
+
          return;
- 
+
       /END-FREE
       *
      P loadConfiguration...

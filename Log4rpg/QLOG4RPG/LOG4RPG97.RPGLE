@@ -31,6 +31,7 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
       *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
@@ -95,11 +96,11 @@
      D  i_mode                         N   const
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          g_isLogMode = i_mode;
- 
+
          return;
- 
+
       /END-FREE
       *
      P Synchronisation_setLogMode...
@@ -116,11 +117,11 @@
      D  i_text                       50A   const  varying
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          g_objectDesc = i_text;
- 
+
          return;
- 
+
       /END-FREE
       *
      P Synchronisation_setObjectDesc...
@@ -156,12 +157,12 @@
      D rcvm0200        DS                  likeds(rcvm0200_t) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          clear o_ticket;
          msg = f_newMsg(cMSG_ID_OK);
- 
+
          dou '1';
- 
+
             if (not f_exist(i_dtaara: i_lib: '*DTAARA'));
                cmd = 'CRTDTAARA DTAARA(%LIB%/%DTAARA%) +
                                 TYPE(*CHAR) LEN(%LEN%) +
@@ -174,9 +175,9 @@
                   leave;
                endif;
             endif;
- 
+
             g_syncObjName = %trimR(i_lib) + '/' + %trimR(i_dtaara);
- 
+
             monitor;
                in *lock g_syncData;
             on-error;
@@ -184,25 +185,25 @@
                msg = f_cvtRcvMsgToMsg(rcvm0200);
                leave;
             endmon;
- 
+
             g_syncData.jobName = %trimR(%char(sds.nbr)) + '/' +
                                  %trimR(sds.user)       + '/' +
                                  %trimR(sds.job );
             g_syncData.alcTime = %timestamp();
- 
+
             if (g_isLogMode);
                out *lock g_syncData;
             endif;
- 
+
             o_ticket.jobName = g_syncData.jobName;
             o_ticket.alcTime = g_syncData.alcTime;
             isStarted = cTrue;
          enddo;
- 
+
          if (msg.ID <> cMSG_ID_OK);
             msg.type = cMsg_Escape;
          endif;
- 
+
          // Process optional/omissible message parameter
          if (%parms() >= p_msg);
             CEETSTA(isPresent: p_msg: *omit);
@@ -214,9 +215,9 @@
                f_sndPgmMsg(msg: cMsg_Prv);
             endif;
          endif;
- 
+
          return isStarted;
- 
+
       /END-FREE
       *
      P Synchronisation_start...
@@ -245,11 +246,11 @@
      D rcvm0200        DS                  likeds(rcvm0200_t) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          msg = f_newMsg(cMSG_ID_OK);
- 
+
          dou '1';
- 
+
             monitor;
                if (g_isLogMode);
                   in *lock g_syncData;
@@ -261,24 +262,24 @@
                msg = f_cvtRcvMsgToMsg(rcvm0200);
                leave;
             endmon;
- 
+
             if (g_isLogMode);
                p_assert(io_ticket.jobName = g_syncData.jobName and
                         io_ticket.alcTime = g_syncData.alcTime
                         : 'Invalid ticket data when attempting +
                            to release sync lock');
- 
+
                clear g_syncData;
                out g_syncData;
             endif;
- 
+
             clear io_ticket;
          enddo;
- 
+
          if (msg.ID <> cMSG_ID_OK);
             msg.type = cMsg_Escape;
          endif;
- 
+
          // Process optional/omissible message parameter
          if (%parms() >= p_msg);
             CEETSTA(isPresent: p_msg: *omit);
@@ -290,9 +291,9 @@
                f_sndPgmMsg(msg: cMsg_Prv);
             endif;
          endif;
- 
+
          return;
- 
+
       /END-FREE
       *
      P Synchronisation_end...

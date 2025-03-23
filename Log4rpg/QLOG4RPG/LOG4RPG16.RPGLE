@@ -36,6 +36,7 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
       *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
@@ -120,12 +121,12 @@
      D tmpLogEvent     DS                  likeds(handle_t              ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          LogLog_verbose('Creating log event for logger [' +
                         i_logName + '] ...');
- 
+
          pLogEvent = LogEvent_null();
- 
+
          // Initialize log event
          clear tmpLogEvent;
          tmpLogEvent.logName     = i_logName;
@@ -138,13 +139,13 @@
          endif;
          tmpLogEvent.caller      = i_caller;
          tmpLogEvent.hPropList   = PropertyList_new();
- 
+
          // Return layout to caller
          pLogEvent = %alloc(%size(handle_t));
          logEvent = tmpLogEvent;
- 
+
          return pLogEvent;
- 
+
       /END-FREE
       *
      P LogEvent_new...
@@ -171,9 +172,9 @@
      D                                     based(i_pLogEvent)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return logEvent.hPropList;
- 
+
       /END-FREE
       *
      P LogEvent_getPropertyList...
@@ -203,15 +204,15 @@
      D                                     based(i_pLogEvent)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (%len(i_text) > 0);
             logEvent.text = %subst(i_text: 1: %len(i_text));
          else;
             logEvent.text = '';
          endif;
- 
+
          return;
- 
+
       /END-FREE
       *
      P LogEvent_setText...
@@ -241,11 +242,11 @@
      D                                     based(i_pLogEvent)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          logEvent.text = logEvent.text + %subst(i_text: 1: %len(i_text));
- 
+
          return;
- 
+
       /END-FREE
       *
      P LogEvent_appendText...
@@ -272,9 +273,9 @@
      D                                     based(i_pLogEvent)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return logEvent.logName;
- 
+
       /END-FREE
       *
      P LogEvent_getLoggerName...
@@ -301,9 +302,9 @@
      D                                     based(i_pLogEvent)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return logEvent.priority;
- 
+
       /END-FREE
       *
      P LogEvent_getPriority...
@@ -330,9 +331,9 @@
      D                                     based(i_pLogEvent)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return Level_toString(logEvent.priority);
- 
+
       /END-FREE
       *
      P LogEvent_getLevel...
@@ -359,9 +360,9 @@
      D                                     based(i_pLogEvent)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return logEvent.time;
- 
+
       /END-FREE
       *
      P LogEvent_getTime...
@@ -388,9 +389,9 @@
      D                                     based(i_pLogEvent)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return logEvent.caller;
- 
+
       /END-FREE
       *
      P LogEvent_getCaller...
@@ -417,13 +418,13 @@
      D                                     based(i_pLogEvent)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if logEvent.caller.pgm.lib = '';
             logEvent.caller = getCallingProcedure();
          endif;
- 
+
          return logEvent.caller.pgm.lib;
- 
+
       /END-FREE
       *
      P LogEvent_resolveCallerPgmLibrary...
@@ -450,9 +451,9 @@
      D                                     based(i_pLogEvent)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return logEvent.text;
- 
+
       /END-FREE
       *
      P LogEvent_getText...
@@ -482,15 +483,15 @@
      D size            S             10I 0 inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          size = LogEvent_textLength(i_pLogEvent) + 1;
- 
+
          pText = %alloc(size);
- 
+
          %str(pText: size) = LogEvent_getText(i_pLogEvent);
- 
+
          return pText;
- 
+
       /END-FREE
       *
      P LogEvent_getTextPointer...
@@ -517,9 +518,9 @@
      D                                     based(i_pLogEvent)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return %len(logEvent.text);
- 
+
       /END-FREE
       *
      P LogEvent_textLength...
@@ -551,16 +552,16 @@
      D                                     based(i_pLogEvent)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          logEvent.startPos = 1;
- 
+
          if (%parms() >= p_width);
             return LogEvent_getNextLineOfText(i_pLogEvent: o_isText: i_width);
          else;
             return LogEvent_getNextLineOfText(i_pLogEvent: o_isText);
          endif;
- 
- 
+
+
       /END-FREE
       *
      P LogEvent_getFirstLineOfText...
@@ -598,13 +599,13 @@
      D                                     based(i_pLogEvent)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (%parms() >= p_width);
             width = i_width;
          else;
             width = cLOG4RPG_MAX_TEXT_LENGTH;
          endif;
- 
+
          if logEvent.startPos > 0;
             o_isText = cTrue;
             return f_wordWrap(logEvent.text
@@ -613,11 +614,11 @@
                               : cWORDWRAP_PARAGRAPH_TEXT +
                                 cWORDWRAP_PARAGRAPH_TRIMR);
          endif;
- 
+
          o_isText = cFalse;
- 
+
          return '';
- 
+
       /END-FREE
       *
      P LogEvent_getNextLineOfText...
@@ -644,22 +645,22 @@
      D                                     based(io_pLogEvent)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          LogLog_verbose('Deleting log event of logger [' +
                          logEvent.logName + '] ...');
- 
+
          if not PropertyList_isNull(logEvent.hPropList);
             PropertyList_delete(logEvent.hPropList);
          endif;
- 
+
          clear logEvent;
- 
+
          dealloc(N) io_pLogEvent;
- 
+
          io_pLogEvent = LogEvent_null();
- 
+
          return;
- 
+
       /END-FREE
       *
      P LogEvent_delete...
@@ -690,15 +691,15 @@
      D                                     based(i_pLogEvent)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if i_pLogEvent = LogEvent_null();
             isNull = cTrue;
          else;
             isNull = cFalse;
          endif;
- 
+
          return isNull;
- 
+
       /END-FREE
       *
      P LogEvent_isNull...
@@ -720,9 +721,9 @@
      D                 PI                         like(LOG4RPG_pLogEvent_t     )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return *NULL;
- 
+
       /END-FREE
       *
      P LogEvent_null...

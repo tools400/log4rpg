@@ -43,6 +43,7 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
       *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
@@ -152,13 +153,13 @@
      D tempAppender    DS                  likeds(handle_t              ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          initializeModule();
- 
+
          LogLog_debug('Creating appender [' + i_appName + '] ...');
- 
+
          pAppender = Appender_null();
- 
+
          // Get optional parameters ...
          // ... property string
          if %parms() >= p_pPropString;
@@ -166,13 +167,13 @@
          else;
             isPresent = 0;
          endif;
- 
+
          if isPresent = 1;
             pPropString = i_pPropString;
          else;
             pPropString = *NULL;
          endif;
- 
+
          // Initialize appender
          tempAppender.name    = i_appName;
          if not ClassLoader_resolveAppender(i_appImpl
@@ -181,38 +182,38 @@
          endif;
          tempAppender.pLayout  = Layout_null();
          tempAppender.pFilter  = Filter_null();
- 
+
          // Create properties list
          if pPropString <> *NULL;
             pPropList = PropertyList_new(pPropString);
          else;
             pPropList = PropertyList_null();
          endif;
- 
+
          // Create appender handle
          pAppender = %alloc(%size(handle_t));
          appender = tempAppender;
- 
+
          // Instanciate appender implementation object
          g_pAppender_new = appender.appenderImpl.procNew.procptr;
          SrvPgmAppender_new(pAppender
                             : appender.appenderImpl.pHandle
                             : pPropList
                             : '');
- 
+
          // Destroy properties list
          if not PropertyList_isNull(pPropList);
             PropertyList_delete(pPropList);
          endif;
- 
+
          // Add appender to the repository
          Repository_addAppender(pAppender);
- 
+
          LogLog_verbose('+ Allocated memory for appender [' +
                            appender.name + '].');
- 
+
          return pAppender;
- 
+
       /END-FREE
       *
      P Appender_new...
@@ -248,7 +249,7 @@
      D                                     based(i_pAppender)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Let the filter decide what to do with the log event
          pFilter = Appender_getFilter(i_pAppender);
          dow not Filter_isNull(pFilter);
@@ -267,20 +268,20 @@
                leave;
             endsl;
          enddo;
- 
+
          // Layout text of logging event
          if Appender_requiresLayout(i_pAppender) and
  B02        not Layout_isNull(appender.pLayout);
             Layout_format(appender.pLayout: i_pLogEvent);
          endif;
- 
+
          // Append line of log statement to log
          g_pAppender_doAppend = appender.appenderImpl.procDoAppend.procptr;
          isAppended = SrvPgmAppender_doAppend(
                          appender.appenderImpl.pHandle: i_pLogEvent);
- 
+
          return isAppended;
- 
+
       /END-FREE
       *
      P Appender_doAppend...
@@ -307,9 +308,9 @@
      D                                     based(i_pAppender)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return appender.name;
- 
+
       /END-FREE
       *
      P Appender_getName...
@@ -336,9 +337,9 @@
      D                                     based(i_pAppender)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return appender.pLayout;
- 
+
       /END-FREE
       *
      P Appender_getLayout...
@@ -369,15 +370,15 @@
      D                                     based(i_pAppender)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          g_pAppender_setProperties =
                appender.appenderImpl.procSetProperties.procptr;
          SrvPgmAppender_setProperties(appender.appenderImpl.pHandle
                                       : i_pPropList
                                       : i_prefix);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Appender_setProperties...
@@ -411,25 +412,25 @@
      D                                     based(io_pAppender)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          initializeModule();
- 
+
          if not Repository_existAppender(appender.name);
             io_pAppender = Appender_null();
             return cTrue;
          endif;
- 
+
          LogLog_verbose('Deleting appender [' + appender.name + '] ...');
- 
+
          name = appender.name;
- 
+
          // Remove appender from repository
          Repository_removeAppender(appender.name);
- 
+
          // Delete appender (close appender)
          g_pAppender_delete = appender.appenderImpl.procDelete.procptr;
          isDeleted = SrvPgmAppender_delete(appender.appenderImpl.pHandle);
- 
+
          // Delete layout
          if Appender_requiresLayout(io_pAppender);
             if not Layout_isNull(appender.pLayout);
@@ -437,17 +438,17 @@
                appender.pLayout = Layout_null();
             endif;
          endif;
- 
+
          // Detach filter from appender
          appender.pFilter = Filter_null();
- 
+
          dealloc(N) io_pAppender;
          io_pAppender = Appender_null();
- 
+
          LogLog_verbose('- Freed memory of appender [' + name + '].');
- 
+
          return isDeleted;
- 
+
       /END-FREE
       *
      P Appender_delete...
@@ -478,14 +479,14 @@
      D                                     based(i_pAppender)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          g_pAppender_requiresLayout =
                      appender.appenderImpl.procRequiresLayout.procptr;
          reqLayout = SrvPgmAppender_requiresLayout(
                                        appender.appenderImpl.pHandle);
- 
+
          return reqLayout;
- 
+
       /END-FREE
       *
      P Appender_requiresLayout...
@@ -514,11 +515,11 @@
      D                                     based(i_pAppender)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          appender.pLayout = i_pLayout;
- 
+
          return cTrue;
- 
+
       /END-FREE
       *
      P Appender_setLayout...
@@ -550,28 +551,28 @@
      D                                     based(i_pAppender)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if Filter_isNull(i_pFilter);
             LogLog_warning('Filter is NULL. Please check call from [' +
                            f_caller() + '] to [' + f_this() + '].');
             return cFalse;
          endif;
- 
+
          filterName = Filter_getName(i_pFilter);
- 
+
          if not Repository_existFilter(filterName);
             LogLog_warning('Filter [' + filterName +
                            '] does not exist in repository.');
             return cFalse;
          endif;
- 
+
          appender.pFilter = i_pFilter;
- 
+
          LogLog_debug('Filter [' + filterName +
                       '] attached to appender [' + appender.name + '].');
- 
+
          return cTrue;
- 
+
       /END-FREE
       *
      P Appender_setFilter...
@@ -599,9 +600,9 @@
      D                                     based(i_pAppender)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return appender.pFilter;
- 
+
       /END-FREE
       *
      P Appender_getFilter...
@@ -626,7 +627,7 @@
      D  i_parameter                        const  like(LOG4RPG_Property_key_t  )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          select;
          when i_parameter = cPARAMETER_LAYOUT or
               f_startsWith(cPARAMETER_LAYOUT + '.': i_parameter);
@@ -637,7 +638,7 @@
          other;
             return cFalse;
          endsl;
- 
+
       /END-FREE
       *
      P Appender_knowsProperty...
@@ -668,15 +669,15 @@
      D                                     based(i_pAppender)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if i_pAppender = Appender_null();
             isNull = cTrue;
          else;
             isNull = cFalse;
          endif;
- 
+
          return isNull;
- 
+
       /END-FREE
       *
      P Appender_isNull...
@@ -698,9 +699,9 @@
      D                 PI                         like(LOG4RPG_pAppender_t     )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return *NULL;
- 
+
       /END-FREE
       *
      P Appender_null...
@@ -721,19 +722,19 @@
       *  Helper fields
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if g_isInit;
             return;
          endif;
- 
+
          Loglog_verbose('Initializing module ' + sds.modContProc + '...');
- 
+
          Repository_initialize();
- 
+
          g_isInit = cTrue;
- 
+
          return;
- 
+
       /END-FREE
       *
      P initializeModule...

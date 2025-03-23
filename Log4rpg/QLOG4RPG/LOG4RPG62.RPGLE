@@ -46,6 +46,7 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
       *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
@@ -159,27 +160,27 @@
      D handle          DS                  likeds(handle_t ) based(io_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          clear tempHandle;
- 
+
          // Initialize handle
          tempHandle.pSuper        = i_pSuper;   // Handle of the super class 'Layout'
          tempHandle.rplUnprtChars = cFalse;
          tempHandle.substitutionChar = '�';
          tempHandle.encoding         = '';
- 
+
          // Initialize handle from configuration properties
          if (i_pPropList <> *NULL) and not PropertyList_isNull(i_pPropList);
             loadConfiguration(tempHandle: i_pPropList: i_prefix);
          endif;
- 
+
          io_pHandle = %alloc(%size(tempHandle));
          handle = tempHandle;
- 
+
          LogLog_debug('Loaded instance of [' + cTHIS_CLASS + '].');
- 
+
          return isDone;
- 
+
       /END-FREE
       *
      P XMLLayout_new...
@@ -241,7 +242,7 @@
      D END_CDATA       S              3C   inz(u'005D005D003E')                 ]]>
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Convert log timestamp to Epoch time since this is
          // what 'Chainsaw' expects:
          mSeconds = %subdt(LogEvent_getTime(i_pLogEvent): *MSECONDS);
@@ -250,7 +251,7 @@
          CEEUTCO(hours: minutes: seconds);
          elapsedEpochTime = elapsedEpochTime - seconds;
          elapsedEpochTime = (elapsedEpochTime * 1000) + (mSeconds / 1000);
- 
+
          // Start log event ...
          xmlString = '<log4j:event logger="'                  +
                         LogEvent_getLoggerName(i_pLogEvent)   + '" ' +
@@ -264,7 +265,7 @@
                         %trimR(sds.user)     + '/' +
                         %trimR(sds.job )                      + '" ' +
                      '>';
- 
+
          // ... append message text
          xmlString = xmlString +
                      '<log4j:message>' + %char(START_CDATA) +
@@ -272,10 +273,10 @@
                                        : LogEvent_getText(i_pLogEvent)) +
                      %char(END_CDATA) +
                      '</log4j:message>';
- 
+
          // ... append caller information
          caller = LogEvent_getCaller(i_pLogEvent);
- 
+
          xmlString = xmlString +
                      '<log4j:locationInfo class="' +
                         %trimR(caller.pgm.name)    + '" ' +
@@ -286,44 +287,44 @@
                      'line="'                      +
                         %trimR(caller.stmtID)      + '" ' +
                      '/>';
- 
+
          // ... append properties
          pPropList = LogEvent_getPropertyList(i_pLogEvent);
- 
+
          if not PropertyList_isNull(pPropList);
- 
+
             propIter = PropertyList_getIterator(pPropList);
- 
+
             isStarted = cFalse;
             property = PropertyList_getFirst(propIter);
- 
+
             dow property.key <> '';
- 
+
                if not isStarted;
                   xmlString = xmlString + '<log4j:properties>';
                   isStarted = cTrue;
                endif;
- 
+
                xmlString = xmlString +
                            '<log4j:data name="' + property.key   +
                                     '" value="' + property.value + '"' +
                            '/>';
- 
+
                property = PropertyList_getNext(propIter);
             enddo;
- 
+
             if isStarted;
                xmlString = xmlString + '</log4j:properties>';
             endif;
          endif;
- 
+
          // ... close.
          xmlString = xmlString + '</log4j:event>';
- 
+
          LogEvent_setText(i_pLogEvent: xmlString);
- 
+
          return;
- 
+
       /END-FREE
       *
      P XMLLayout_format...
@@ -353,29 +354,29 @@
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          xmlString =                                                                        //RADDAT
             '<?xml version="1.0" ';
- 
+
          if handle.encoding <> '';
             xmlString = xmlString +
             'encoding="' + handle.encoding + '" ';
          endif;
- 
+
          xmlString = xmlString +
             '?>' + Layout_newLine();
- 
+
          xmlString = xmlString +
             '<!DOCTYPE log4j:eventSet SYSTEM "log4j.dtd">' +
              Layout_newLine();
- 
+
          xmlString = xmlString +
             '<log4j:eventSet version="1.2" +
              xmlns:log4j="http://jakarta.apache.org/log4j/">' +
              Layout_newLine();
- 
+
          return xmlString;
- 
+
       /END-FREE
       *
      P XMLLayout_getHeader...
@@ -405,12 +406,12 @@
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          xmlString =
             '</log4j:eventSet>' + Layout_newLine();
- 
+
          return xmlString;
- 
+
       /END-FREE
       *
      P XMLLayout_getFooter...
@@ -442,11 +443,11 @@
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          loadConfiguration(handle: i_pPropList: i_prefix);
- 
+
          return;
- 
+
       /END-FREE
       *
      P XMLLayout_setProperties...
@@ -476,19 +477,19 @@
      D handle          DS                  likeds(handle_t ) based(io_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Clear handle data
          clear handle;
- 
+
          // Free handle memory
          dealloc(N) io_pHandle;
- 
+
          LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
- 
+
          isDone = cTrue;
- 
+
          return isDone;
- 
+
       /END-FREE
       *
      P XMLLayout_delete...
@@ -515,20 +516,20 @@
      D                                                    ListIterator_t) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          prefix = f_lcase(i_prefix);
- 
+
          propIter = PropertyList_getIterator(i_pPropList);
- 
+
          property = PropertyList_getFirst(propIter);
- 
+
          dow property.key <> '';
- 
+
             if (prefix = '') or (f_startsWith(prefix: property.key) and
  B03                             %len(property.key) > %len(prefix));
- 
+
                parameter = f_lcase(%subst(property.key: %len(prefix) + 1));
- 
+
                select;
                when parameter = cPARAMETER_REPLACE_UNPRINTABLE_CHARACTERS;
                   if property.value = '1' or f_lcase(property.value) = 'true';
@@ -547,14 +548,14 @@
                                   property.key            +
                                  '] in [' + cTHIS_CLASS + ']');
                endsl;
- 
+
             endif;
- 
+
             property = PropertyList_getNext(propIter);
          enddo;
- 
+
          return;
- 
+
       /END-FREE
       *
      P loadConfiguration...
@@ -583,15 +584,15 @@
      D ESC_END_CDATA   S              6C   inz(u'005D005D002600670074003B')     ]]&gt;
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Replace closing string of CDATA section
          text1 = f_replace(%char(END_CDATA): %char(ESC_END_CDATA): i_text);
- 
+
          // Replace unprintable characters
          if not i_handle.rplUnprtChars;
             return text1;
          endif;
- 
+
          for x = 1 to %len(text1);
             if %subst(text1: x: 1) < x'40' or %subst(text1: x: 1) > x'FE';
                text2 = text2 + i_handle.substitutionChar;
@@ -599,9 +600,9 @@
                text2 = text2 + %subst(text1: x: 1);
             endif;
          endfor;
- 
+
          return text2;
- 
+
       /END-FREE
       *
      P rplcUnprtChars...

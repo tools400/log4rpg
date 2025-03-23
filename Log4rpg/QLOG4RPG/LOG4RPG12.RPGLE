@@ -39,6 +39,7 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
       *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
@@ -152,13 +153,13 @@
      D msg             DS                  likeds(msg_t                  ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          clear o_classAppender;
          clear tempClassAppender;
- 
+
          srvPgm = getSrvPgm(i_appendImpl);
          proc   = getProcedure(i_appendImpl);
- 
+
          tempClassAppender.pHandle = *NULL;
          tempClassAppender.srvPgm  = f_activateSrvPgm(srvPgm.name
                                                       : srvPgm.lib
@@ -168,9 +169,9 @@
                             i_appendImpl + ']');
             return isResolved;
          endif;
- 
+
          tempClassAppender.proc = proc;
- 
+
          tempClassAppender.procNew            =
                        f_getProcPtrByName(proc + cAPPENDER_NEW
                                           : tempClassAppender.srvPgm: *omit);
@@ -179,7 +180,7 @@
                           proc + cAPPENDER_NEW);
             return isResolved;
          endif;
- 
+
          tempClassAppender.procRequiresLayout =
                        f_getProcPtrByName(proc + cAPPENDER_REQUIRES_LAYOUT
                                           : tempClassAppender.srvPgm: *omit);
@@ -188,7 +189,7 @@
                           proc + cAPPENDER_REQUIRES_LAYOUT);
             return isResolved;
          endif;
- 
+
          tempClassAppender.procDoAppend       =
                        f_getProcPtrByName(proc + cAPPENDER_DOAPPEND
                                           : tempClassAppender.srvPgm: *omit);
@@ -197,7 +198,7 @@
                           proc + cAPPENDER_DOAPPEND);
             return isResolved;
          endif;
- 
+
          tempClassAppender.procSetProperties  =
                        f_getProcPtrByName(proc + cAPPENDER_SET_PROPERTIES
                                           : tempClassAppender.srvPgm: *omit);
@@ -206,7 +207,7 @@
                           proc + cAPPENDER_SET_PROPERTIES);
             return isResolved;
          endif;
- 
+
          tempClassAppender.procDelete         =
                        f_getProcPtrByName(proc + cAPPENDER_DELETE
                                           : tempClassAppender.srvPgm: *omit);
@@ -215,13 +216,13 @@
                           proc + cAPPENDER_DELETE);
             return isResolved;
          endif;
- 
+
          o_classAppender = tempClassAppender;
- 
+
          isResolved = cTrue;
- 
+
          return isResolved;
- 
+
       /END-FREE
       *
      P ClassLoader_resolveAppender...
@@ -258,13 +259,13 @@
      D msg             DS                  likeds(msg_t                  ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          clear o_classLayout;
          clear tempClassLayout;
- 
+
          srvPgm = getSrvPgm(i_layoutImpl);
          proc   = getProcedure(i_layoutImpl);
- 
+
          tempClassLayout.pHandle = *NULL;
          tempClassLayout.srvPgm  = f_activateSrvPgm(srvPgm.name
                                                     : srvPgm.lib
@@ -274,9 +275,9 @@
                             i_layoutImpl + ']');
             return isResolved;
          endif;
- 
+
          tempClassLayout.proc = proc;
- 
+
          tempClassLayout.procNew            =
                        f_getProcPtrByName(proc + cLAYOUT_NEW
                                           : tempClassLayout.srvPgm: *omit);
@@ -285,7 +286,7 @@
                           proc + cLAYOUT_NEW);
             return isResolved;
          endif;
- 
+
          tempClassLayout.procFormat         =
                        f_getProcPtrByName(proc + cLAYOUT_FORMAT
                                           : tempClassLayout.srvPgm: *omit);
@@ -294,7 +295,7 @@
                           proc + cLAYOUT_NEW);
             return isResolved;
          endif;
- 
+
          tempClassLayout.procSetProperties  =
                        f_getProcPtrByName(proc + cLAYOUT_SET_PROPERTIES
                                           : tempClassLayout.srvPgm: *omit);
@@ -303,7 +304,7 @@
                           proc + cLAYOUT_NEW);
             return isResolved;
          endif;
- 
+
          tempClassLayout.procDelete         =
                        f_getProcPtrByName(proc + cLAYOUT_DELETE
                                           : tempClassLayout.srvPgm: *omit);
@@ -312,7 +313,7 @@
                           proc + cLAYOUT_NEW);
             return isResolved;
          endif;
- 
+
          // Resolve optional procedures
          tempClassLayout.procGetHeader      =
                        f_getProcPtrByName(proc + cLAYOUT_GET_HEADER
@@ -321,7 +322,7 @@
             LogLog_verbose('Could not resolve procedure: ' +
                             proc + cLAYOUT_GET_HEADER);
          endif;
- 
+
          tempClassLayout.procGetFooter      =
                        f_getProcPtrByName(proc + cLAYOUT_GET_FOOTER
                                           : tempClassLayout.srvPgm: *omit);
@@ -329,13 +330,13 @@
             LogLog_verbose('Could not resolve procedure: ' +
                             proc + cLAYOUT_GET_FOOTER);
          endif;
- 
+
          o_classLayout = tempClassLayout;
- 
+
          isResolved = cTrue;
- 
+
          return isResolved;
- 
+
       /END-FREE
       *
      P ClassLoader_resolveLayout...
@@ -372,13 +373,13 @@
      D msg             DS                  likeds(msg_t                  ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          clear o_classFilter;
          clear tempClassFilter;
- 
+
          srvPgm = getSrvPgm(i_filterImpl);
          proc   = getProcedure(i_filterImpl);
- 
+
          tempClassFilter.pHandle = *NULL;
          tempClassFilter.srvPgm  = f_activateSrvPgm(srvPgm.name
                                                     : srvPgm.lib
@@ -388,9 +389,9 @@
                             i_filterImpl + ']');
             return isResolved;
          endif;
- 
+
          tempClassFilter.proc = proc;
- 
+
          tempClassFilter.procNew            =
                        f_getProcPtrByName(proc + cFILTER_NEW
                                           : tempClassFilter.srvPgm: *omit);
@@ -399,7 +400,7 @@
                           proc + cFILTER_NEW);
             return isResolved;
          endif;
- 
+
          tempClassFilter.procDecide         =
                        f_getProcPtrByName(proc + cFILTER_DECIDE
                                           : tempClassFilter.srvPgm: *omit);
@@ -408,7 +409,7 @@
                           proc + cFILTER_DECIDE);
             return isResolved;
          endif;
- 
+
          tempClassFilter.procSetProperties  =
                        f_getProcPtrByName(proc + cFILTER_SET_PROPERTIES
                                           : tempClassFilter.srvPgm: *omit);
@@ -417,7 +418,7 @@
                           proc + cFILTER_SET_PROPERTIES);
             return isResolved;
          endif;
- 
+
          tempClassFilter.procDelete         =
                        f_getProcPtrByName(proc + cFILTER_DELETE
                                           : tempClassFilter.srvPgm: *omit);
@@ -426,13 +427,13 @@
                           proc + cFILTER_DELETE);
             return isResolved;
          endif;
- 
+
          o_classFilter = tempClassFilter;
- 
+
          isResolved = cTrue;
- 
+
          return isResolved;
- 
+
       /END-FREE
       *
      P ClassLoader_resolveFilter...

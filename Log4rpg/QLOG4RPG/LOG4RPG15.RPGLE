@@ -31,6 +31,7 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
       *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
@@ -85,7 +86,7 @@
      D  i_debugOutput                      const  like(LOG4RPG_debugOutput_t)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          select;
          when i_debugOutput = cLOG4RPG_DEBUG_OUTPUT_PRINTER;
             return cLOG4RPG_INT_DEBUG_OUTPUT_PRINTER;
@@ -94,7 +95,7 @@
          other;
             return cLOG4RPG_INT_DEBUG_OUTPUT_PRINTER;
          endsl;
- 
+
       /END-FREE
       *
      P DebugOutput_toInt...
@@ -117,7 +118,7 @@
      D  i_debugOutput                 5I 0 const
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          select;
          when i_debugOutput = cLOG4RPG_INT_DEBUG_OUTPUT_PRINTER;
             return cLOG4RPG_DEBUG_OUTPUT_PRINTER;
@@ -126,7 +127,7 @@
          other;
             return '';
          endsl;
- 
+
       /END-FREE
       *
      P DebugOutput_toString...
@@ -149,14 +150,14 @@
      D  i_debugOutput                      const  like(LOG4RPG_debugOutput_t)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (i_debugOutput = cLOG4RPG_DEBUG_OUTPUT_PRINTER) or
             (i_debugOutput = cLOG4RPG_DEBUG_OUTPUT_STDOUT);
             return cTrue;
          else;
             return cFalse;
          endif;
- 
+
       /END-FREE
       *
      P DebugOutput_isValid...

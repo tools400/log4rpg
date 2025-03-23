@@ -33,6 +33,7 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
       *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
@@ -121,11 +122,11 @@
      D tempLayout      DS                  likeds(handle_t              ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          LogLog_debug('Creating layout ...');
- 
+
          pLayout = Layout_null();
- 
+
          // Get optional parameters ...
          // ... property string
          if %parms() >= p_pPropString;
@@ -133,45 +134,45 @@
          else;
             isPresent = 0;
          endif;
- 
+
          if isPresent = 1;
             pPropString = i_pPropString;
          else;
             pPropString = *NULL;
          endif;
- 
+
          // Initialize layout;
          if not ClassLoader_resolveLayout(i_layoutImpl: tempLayout.layoutImpl);
             return pLayout;
          endif;
- 
+
          // Create properties list
          if pPropString <> *NULL;
             pPropList = PropertyList_new(pPropString);
          else;
             pPropList = PropertyList_null();
          endif;
- 
+
          // Create layout handle
          pLayout = %alloc(%size(handle_t));
          layout = tempLayout;
- 
+
          // Instanciate layout implementation object
          g_pLayout_new = layout.layoutImpl.procNew.procptr;
          SrvPgmLayout_new(pLayout
                           : layout.layoutImpl.pHandle
                           : pPropList
                           : '');
- 
+
          // Destroy properties list
          if not PropertyList_isNull(pPropList);
             PropertyList_delete(pPropList);
          endif;
- 
+
          LogLog_verbose('+ Allocated memory for layout.');
- 
+
          return pLayout;
- 
+
       /END-FREE
       *
      P Layout_new...
@@ -199,16 +200,16 @@
      D                                     based(i_pLayout)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          LogLog_verbose('-> Formatting log event of logger [' +
                             LogEvent_getLoggerName(i_pLogEvent) + ']...');
- 
+
          g_pLayout_format = layout.layoutImpl.procFormat.procptr;
          SrvPgmLayout_format(layout.layoutImpl.pHandle
                              : i_pLogEvent);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Layout_format...
@@ -238,15 +239,15 @@
      D                                     based(i_pLayout)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          g_pLayout_getHeader = layout.layoutImpl.procGetHeader.procptr;
- 
+
          if g_pLayout_getHeader <> *NULL;
             header = SrvPgmLayout_getHeader(layout.layoutImpl.pHandle);
          endif;
- 
+
          return header;
- 
+
       /END-FREE
       *
      P Layout_getHeader...
@@ -276,15 +277,15 @@
      D                                     based(i_pLayout)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          g_pLayout_getFooter = layout.layoutImpl.procGetFooter.procptr;
- 
+
          if g_pLayout_getFooter <> *NULL;
             footer = SrvPgmLayout_getFooter(layout.layoutImpl.pHandle);
          endif;
- 
+
          return footer;
- 
+
       /END-FREE
       *
      P Layout_getFooter...
@@ -306,9 +307,9 @@
      D                 PI             2A          varying
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return '\n';
- 
+
       /END-FREE
       *
      P Layout_newLine...
@@ -339,15 +340,15 @@
      D                                     based(i_pLayout)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          g_pLayout_setProperties =
                layout.layoutImpl.procSetProperties.procptr;
          SrvPgmLayout_setProperties(layout.layoutImpl.pHandle
                                     : i_pPropList
                                     : i_prefix);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Layout_setProperties...
@@ -377,20 +378,20 @@
      D                                     based(io_pLayout)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          LogLog_verbose('Deleting layout ...');
- 
+
          // Delete layout
          g_pLayout_delete = layout.layoutImpl.procDelete.procptr;
          isDeleted = SrvPgmLayout_delete(layout.layoutImpl.pHandle);
- 
+
          dealloc(N) io_pLayout;
          io_pLayout = Layout_null();
- 
+
          LogLog_verbose('- Free memory of layout.');
- 
+
          return isDeleted;
- 
+
       /END-FREE
       *
      P Layout_delete...
@@ -415,12 +416,12 @@
      D  i_parameter                        const  like(LOG4RPG_Property_key_t  )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          select;
          other;
             return cFalse;
          endsl;
- 
+
       /END-FREE
       *
      P Layout_knowsProperty...
@@ -448,15 +449,15 @@
      D isNull          S               N   inz(cFalse)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if i_pLayout = Layout_null();
             isNull = cTrue;
          else;
             isNull = cFalse;
          endif;
- 
+
          return isNull;
- 
+
       /END-FREE
       *
      P Layout_isNull...
@@ -478,9 +479,9 @@
      D                 PI                         like(LOG4RPG_pLayout_t       )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return *NULL;
- 
+
       /END-FREE
       *
      P Layout_null...

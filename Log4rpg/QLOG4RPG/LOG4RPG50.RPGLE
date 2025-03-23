@@ -77,6 +77,7 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
       *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
@@ -289,9 +290,9 @@
      D handle          DS                  likeds(handle_t ) based(io_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          clear tempHandle;
- 
+
          // Initialize handle
          tempHandle.pSuper          = i_pSuper;   // Handle of the super class 'Appender'
          tempHandle.isOpen          = cFalse;
@@ -309,19 +310,19 @@
          tempHandle.syncText        = cDEFAULT_SYNC_TEXT;
          tempHandle.ccsid           = cDEFAULT_CCSID;
          tempHandle.lastRnmErr      = *LOVAL;
- 
+
          // Initialize handle from configuration properties
          if (i_pPropList <> *NULL) and not PropertyList_isNull(i_pPropList);
             loadConfiguration(tempHandle: i_pPropList: i_prefix);
          endif;
- 
+
          io_pHandle = %alloc(%size(tempHandle));
          handle = tempHandle;
- 
+
          LogLog_debug('Loaded instance of [' + cTHIS_CLASS + '].');
- 
+
          return isDone;
- 
+
       /END-FREE
       *
      P DailyRollingFileAppender_new...
@@ -349,9 +350,9 @@
      D handle          DS                  likeds(handle_t ) based(io_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return cTrue;
- 
+
       /END-FREE
       *
      P DailyRollingFileAppender_requiresLayout...
@@ -394,27 +395,27 @@
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return if there is no text
          if LogEvent_textLength(i_pLogEvent) = 0;
             return cTrue;
          endif;
- 
+
          // Open the appender for output is it is not yet open
          if not handle.isOpen;
             if not openAppender(i_pHandle);
                return cFalse;
             endif;
          endif;
- 
+
          // Check if a new file must be started.
          if (not checkAndHandleRenameError(i_pHandle) and
              isNewFileCondition(handle));
- 
+
             dou '1';
- 
+
                isRenameError = cFalse;
- 
+
                // Start synchronisation with concurrent jobs
                if (handle.share);
                   if (not Synchronisation_start(handle.qSyncObj.name
@@ -425,7 +426,7 @@
                      leave;
                   endif;
                endif;
- 
+
                // Determine, whether this job has to create a new file or not.
                // If a new file has been created by anther job, this job only
                // has to switch to the new file.
@@ -435,14 +436,14 @@
                else;
                   isNewFile = cFalse;
                endif;
- 
+
                if handle.isOpen;
                   if (isNewFile);
                      appendFooter(i_pHandle);
                   endif;
                   closeAppender(i_pHandle);
                endif;
- 
+
                if (isNewFile and f_isIfsFile(handle.path: *omit));
                   archive =%trimR(f_rtvIfsFileFromPath(getArchivePath(handle)));
                   if (f_renameIfsFile(handle.path: archive: msg) <> 0);
@@ -450,28 +451,28 @@
                      isRenameError = cTrue;
                   endif;
                endif;
- 
+
                openAppender(i_pHandle);
- 
+
                // End synchronisation
                if (handle.share);
                   Synchronisation_end(ticket);
                endif;
- 
+
             enddo;
- 
+
             if (isRenameError);
                setRenameError(i_pHandle);
             else;
                clearRenameError(i_pHandle);
             endif;
- 
+
             if (not handle.isOpen);
                return cFalse;
             endif;
- 
+
          endif;
- 
+
          // Write to file. Asking the LogEvent to do wordWrap.
          lineLength = cLOG4RPG_MAX_TEXT_LENGTH - %len(cIFS_EOL_CRLF);
          text = LogEvent_getFirstLineOfText(i_pLogEvent: isText: lineLength);
@@ -491,9 +492,9 @@
             endif;
             text = LogEvent_getNextLineOfText(i_pLogEvent: isText: lineLength);
          enddo;
- 
+
          return isDone;
- 
+
       /END-FREE
       *
      P DailyRollingFileAppender_doAppend...
@@ -525,11 +526,11 @@
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          loadConfiguration(handle: i_pPropList: i_prefix);
- 
+
          return;
- 
+
       /END-FREE
       *
      P DailyRollingFileAppender_setProperties...
@@ -559,24 +560,24 @@
      D handle          DS                  likeds(handle_t ) based(io_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Close file if it is left open
          if handle.isOpen;
             closeAppender(io_pHandle);
          endif;
- 
+
          // Clear handle data
          clear handle;
- 
+
          // Free handle memory
          dealloc(N) io_pHandle;
- 
+
          LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
- 
+
          isDone = cTrue;
- 
+
          return isDone;
- 
+
       /END-FREE
       *
      P DailyRollingFileAppender_delete...
@@ -603,22 +604,22 @@
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Set sync logging mode. Enables or disables the
          // logging of the sync lock holder.
          Synchronisation_setLogMode(handle.isSyncLogMode);
          Synchronisation_setObjectDesc(handle.syncText);
- 
+
          // Check, whether the  file already exists
          isNewFile = not f_isIfsFile(handle.path: *omit);
- 
+
          // Open new instance of file
          if not handle.share;
             SHARE_MODE = O_SHARE_RDONLY;
          else;
             SHARE_MODE = O_SHARE_RDWR;
          endif;
- 
+
          handle.hFile = f_openIfsFile(handle.path: O_CREAT + O_APPEND
                                                            + O_TEXTDATA
                                                            + SHARE_MODE
@@ -630,24 +631,24 @@
             LogLog_errorMsg(msg);
             return cFalse;
          endif;
- 
+
          // Set end of livetime of file
          crtTime = f_getIfsFileCrtTime(handle.path: *omit);
          handle.dateValue = replaceVariables(handle.datePattern: crtTime);
- 
+
          // Mark file as "open"
          handle.isOpen = cTrue;
- 
+
          // Remember the unique file ID
          handle.fileID = f_getIfsFileIDH(handle.hFile);
- 
+
          // Write header to file
          if isNewFile;
             appendHeader(i_pHandle);
          endif;
- 
+
          return cTrue;
- 
+
       /END-FREE
       *
      P openAppender...
@@ -671,7 +672,7 @@
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if f_closeIfsFile(handle.hFile) = 0;
             handle.isOpen = cFalse;
             handle.hFile  = 0;
@@ -679,9 +680,9 @@
          else;
             isDone = cFalse;
          endif;
- 
+
          return isDone;
- 
+
       /END-FREE
       *
      P closeAppender...
@@ -710,21 +711,21 @@
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if not handle.writeHeader;
             return;
          endif;
- 
+
          // Get layout to write footer string of layout
          pLayout = Appender_getLayout(handle.pSuper);
- 
+
          if not Layout_isNull(pLayout);
             header = Layout_getHeader(pLayout);
             append(i_pHandle: header);
          endif;
- 
+
          return;
- 
+
       /END-FREE
       *
      P appendHeader...
@@ -753,21 +754,21 @@
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if not handle.writeFooter;
             return;
          endif;
- 
+
          // Get layout to write footer string of layout
          pLayout = Appender_getLayout(handle.pSuper);
- 
+
          if not Layout_isNull(pLayout);
             footer = Layout_getFooter(pLayout);
             append(i_pHandle: footer);
          endif;
- 
+
          return;
- 
+
       /END-FREE
       *
      P appendFooter...
@@ -799,11 +800,11 @@
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if i_text = '';
             return;
          endif;
- 
+
          startPos = 1;
          dow startPos > 0;
             text = f_wordWrap(i_text
@@ -821,9 +822,9 @@
                LogLog_errorMsg(msg);
             endif;
          enddo;
- 
+
          return;
- 
+
       /END-FREE
       *
      P append...
@@ -847,18 +848,18 @@
      D cmpDateValue    S                   like(i_handle.dateValue  ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          cmpDateValue = replaceVariables(i_handle.datePattern: %timestamp());
- 
+
          if i_handle.dateValue <> cmpDateValue or
             not f_isIfsFile(i_handle.path: *omit);
             isNewFile = cTrue;
          else;
             isNewFile = cFalse;
          endif;
- 
+
          return isNewFile;
- 
+
       /END-FREE
       *
      P isNewFileCondition...
@@ -888,16 +889,16 @@
      D hours           S              2S 0 inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          timestamp = i_time;
          days    = %subdt(timestamp: *DAYS    );
          months  = %subdt(timestamp: *MONTHS  );
          years   = %subdt(timestamp: *YEARS   );
          minutes = %subdt(timestamp: *MINUTES );
          hours   = %subdt(timestamp: *HOURS   );
- 
+
          string = i_string;
- 
+
          string = f_replace(cDATE_PATTERN_DAYS
                             : %editc(days   : 'X'): string);
          string = f_replace(cDATE_PATTERN_MONTHS
@@ -908,9 +909,9 @@
                             : %editc(minutes: 'X'): string);
          string = f_replace(cDATE_PATTERN_HOURS
                             : %editc(hours  : 'X'): string);
- 
+
          return string;
- 
+
       /END-FREE
       *
      P replaceVariables...
@@ -930,20 +931,20 @@
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (handle.lastRnmErr = *LOVAL);
             return cFalse;
          endif;
- 
+
          if (%diff(%timestamp(): handle.lastRnmErr: *DAYS) > 1 or
              %diff(%timestamp(): handle.lastRnmErr: *SECONDS) > 600);
             // try again
             clearRenameError(i_pHandle);
             return cFalse;
          endif;
- 
+
          return cTrue;
- 
+
       /END-FREE
      P                 E
       *
@@ -960,11 +961,11 @@
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (handle.lastRnmErr = *LOVAL);
             handle.lastRnmErr = %timestamp();
          endif;
- 
+
       /END-FREE
      P                 E
       *
@@ -981,9 +982,9 @@
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          handle.lastRnmErr = *LOVAL;
- 
+
       /END-FREE
      P                 E
       *
@@ -1008,20 +1009,20 @@
      D                                                    ListIterator_t) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          prefix = f_lcase(i_prefix);
- 
+
          propIter = PropertyList_getIterator(i_pPropList);
- 
+
          property = PropertyList_getFirst(propIter);
- 
+
          dow property.key <> '';
- 
+
             if (prefix = '') or (f_startsWith(prefix: property.key) and
                                  %len(property.key) > %len(prefix));
- 
+
                parameter = f_lcase(%subst(property.key: %len(prefix) + 1));
- 
+
                select;
                when parameter = cPARAMETER_PATH;
                   io_handle.path = property.value;
@@ -1058,14 +1059,14 @@
                                   property.key            +
                                  '] in [' + cTHIS_CLASS + ']');
                endsl;
- 
+
             endif;
- 
+
             property = PropertyList_getNext(propIter);
          enddo;
- 
+
          return;
- 
+
       /END-FREE
       *
      P loadConfiguration...
@@ -1092,18 +1093,18 @@
      D extension       S             10I 0                         inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          dou not f_isIfsFile(archive);
- 
+
             dir  = %trimR(f_rtvIfsDirFromPath(i_handle.path));
             file = %trimR(f_rtvIfsFileFromPath(i_handle.path));
- 
+
             select;
- 
+
             // Append date pattern to file name.
             when f_left(i_handle.dateValue: 1) = '.';
                file = file + i_handle.dateValue;
- 
+
             // Insert date pattern before '.' of file name
             when f_right(i_handle.dateValue: 1) = '.';
                start = f_scanR('.': file);
@@ -1113,12 +1114,12 @@
                   // Append date pattern if the is no '.' in file name
                   file = file + i_handle.dateValue;
                endif;
- 
+
             // Append date pattern to file name
             other;
                file = file + i_handle.dateValue;
             endsl;
- 
+
             if extension = 0;
                archive = dir + file;
             else;
@@ -1126,9 +1127,9 @@
             endif;
             extension = extension + 1;
          enddo;
- 
+
          return archive;
- 
+
       /END-FREE
       *
      P getArchivePath...

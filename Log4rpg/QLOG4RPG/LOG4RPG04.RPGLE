@@ -31,6 +31,7 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
       *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
@@ -100,23 +101,23 @@
      D tempAppList     DS                  likeds(handle_t       ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          LogLog_verbose('Creating appender list ...');
- 
+
          pAppList = AppenderList_null();
- 
+
          // Initialize appender list handle
          clear tempAppList;
          tempAppList.pMap = BasicMap_new();
- 
+
          // Return properties list to caller
          pAppList = %alloc(%size(handle_t));
          appList = tempAppList;
- 
+
          LogLog_verbose('+ Allocated memory for appender list.');
- 
+
          return pAppList;
- 
+
       /END-FREE
       *
      P AppenderList_new...
@@ -144,9 +145,9 @@
      D                                     based(i_pAppList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return BasicMap_getNumE(appList.pMap);
- 
+
       /END-FREE
       *
      P AppenderList_getNumE...
@@ -178,13 +179,13 @@
      D                                     based(i_pAppList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          pAppender = i_pAppender;
- 
+
          return BasicMap_put(appList.pMap: Appender_getName(pAppender)
                                          : %addr(pAppender)
                                          : %len(pAppender ));
- 
+
       /END-FREE
       *
      P AppenderList_put...
@@ -214,9 +215,9 @@
      D                                     based(i_pAppList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return BasicMap_remove(appList.pMap: i_appName);
- 
+
       /END-FREE
       *
      P AppenderList_remove...
@@ -248,12 +249,12 @@
      D                                     based(i_pAppList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          BasicMap_get(appList.pMap: i_appName: %addr(pAppender)
                                              : %size(pAppender));
- 
+
          return pAppender;
- 
+
       /END-FREE
       *
      P AppenderList_get...
@@ -282,9 +283,9 @@
      D                                     based(i_pAppList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return BasicMap_containsKey(appList.pMap: i_appName);
- 
+
       /END-FREE
       *
      P AppenderList_exist...
@@ -312,13 +313,13 @@
      D                                                    ListIterator_t) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          clear appIter;
          appIter.pAppList = i_pAppList;
          appIter.lastApp  = 0;
- 
+
          return appIter;
- 
+
       /END-FREE
       *
      P AppenderList_getIterator...
@@ -353,21 +354,21 @@
      D                                     based(io_appIter.pAppList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          pAppender = Appender_null();
- 
+
          if AppenderList_getNumE(io_appIter.pAppList) = 0;
             return pAppender;
          endif;
- 
+
          io_appIter.lastApp = 1;
- 
+
          appName = BasicMap_getKeyByIndex(appList.pMap
                                           : io_appIter.lastApp);
          pAppender = AppenderList_get(io_appIter.pAppList: appName);
- 
+
          return pAppender;
- 
+
       /END-FREE
       *
      P AppenderList_getFirst...
@@ -402,21 +403,21 @@
      D                                     based(io_appIter.pAppList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          pAppender = Appender_null();
- 
+
          if AppenderList_getNumE(io_appIter.pAppList) <= io_appIter.lastApp;
             return pAppender;
          endif;
- 
+
          io_appIter.lastApp = io_appIter.lastApp + 1;
- 
+
          appName = BasicMap_getKeyByIndex(appList.pMap
                                           : io_appIter.lastApp);
          pAppender = AppenderList_get(io_appIter.pAppList: appName);
- 
+
          return pAppender;
- 
+
       /END-FREE
       *
      P AppenderList_getNext...
@@ -452,41 +453,41 @@
      D                                     based(io_pAppList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if BasicMap_isNull(appList.pMap);
             return cTrue;
          endif;
- 
+
          LogLog_verbose('Deleting appender list ...');
- 
+
          p_assert(AppenderList_getNumE(io_pAppList) = 0
                   : 'All appender should have been removed from this +
                      appender list by the logger or the repository.');
- 
+
          appIter = AppenderList_getIterator(io_pAppList);
- 
+
          dow AppenderList_getNumE(io_pAppList) > 0;
             pAppender = AppenderList_getFirst(appIter);
             name = Appender_getName(pAppender);
             AppenderList_remove(io_pAppList: name);
             Appender_delete(pAppender);
          enddo;
- 
+
          if BasicMap_delete(appList.pMap) = 0;
             isDeleted = cTrue;
          else;
             isDeleted = cFalse;
          endif;
- 
+
          clear appList;
          dealloc(N) io_pAppList;
- 
+
          io_pAppList = AppenderList_null();
- 
+
          LogLog_verbose('- Freed memory of appender list.');
- 
+
          return isDeleted;
- 
+
       /END-FREE
       *
      P AppenderList_delete...
@@ -514,13 +515,13 @@
      D                                     based(i_pAppList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if i_pAppList = AppenderList_null();
             return cTrue;
          else;
             return BasicMap_isNull(appList.pMap);
          endif;
- 
+
       /END-FREE
       *
      P AppenderList_isNull...
@@ -542,9 +543,9 @@
      D                 PI                         like(LOG4RPG_pAppenderList_t )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return BasicMap_null();
- 
+
       /END-FREE
       *
      P AppenderList_null...

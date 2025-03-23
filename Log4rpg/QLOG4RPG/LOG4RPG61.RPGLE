@@ -37,6 +37,7 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
       *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
@@ -109,11 +110,11 @@
      D isDone          S               N                         inz(cFalse)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          LogLog_debug('Loaded instance of [' + cTHIS_CLASS + '].');
- 
+
          return isDone;
- 
+
       /END-FREE
       *
      P SimpleLayout_new...
@@ -143,14 +144,14 @@
      D string          S                   like(LOG4RPG_formattedText_t) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          string = Level_toString(LogEvent_getPriority(i_pLogEvent)) + ' - ' +
                                  LogEvent_getText(i_pLogEvent);
- 
+
          LogEvent_setText(i_pLogEvent: string);
- 
+
          return;
- 
+
       /END-FREE
       *
      P SimpleLayout_format...
@@ -179,9 +180,9 @@
      D  i_prefix                           const  like(LOG4RPG_prefix_t        )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return;
- 
+
       /END-FREE
       *
      P SimpleLayout_setProperties...
@@ -208,13 +209,13 @@
      D isDone          S               N                         inz(cFalse)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
- 
+
          isDone = cTrue;
- 
+
          return isDone;
- 
+
       /END-FREE
       *
      P SimpleLayout_delete...
