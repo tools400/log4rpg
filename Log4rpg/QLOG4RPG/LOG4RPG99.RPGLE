@@ -22,6 +22,10 @@
       *  ----------  ------------  ---------------------------------------  *
       *  08.11.2008  Th.Raddatz    Added procedure: getObject()             *
       *                                                                     *
+      *  23.03.20025 Th.Raddatz    Added procedures:                        *
+      *                             - rslvMbrName                           *
+      *                             - rslvLibName                           *
+      *                                                                     *
       *=====================================================================*
       *   >>PRE-COMPILER<<                                                  *
       *                                                                     *

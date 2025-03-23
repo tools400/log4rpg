@@ -47,6 +47,9 @@
       *                            memory of the PropertyList handle is     *
       *                            correctly freed.                         *
       *                                                                     *
+      *  23.03.2025                Resolve special library and member       *
+      *                            values (*LIBL, *FIRST).                  *
+      *                                                                     *
       *=====================================================================*
       *   >>PRE-COMPILER<<                                                  *
       *                                                                     *
