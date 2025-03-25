@@ -15,6 +15,10 @@ That is what Log4rpg is made for. Log4rpg is a powerful logger that was inspired
 
 With Log4rpg it is possible to enable and disable logging just by modifying a configuration file. There is no need for changing code and compiling the program.
 
+## Usage
+
+Using Log4rpg is very close to using Log4j. Additional information is available on the [Using Log4rpg](USAGE.md) page.
+
 ## Installation
 
 Installing Log4rpg is a bit uncomfortable, because I could not yet migrate all my projects from Sourceforge to GitHub. Basically there are two options:
@@ -55,7 +59,7 @@ Then logon to your IBM i system and follow these steps:
 * Open member IFS and copy everything between the following lines into a new RPGLE source member `INSTALLER`:
   * `/// START OF INSTALL PGM HERE`
   * `/// END   OF INSTALL PGM HERE`
- 
+
   Actually all 3 XML packages contain the same installer. The problem is that you cannot open BASICS1 and LOG4RPG with SEU, because both packages exceeds 32764 records. However you can use RDi or a PC text editor for extracting the installer program.
 
 * Compile the installation utility:
@@ -64,11 +68,11 @@ Then logon to your IBM i system and follow these steps:
 
 * Run the following commands and answer the questions with one of the displayed options:
 
-  `CALL PGM(QTEMP/INSTALLER) PARM(('BASICS1') ('QXML') ('LOG4RPG'))` 
+  `CALL PGM(QTEMP/INSTALLER) PARM(('BASICS1') ('QXML') ('LOG4RPG'))`
 
-  `CALL PGM(QTEMP/INSTALLER) PARM(('IFS') ('QXML') ('LOG4RPG'))` 
+  `CALL PGM(QTEMP/INSTALLER) PARM(('IFS') ('QXML') ('LOG4RPG'))`
 
-  `CALL PGM(QTEMP/INSTALLER) PARM(('LOG4RPG') ('QXML') ('LOG4RPG'))` 
+  `CALL PGM(QTEMP/INSTALLER) PARM(('LOG4RPG') ('QXML') ('LOG4RPG'))`
 
   The questions asked by BASICS1 are:
 
@@ -86,7 +90,7 @@ Then logon to your IBM i system and follow these steps:
    * _Create sample programs? (YES, NO)_ - typically you would answer `NO`
 
    **Hint: The answers are case-insensitive.**
- 
+
 ---
 
 © 2025, Thomas Raddatz
