@@ -23,10 +23,8 @@
 
              DCL        VAR(&SRCLIB    ) TYPE(*CHAR) LEN( 10)
              DCL        VAR(&FAILED    ) TYPE(*DEC ) LEN( 10 0) VALUE(0)
-             DCL        VAR(&FAILEDSTR ) TYPE(*CHAR) LEN( 10)
+             DCL        VAR(&FAILED_STR) TYPE(*CHAR) LEN( 10)
              DCL        VAR(&DBGVIEW   ) TYPE(*CHAR) LEN( 10) VALUE(*LIST)
-             DCL        VAR(&TGTRLS    ) TYPE(*CHAR) LEN( 10) VALUE(*CURRENT)
-             DCL        VAR(&COMPILEOPT) TYPE(*CHAR) LEN(100)
              DCL        VAR(&OPTIMIZE  ) TYPE(*CHAR) LEN( 10) VALUE(*NONE)
 
              DCL        VAR(&BASICS1LIB) TYPE(*CHAR) LEN( 10) VALUE('*LIBL')
@@ -730,9 +728,6 @@ M53:            CRTPGM     PGM(&TOLIB/LOG4_X2PGM) +
 
              ENDDO
 
-             CHGVAR     VAR(&FAILEDSTR) VALUE(&FAILED)
-             ADDENVVAR  ENVVAR(QRB_NUMBER_FAILED) VALUE(&FAILEDSTR) REPLACE(*YES)
-
    /* ------------------------------------------- */
    /*   Delete Log4rpg modules                    */
    /* ------------------------------------------- */
@@ -815,5 +810,21 @@ CLEAN_UP:
 
              DLTMOD     MODULE(&TOLIB/LOG4_X1   )
              MONMSG     MSGID(CPF0000)
+
+   /* ------------------------------------------- */
+   /*   Send final status message                 */
+   /* ------------------------------------------- */
+             IF         COND(&FAILED *EQ 0) THEN(DO)
+               SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                            MSGDTA('*** Successfully installed LOG4RPG ***') +
+                            TOPGMQ(*PRV (*CTLBDY))
+             ENDDO
+             ELSE CMD(DO)
+               CHGVAR     VAR(&FAILED_STR) VALUE(&FAILED)
+               SNDPGMMSG  MSGID(CPF9897) MSGF(QCPFMSG) +
+                            MSGDTA('ERROR: Failed installing LOG4RPG. Errors:' +
+                                    *BCAT &FAILED_STR) +
+                            TOPGMQ(*PRV (*CTLBDY))
+             ENDDO
 
              ENDPGM
