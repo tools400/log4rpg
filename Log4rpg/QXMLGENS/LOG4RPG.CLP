@@ -21,18 +21,18 @@
 
              XMLGENVRS XSRCFILE(QLOG4RPG) XSRCLIB(LOG4RPGDVP) XSRCMBR(COPYRIGHT)
 
-             XMLGENCND  XMSG('Use *LIBL at runtime? (L_YES, L_NO)') +
-                          XVALUES(L_YES L_NO) XVAR(&USELIBL)
-
              XMLGENCND  XMSG('Create sample programs? (YES, NO)') +
                           XVALUES(YES NO) XVAR(&CRTTSTPGM)
+
+             XMLGENCND  XMSG('Use *LIBL at runtime? (L_YES, L_NO)') +
+                          XVALUES(L_YES L_NO) XVAR(&USELIBL)
 
              XMLGENSET  XVAR(&SRCFILE) XVALUE(QLOG4RPG)
 
 /* ---------------------------------- */
 /*  Deploy source member              */
 /* ---------------------------------- */
-             XMLGENMBR  XMBR(A_INSTALL  ) XMBRATR(TXT  ) +
+             XMLGENMBR  XMBR(A_INSTALL  ) XMBRATR(CLLE ) +
                           XFROMSRCF(QLOG4RPG  ) XFROMSRCL(LOG4RPGDVP) +
                           XTOSRCF(QLOG4RPG  ) XOBJTYPE(*PGM   ) +
                           XGENCRT(*NO ) XPARAM(*BLANK)

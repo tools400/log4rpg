@@ -1285,12 +1285,12 @@
 <![CDATA[
 ]]>  </chgvar>
 <sendmsg  sendmsgid="CPF9897" sendmsgtype = "*STATUS   "><![CDATA[
-Installing A_INSTALL  type TXT - in progress.
+Installing A_INSTALL  type CLLE - in progress.
 ]]>  </sendmsg>
 <!-- START OF MEMBER  -->
 <mbr
 mbrname =  "A_INSTALL "
-mbrtype =  "TXT       "
+mbrtype =  "CLLE      "
 mbrtext =  "Log4rpg - Installer                               "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
