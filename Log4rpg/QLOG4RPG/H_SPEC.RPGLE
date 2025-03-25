@@ -12,5 +12,6 @@
      H EXPROPTS(*RESDECPOS)
      H EXTBININT(*YES)
      H CCSID(*CHAR: *JOBRUN)
+     H REQPREXP(*REQUIRE)
       *
       /ENDIF
