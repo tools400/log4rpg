@@ -58,6 +58,7 @@
       *   >>END-PRE-COMPILER<<                                              *
       *=====================================================================*
  CPY H NOMAIN
+     H REQPREXP(*REQUIRE)
       /UNDEFINE NO_DECEDIT
       /COPY QLOG4RPG,COPYRIGHT
       *=====================================================================*
@@ -243,7 +244,8 @@
      D  name                        256A   varying
      D  srvPgm                       10A
      D  lib                          10A
-      *  API error code                                               *
+      *
+      *  API error code
      D errCode_t       DS                  qualified template
      D  bytPrv                       10I 0
      D  bytAvl                       10I 0
@@ -255,13 +257,11 @@
       *  Imported prototypes
       * ------------------------------------
       *
-      /DEFINE TYPES_ONLY
       /COPY QLOG4RPG,PLOG4RPG
       *
       * ------------------------------------
       *  Exported prototypes
       * ------------------------------------
-      /DEFINE LOGGER_STUB
       /COPY QLOG4RPG,PLOG4RPG00                    Logger Stub
       *
       * ------------------------------------
@@ -273,7 +273,7 @@
      D  i_actSrvPgm                        const  likeds(actSrvPgm_t)
       *
      D activateSrvPgm...
-     D                 PR                         likeds(actSrvPgm_t )
+     D                 PR                         likeds(actSrvPgm_t)
      D  i_srvPgm                     10A   const
      D  i_lib                        10A   const  options(*nopass: *omit)
       *
