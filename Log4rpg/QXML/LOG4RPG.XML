@@ -51,7 +51,7 @@
       appblddate CDATA #REQUIRED
      >
      ]>
-<upload  appname="LOG4RPG"  appauthor="Thomas Raddatz"  appblddate=" 3/25/2025">
+<upload  appname="LOG4RPG"  appauthor="Thomas Raddatz"  appblddate=" 3/26/2025">
 <install_instructions><![CDATA[
      *----------------------------------------------------------------      ------
      *  1. Upload entire XML to your AS/400 to a source file 112 long, into any mbr
@@ -1427,10 +1427,34 @@ srccssid=  "01141">
 
              DLTMOD     MODULE(&TOLIB/LOG4SHBAPC)
              MONMSG     MSGID(CPF0000)
-             DLTMOD     MODULE(&TOLIB/LOG4SOCK  )
+             DLTMOD     MODULE(&TOLIB/LOG4SOCK)
              MONMSG     MSGID(CPF0000)
              DLTPGM     PGM(&TOLIB/LOG4SHBAPC)
              MONMSG     MSGID(CPF0000)
+
+             DLTMOD     MODULE(&TOLIB/LOG4_EXP1)
+             MONMSG     MSGID(CPF0000)
+             DLTPGM     PGM(&TOLIB/LOG4_EXP1)
+             MONMSG     MSGID(CPF0000)
+
+             DLTMOD     MODULE(&TOLIB/LOG4_EXP2)
+             MONMSG     MSGID(CPF0000)
+             DLTPGM     PGM(&TOLIB/LOG4_EXP2)
+             MONMSG     MSGID(CPF0000)
+
+             DLTMOD     MODULE(&TOLIB/LOG4_EXP3)
+             MONMSG     MSGID(CPF0000)
+             DLTPGM     PGM(&TOLIB/LOG4_EXP3)
+             MONMSG     MSGID(CPF0000)
+
+             DLTMOD     MODULE(&TOLIB/LOG4_EXP4)
+             MONMSG     MSGID(CPF0000)
+             DLTPGM     PGM(&TOLIB/LOG4_EXP4)
+             MONMSG     MSGID(CPF0000)
+
+   /* ------------------------------------------- */
+   /*   Delete old objects (obsolete examples)    */
+   /* ------------------------------------------- */
 
              DLTMOD     MODULE(&TOLIB/LOG4_X1   )
              MONMSG     MSGID(CPF0000)
@@ -1977,7 +2001,7 @@ M43:         CRTPGM     PGM(&TOLIB/LOG4SHBAPC) +
 CRTTSTPGM:
              IF         COND(&CRTTSTPGM *EQ 'YES') THEN(DO)
 
-M50:            CRTRPGMOD  MODULE(&TOLIB/LOG4_X1   ) +
+M50:            CRTRPGMOD  MODULE(&TOLIB/LOG4_EXP1) +
                              SRCFILE(&SRCLIB/&SRCFILE) SRCMBR(*MODULE) +
                              DBGVIEW(&DBGVIEW) TRUNCNBR(*NO) TGTRLS(&TGTRLS) +
                              OPTIMIZE(&OPTIMIZE)
@@ -1985,11 +2009,11 @@ M50:            CRTRPGMOD  MODULE(&TOLIB/LOG4_X1   ) +
                    CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
                    GOTO       CMDLBL(M51)
                 ENDDO
-                DLTSPLF    FILE(LOG4_X1   ) JOB(*) SPLNBR(*LAST)
+                DLTSPLF    FILE(LOG4_EXP1) JOB(*) SPLNBR(*LAST)
                 MONMSG     MSGID(CPF0000)
 
-M51:            CRTPGM     PGM(&TOLIB/LOG4_X1PGM) +
-                             MODULE(&TOLIB/LOG4_X1) +
+M51:            CRTPGM     PGM(&TOLIB/LOG4_EXP1) +
+                             MODULE(&TOLIB/LOG4_EXP1) +
                              BNDSRVPGM(&LOG4LIB/LOG4RPG) +
                              BNDDIR(QC2LE ) ACTGRP(*NEW) DETAIL(*BASIC) +
                              TGTRLS(&TGTRLS) +
@@ -1998,10 +2022,10 @@ M51:            CRTPGM     PGM(&TOLIB/LOG4_X1PGM) +
                    CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
                    GOTO       CMDLBL(M52)
                 ENDDO
-                DLTSPLF    FILE(LOG4_X1PGM) JOB(*) SPLNBR(*LAST)
+                DLTSPLF    FILE(LOG4_EXP1) JOB(*) SPLNBR(*LAST)
                 MONMSG     MSGID(CPF0000)
 
-M52:            CRTRPGMOD  MODULE(&TOLIB/LOG4_X2   ) +
+M52:            CRTRPGMOD  MODULE(&TOLIB/LOG4_EXP2) +
                              SRCFILE(&SRCLIB/&SRCFILE) SRCMBR(*MODULE) +
                              DBGVIEW(&DBGVIEW) TRUNCNBR(*NO) TGTRLS(&TGTRLS) +
                              OPTIMIZE(&OPTIMIZE)
@@ -2009,11 +2033,59 @@ M52:            CRTRPGMOD  MODULE(&TOLIB/LOG4_X2   ) +
                    CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
                    GOTO       CMDLBL(M53)
                 ENDDO
-                DLTSPLF    FILE(LOG4_X2   ) JOB(*) SPLNBR(*LAST)
+                DLTSPLF    FILE(LOG4_EXP2) JOB(*) SPLNBR(*LAST)
                 MONMSG     MSGID(CPF0000)
 
-M53:            CRTPGM     PGM(&TOLIB/LOG4_X2PGM) +
-                             MODULE(&TOLIB/LOG4_X2) +
+M53:            CRTPGM     PGM(&TOLIB/LOG4_EXP2) +
+                             MODULE(&TOLIB/LOG4_EXP2) +
+                             BNDSRVPGM(&LOG4LIB/LOG4RPG) +
+                             BNDDIR(QC2LE ) ACTGRP(*NEW) DETAIL(*BASIC) +
+                             TGTRLS(&TGTRLS) +
+                             TEXT('Sample: Loads config from mbr:LOG4_X1P1')
+                MONMSG     MSGID(CPF0000) EXEC(DO)
+                   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+                   GOTO       CMDLBL(M54)
+                ENDDO
+                DLTSPLF    FILE(LOG4_EXP2) JOB(*) SPLNBR(*LAST)
+                MONMSG     MSGID(CPF0000)
+
+M54:            CRTRPGMOD  MODULE(&TOLIB/LOG4_EXP3) +
+                             SRCFILE(&SRCLIB/&SRCFILE) SRCMBR(*MODULE) +
+                             DBGVIEW(&DBGVIEW) TRUNCNBR(*NO) TGTRLS(&TGTRLS) +
+                             OPTIMIZE(&OPTIMIZE)
+                MONMSG     MSGID(CPF0000) EXEC(DO)
+                   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+                   GOTO       CMDLBL(M55)
+                ENDDO
+                DLTSPLF    FILE(LOG4_EXP3) JOB(*) SPLNBR(*LAST)
+                MONMSG     MSGID(CPF0000)
+
+M55:            CRTPGM     PGM(&TOLIB/LOG4_EXP3) +
+                             MODULE(&TOLIB/LOG4_EXP3) +
+                             BNDSRVPGM(&LOG4LIB/LOG4RPG) +
+                             BNDDIR(QC2LE ) ACTGRP(*NEW) DETAIL(*BASIC) +
+                             TGTRLS(&TGTRLS) +
+                             TEXT('Sample: Loads config from mbr:LOG4_X1P1')
+                MONMSG     MSGID(CPF0000) EXEC(DO)
+                   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+                   GOTO       CMDLBL(M56)
+                ENDDO
+                DLTSPLF    FILE(LOG4_EXP3) JOB(*) SPLNBR(*LAST)
+                MONMSG     MSGID(CPF0000)
+
+M56:            CRTRPGMOD  MODULE(&TOLIB/LOG4_EXP4) +
+                             SRCFILE(&SRCLIB/&SRCFILE) SRCMBR(*MODULE) +
+                             DBGVIEW(&DBGVIEW) TRUNCNBR(*NO) TGTRLS(&TGTRLS) +
+                             OPTIMIZE(&OPTIMIZE)
+                MONMSG     MSGID(CPF0000) EXEC(DO)
+                   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+                   GOTO       CMDLBL(M57)
+                ENDDO
+                DLTSPLF    FILE(LOG4_EXP4) JOB(*) SPLNBR(*LAST)
+                MONMSG     MSGID(CPF0000)
+
+M57:            CRTPGM     PGM(&TOLIB/LOG4_EXP4) +
+                             MODULE(&TOLIB/LOG4_EXP4) +
                              BNDSRVPGM(&LOG4LIB/LOG4RPG) +
                              BNDDIR(QC2LE ) ACTGRP(*NEW) DETAIL(*BASIC) +
                              TGTRLS(&TGTRLS) +
@@ -2022,7 +2094,7 @@ M53:            CRTPGM     PGM(&TOLIB/LOG4_X2PGM) +
                    CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
                    GOTO       CMDLBL(CLEAN_UP)
                 ENDDO
-                DLTSPLF    FILE(LOG4_X2PGM) JOB(*) SPLNBR(*LAST)
+                DLTSPLF    FILE(LOG4_EXP4) JOB(*) SPLNBR(*LAST)
                 MONMSG     MSGID(CPF0000)
 
              ENDDO
@@ -2107,7 +2179,20 @@ CLEAN_UP:
              DLTMOD     MODULE(&TOLIB/LOG4SOCK  )
              MONMSG     MSGID(CPF0000)
 
-             DLTMOD     MODULE(&TOLIB/LOG4_X1   )
+   /* ------------------------------------------- */
+   /*   Delete modules of sample programs         */
+   /* ------------------------------------------- */
+
+             DLTMOD     MODULE(&TOLIB/LOG4_EXP1 )
+             MONMSG     MSGID(CPF0000)
+
+             DLTMOD     MODULE(&TOLIB/LOG4_EXP2 )
+             MONMSG     MSGID(CPF0000)
+
+             DLTMOD     MODULE(&TOLIB/LOG4_EXP3 )
+             MONMSG     MSGID(CPF0000)
+
+             DLTMOD     MODULE(&TOLIB/LOG4_EXP4 )
              MONMSG     MSGID(CPF0000)
 
    /* ------------------------------------------- */
@@ -4602,6 +4687,149 @@ end-proc;
 ]]>  </copysrc>
 </mbr>
 <sendmsg  sendmsgid="CPF9897" sendmsgtype = "*STATUS   "><![CDATA[
+Installing LOG4_EXP4  type RPGLE - in progress.
+]]>  </sendmsg>
+<!-- START OF MEMBER  -->
+<mbr
+mbrname =  "LOG4_EXP4 "
+mbrtype =  "RPGLE     "
+mbrtext =  "Example 4 - Speed Test                            "
+srcfile =  "QLOG4RPG  "
+srclib  =  "selected  "
+srclen  =  "00112"
+srccssid=  "01141">
+<copysrc><![CDATA[
+**free
+//=====================================================================
+//  Sample: Loads config from mbr:LOG4_X1P1
+//=====================================================================
+//  This sample program loads the configuration data from member
+//  QLOG4RPG.LOG4_X1P1.
+//  The program writes some log events to file 'log4_x1p1.log'
+//  in the user's current directory. Usually it is the user's home
+//  directory. Please verify that appending log entries to file
+//  'log4_x1p1.log' in the current directory does not harm your
+//  system. You may use WRKLNK 'log4_x1p1.log' to check where the
+//  output goes.
+//
+//  Caution: The log events will be added to 'log4_x1.log'
+//           without warning.
+//
+//=====================================================================
+// >>PRE-COMPILER<<
+//   >>CRTCMD<< CRTRPGMOD    MODULE(&LI/&OB) +
+//                           SRCFILE(&SL/&SF) SRCMBR(&SM);
+//
+//   >>COMPILE<<
+//     >>PARM<< TRUNCNBR(*NO);
+//     >>PARM<< DBGVIEW(*LIST);
+//   >>END-COMPILE<<
+//   >>EXECUTE<<
+//   >>CMD<<    CRTPGM       PGM(&LI/&OB) +
+//                           MODULE(&LI/&OB) +
+//                           BNDSRVPGM(*LIBL/BASICS1  +
+//                                     *LIBL/IFS      +
+//                                     *LIBL/LOG4RPG) +
+//                           BNDDIR(*LIBL/QC2LE) +
+//                           DETAIL(*BASIC) +
+//                           ACTGRP(*NEW);
+// >>END-PRE-COMPILER<<
+//=====================================================================
+ctl-opt main(PGM_ENTRY_POINT);
+ctl-opt debug option(*srcstmt: *nodebugio);
+ctl-opt decedit('0,') datedit(*dmy.) datfmt(*iso) timfmt(*iso);
+ctl-opt expropts(*resdecpos) extbinint(*yes);
+//=====================================================================*
+//
+// ------------------------------------
+//  Type definitions
+// ------------------------------------
+//
+// ------------------------------------
+//  External Prototypes
+// ------------------------------------
+/COPY QBASICS1,PBASICS1                      SrvPgm: Basics 1
+/COPY QLOG4RPG,PLOG4RPG                      Log4rpg
+//
+// ------------------------------------
+//  Global Fields
+// ------------------------------------
+//
+// ------------------------------------
+//  Globale Konstanten
+// ------------------------------------
+//
+// ------------------------------------
+//  Prototypes
+// ------------------------------------
+//
+dcl-pr PGM_ENTRY_POINT extpgm('LOG4_EXP4');
+  gi_properties char(32) options(*nopass) const;
+end-pr;
+
+//=====================================================================*
+//  Program Entry Point
+//=====================================================================*
+dcl-proc PGM_ENTRY_POINT;
+  dcl-pi *n;
+    gi_properties char(32) options(*nopass) const;
+  end-pi;
+
+   if (%parms() >= %parmnum(gi_properties));
+     main(%trim(gi_properties));
+   else;
+     main('mbr:QLOG4RPG.LOG4_X1P1');
+   endif;
+
+end-proc;
+
+//=====================================================================*
+//  Main procedure
+//=====================================================================*
+dcl-proc main;
+  dcl-pi *n;
+    i_properties varchar(32) value;
+  end-pi;
+
+ //  Helper fields
+ dcl-s hLog1 like(LOG4RPG_hLogger_t);
+ dcl-s hLog2 like(LOG4RPG_hLogger_t);
+
+ dcl-s x int(10) inz(10000);
+ dcl-s startTime timestamp;
+ dcl-s endTime timestamp;
+ dcl-s mSecs int(20);
+ // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  Configurator_loadPropertiesConfiguration(i_properties);
+
+  hLog1 = Logger_getRootLogger();
+  hLog2 = Logger_getLogger('de.tools400');
+
+  Logger_debug(hLog1: 'This example demonstrates how long it takes to execute +
+                       a debug statement for ' + %char(x) + ' times.');
+  Logger_debug(hLog1: 'The ''de.tools400'' logger is configured for INFO +
+                       messages and hence no output is expected by this logger.');
+  Logger_debug(hLog1: 'Starting speed test ...');
+
+  startTime = %timestamp();
+
+  dow (x > 0);
+    // Does not show up in the log.
+    Logger_debug(hLog2: '*** Speed test running ***');
+    x = x - 1;
+  enddo;
+
+  endTime = %timestamp();
+  mSecs = %diff(endTime: startTime: *MSECONDS);
+
+  Logger_debug(hLog1: '... finished speed test.');
+  Logger_debug(hLog1: 'Time elapsed: ' + %char(mSecs));
+
+end-proc;
+]]>  </copysrc>
+</mbr>
+<sendmsg  sendmsgid="CPF9897" sendmsgtype = "*STATUS   "><![CDATA[
 Installing LOG4_PROPS  type PROPS - in progress.
 ]]>  </sendmsg>
 <!-- START OF MEMBER  -->
@@ -4782,171 +5010,6 @@ log4rpg.filter.appName.property.application=myApplication
 #                  '%m'          prints the message text supplied by the application.
 # -----------------------------------------------------------------------
 
-]]>  </copysrc>
-</mbr>
-<sendmsg  sendmsgid="CPF9897" sendmsgtype = "*STATUS   "><![CDATA[
-Installing LOG4_X1  type RPGLE - in progress.
-]]>  </sendmsg>
-<!-- START OF MEMBER  -->
-<mbr
-mbrname =  "LOG4_X1   "
-mbrtype =  "RPGLE     "
-mbrtext =  "Sample: Loads config from mbr:LOG4_X1P1           "
-srcfile =  "QLOG4RPG  "
-srclib  =  "selected  "
-srclen  =  "00112"
-srccssid=  "01141">
-<copysrc><![CDATA[
-      *=====================================================================*
-      *  Sample: Loads config from mbr:LOG4_X1P1                            *
-      *=====================================================================*
-      *  This sample program loads the configuration data from member       *
-      *  QLOG4RPG.LOG4_X1P1.                                                *
-      *  The program writes some log events to file 'log4_x1p1.log'         *
-      *  in the user's current directory. Usually it is the user's home     *
-      *  directory. Please verify that appending log entries to file        *
-      *  'log4_x1p1.log' in the current directory does not harm your        *
-      *  system. You may use WRKLNK 'log4_x1p1.log' to check where the      *
-      *  output goes.                                                       *
-      *                                                                     *
-      *  Caution: The log events will be added to 'log4_x1.log'             *
-      *           without warning.                                          *
-      *                                                                     *
-      *=====================================================================*
-      * >>PRE-COMPILER<<                                                    *
-      *                                                                     *
-      *   >>CRTCMD<< CRTRPGMOD    MODULE(&LI/&OB) +                         *
-      *                           SRCFILE(&SL/&SF) +                        *
-      *                           SRCMBR(&SM);                              *
-      *                                                                     *
-      *   >>COMPILE<<                                                       *
-      *     >>PARM<< TRUNCNBR(*NO);                                         *
-      *     >>PARM<< DBGVIEW(*LIST);                                        *
-      *   >>END-COMPILE<<                                                   *
-      *                                                                     *
-      *   >>EXECUTE<<                                                       *
-      *                                                                     *
-      *   >>CMD<<    CRTPGM       PGM(&LI/LOG4_X1PGM) +                     *
-      *                           MODULE(&LI/&OB          +                 *
-      *                                          ) +                        *
-      *                           BNDSRVPGM(*LIBL/BASICS1      +            *
-      *                                     *LIBL/IFS          +            *
-      *                                     *LIBL/LOG4RPG )    +            *
-      *                           BNDDIR(*LIBL/QC2LE) +                     *
-      *                           DETAIL(*BASIC) +                          *
-      *                           ACTGRP(*NEW);                             *
-      *                                                                     *
-      * >>END-PRE-COMPILER<<                                                *
-      *=====================================================================*
-     H DEBUG
-     H OPTION(*SRCSTMT : *NODEBUGIO)
-     H DECEDIT('0,') DATEDIT(*DMY.)
-     H DATFMT(*ISO )  TIMFMT(*ISO )
-     H EXPROPTS(*RESDECPOS)
-     H EXTBININT(*YES)
-      *=====================================================================*
-      *
-      * ------------------------------------
-      *  Type definitions
-      * ------------------------------------
-      *
-      * ------------------------------------
-      *  External Prototypes
-      * ------------------------------------
-      /COPY QBASICS1,PBASICS1                      SrvPgm: Basics 1
-      /COPY QLOG4RPG,PLOG4RPG                      Log4rpg
-      *
-      * ------------------------------------
-      *  Global Fields
-      * ------------------------------------
-      *
-      * ------------------------------------
-      *  Globale Konstanten
-      * ------------------------------------
-      *
-      * ------------------------------------
-      *  Prototypes
-      * ------------------------------------
-      *
-     D PGM_ENTRY_POINT...
-     D                 PR                  extpgm('LOG4_X1')
-     D gi_properties                 32A   const  options(*nopass)
-      *
-     D main...
-     D                 PR
-     D i_properties                  32A   value  varying
-      *
-      *=====================================================================*
-      *  Program Entry Point
-      *=====================================================================*
-     D PGM_ENTRY_POINT...
-     D                 PI
-     D gi_properties                 32A   const  options(*nopass)
-      *
-      /FREE
-
-         if %parms() >= 1;
-            main(%trim(gi_properties));
-         else;
-            main('mbr:QLOG4RPG.LOG4_X1P1');
-         endif;
-
-         *inlr = *on;
-
-         return;
-
-      /END-FREE
-      *
-      *=====================================================================*
-      *  Main procedure
-      *=====================================================================*
-     P main...
-     P                 B
-      *
-     D main...
-     D                 PI
-     D i_properties                  32A   value  varying
-      *
-      *  Helper fields
-     D hLog1           S                   like(LOG4RPG_hLogger_t         ) inz
-     D hLog2           S                   like(LOG4RPG_hLogger_t         ) inz
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
-
-         // Control block
-         dou 1=1;
-
-            Configurator_loadPropertiesConfiguration(i_properties);
-
-            hLog1 = Logger_getRootLogger();
-            hLog2 = Logger_getLogger('de.tools400');
-
-            Logger_debug(hLog1: 'Testnachricht 1.1');
-            Logger_debug(hLog1: 'Testnachricht 1.1.1 + Dies ist eine sehr +
-                                 lange Nachricht. Sie muss daher bei einem +
-                                 Print Appender  ber mehrere Zeilen gedruckt +
-                                 werden.');
-            Logger_debug(hLog1: 'Testnachricht 1.2');
-            Logger_debug(hLog1: 'Testnachricht 1.3');
-            Logger_debug(hLog1: 'Testnachricht 1.4');
-            Logger_debug(hLog1: 'Testnachricht 1.5');
-            Logger_debug(hLog1: 'Testnachricht 1.6');
-
-            Logger_info(hLog2: 'Hello World (de.tools400)');
-            Logger_debug(hLog2: 'Hello World (de.tools400)');
-            Logger_warn(hLog2: 'Hello World (de.tools400)');
-            Logger_error(hLog2: 'Hello World (de.tools400)');
-            Logger_fatal(hLog2: 'Hello World (de.tools400)');
-
-         enddo;
-
-         return;
-
-      /END-FREE
-      *
-     P main...
-     P                 E
-      *
 ]]>  </copysrc>
 </mbr>
 <sendmsg  sendmsgid="CPF9897" sendmsgtype = "*STATUS   "><![CDATA[
@@ -5178,174 +5241,6 @@ log4rpg.appender.file.layout.conversionPattern=%z [%-5p] %L/%P(%M).%F (%S) %m%n
 
 
 
-]]>  </copysrc>
-</mbr>
-<sendmsg  sendmsgid="CPF9897" sendmsgtype = "*STATUS   "><![CDATA[
-Installing LOG4_X2  type RPGLE - in progress.
-]]>  </sendmsg>
-<!-- START OF MEMBER  -->
-<mbr
-mbrname =  "LOG4_X2   "
-mbrtype =  "RPGLE     "
-mbrtext =  "Sample: Speed Test                                "
-srcfile =  "QLOG4RPG  "
-srclib  =  "selected  "
-srclen  =  "00112"
-srccssid=  "01141">
-<copysrc><![CDATA[
-      *=====================================================================*
-      *  Sample: Loads config from mbr:LOG4_X1P1                            *
-      *=====================================================================*
-      *  This sample program loads the configuration data from member       *
-      *  QLOG4RPG.LOG4_X1P1.                                                *
-      *  The program writes some log events to file 'log4_x1p1.log'         *
-      *  in the user's current directory. Usually it is the user's home     *
-      *  directory. Please verify that appending log entries to file        *
-      *  'log4_x1p1.log' in the current directory does not harm your        *
-      *  system. You may use WRKLNK 'log4_x1p1.log' to check where the      *
-      *  output goes.                                                       *
-      *                                                                     *
-      *  Caution: The log events will be added to 'log4_x1.log'             *
-      *           without warning.                                          *
-      *                                                                     *
-      *=====================================================================*
-      * >>PRE-COMPILER<<                                                    *
-      *                                                                     *
-      *   >>CRTCMD<< CRTRPGMOD    MODULE(&LI/&OB) +                         *
-      *                           SRCFILE(&SL/&SF) +                        *
-      *                           SRCMBR(&SM);                              *
-      *                                                                     *
-      *   >>COMPILE<<                                                       *
-      *     >>PARM<< TRUNCNBR(*NO);                                         *
-      *     >>PARM<< DBGVIEW(*LIST);                                        *
-      *   >>END-COMPILE<<                                                   *
-      *                                                                     *
-      *   >>EXECUTE<<                                                       *
-      *                                                                     *
-      *   >>CMD<<    CRTPGM       PGM(&LI/LOG4_X2PGM) +                     *
-      *                           MODULE(&LI/&OB          +                 *
-      *                                          ) +                        *
-      *                           BNDSRVPGM(*LIBL/BASICS1      +            *
-      *                                     *LIBL/IFS          +            *
-      *                                     *LIBL/LOG4RPG )    +            *
-      *                           BNDDIR(*LIBL/QC2LE) +                     *
-      *                           DETAIL(*BASIC) +                          *
-      *                           ACTGRP(*NEW);                             *
-      *                                                                     *
-      * >>END-PRE-COMPILER<<                                                *
-      *=====================================================================*
-     H DEBUG
-     H OPTION(*SRCSTMT : *NODEBUGIO)
-     H DECEDIT('0,') DATEDIT(*DMY.)
-     H DATFMT(*ISO )  TIMFMT(*ISO )
-     H EXPROPTS(*RESDECPOS)
-     H EXTBININT(*YES)
-      *=====================================================================*
-      *
-      * ------------------------------------
-      *  Type definitions
-      * ------------------------------------
-      *
-      * ------------------------------------
-      *  External Prototypes
-      * ------------------------------------
-      /COPY QBASICS1,PBASICS1                      SrvPgm: Basics 1
-      /COPY QLOG4RPG,PLOG4RPG                      Log4rpg
-      *
-      * ------------------------------------
-      *  Global Fields
-      * ------------------------------------
-      *
-      * ------------------------------------
-      *  Globale Konstanten
-      * ------------------------------------
-      *
-      * ------------------------------------
-      *  Prototypes
-      * ------------------------------------
-      *
-     D PGM_ENTRY_POINT...
-     D                 PR                  extpgm('LOG4_X2PGM')
-     D gi_properties                 32A   const  options(*nopass)
-      *
-     D main...
-     D                 PR
-     D i_properties                  32A   value  varying
-      *
-      *=====================================================================*
-      *  Program Entry Point
-      *=====================================================================*
-     D PGM_ENTRY_POINT...
-     D                 PI
-     D gi_properties                 32A   const  options(*nopass)
-      *
-      /FREE
-
-         if %parms() >= 1;
-            main(%trim(gi_properties));
-         else;
-            main('mbr:QLOG4RPG.LOG4_X1P1');
-         endif;
-
-         *inlr = *on;
-
-         return;
-
-      /END-FREE
-      *
-      *=====================================================================*
-      *  Main procedure
-      *=====================================================================*
-     P main...
-     P                 B
-      *
-     D main...
-     D                 PI
-     D i_properties                  32A   value  varying
-      *
-      *  Helper fields
-     D hLog1           S                   like(LOG4RPG_hLogger_t         ) inz
-     D hLog2           S                   like(LOG4RPG_hLogger_t         ) inz
-      *
-     D x               S             10I 0 inz(10000)
-     D startTime       S               Z   inz
-     D endTime         S               Z   inz
-     D mSecs           S             20I 0 inz
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
-
-         // Control block
-         dou 1=1;
-
-            Configurator_loadPropertiesConfiguration(i_properties);
-
-            hLog1 = Logger_getRootLogger();
-            hLog2 = Logger_getLogger('de.tools400');
-
-            Logger_debug(hLog2: 'Starting speed test ...');
-
-            startTime = %timestamp();
-
-            dow (x > 0);
-               Logger_debug(hLog2: '*** Speed test running ***');
-               x = x - 1;
-            enddo;
-
-            endTime = %timestamp();
-            mSecs = %diff(endTime: startTime: *MSECONDS);
-
-            Logger_debug(hLog2: '... finished speed test.');
-            Logger_debug(hLog2: 'Time elapsed: ' + %char(mSecs));
-
-         enddo;
-
-         return;
-
-      /END-FREE
-      *
-     P main...
-     P                 E
-      *
 ]]>  </copysrc>
 </mbr>
 <sendmsg  sendmsgid="CPF9897" sendmsgtype = "*STATUS   "><![CDATA[
@@ -26169,7 +26064,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  27.10.2006  Th.Raddatz    Replaced data structure logEvent with    *
       *                            object LogEvent.                         *
@@ -26208,10 +26103,17 @@ srccssid=  "01141">
       *  Type definitions
       * -----------------------------------------
      D handle_t...
-     D                 DS                  qualified           based(pDummy)
-     D  pSuper                             like(LOG4RPG_pLayout_t  )
+     D                 DS                  qualified template
+     D  pSuper                             like(LOG4RPG_pLayout_t)
      D  pattern                     128A   varying
+     D  tmStmpPattern...
+     D                                     likeds(tmStmpPattern_t)
       *
+     D tmStmpPattern_t...
+     D                 DS                  qualified template
+     D  value                       128A   varying
+     D  isMSec                         N
+     D  length                       10I 0
       * -----------------------------------------
       *  Prototypes
       * -----------------------------------------
@@ -26237,16 +26139,26 @@ srccssid=  "01141">
      D rtvJobInf...
      D                 PR                         likeds(jobi0600_t  )
       *
+      *  Returns the number of digits of the '%%ms' pattern value.
+     D getTmStmpPattern...
+     D                 PR                  likeds(tmStmpPattern_t)
+     D  i_pattern                   128A   const varying
+      *
       * -----------------------------------------
       *  Global constants
       * -----------------------------------------
      D cTHIS_CLASS...
-     D                 C                          const(
-     D                                            'PatternLayout')
+     D                 C
+     D                                            'PatternLayout'
       *
      D cPARAMETER_CONVERSION_PATTERN...
-     D                 C                          const('conversionpattern')
+     D                 C                          'conversionpattern'
       *
+     D cTIMESTAMP_PATTERN...
+     D                 C                          'timestamppattern'
+      *
+     D MSECS_PATTERN...
+     D                 C                          '%ms'
       * -----------------------------------------
       *  Global fields
       * -----------------------------------------
@@ -26297,6 +26209,7 @@ srccssid=  "01141">
          // Initialize handle
          tempHandle.pSuper  = i_pSuper;   // Handle of the super class 'Layout'
          tempHandle.pattern = '%z [%M.%F]  %-5p  %S - %m';
+         clear tempHandle.tmStmpPattern;
 
          // Initialize handle from configuration properties
          if (i_pPropList <> *NULL) and not PropertyList_isNull(i_pPropList);
@@ -26369,7 +26282,7 @@ srccssid=  "01141">
      D PatternLayout_format...
      D                 PI
      D  i_pHandle                      *   const
-     D  i_pLogEvent                        const like(LOG4RPG_pLogEvent_t )
+     D  i_pLogEvent                        const like(LOG4RPG_pLogEvent_t)
       *
       *  Helper fields
      D x               S             10I 0         inz
@@ -26379,12 +26292,17 @@ srccssid=  "01141">
      D pattern         S              1A           inz
      D tmpText         S                   like(LOG4RPG_formattedText_t) inz
      D string          S                   like(LOG4RPG_formattedText_t) inz
-     D caller          DS                  likeds(LOG4RPG_caller_t  ) inz
-     D jobi0600        DS                  likeds(jobi0600_t        ) inz
+     D caller          DS                  likeds(LOG4RPG_caller_t) inz
+     D jobi0600        DS                  likeds(jobi0600_t) inz
+     D buffer          S            128A
       *
       *  Constants
      D cTMPTEXTMAXLEN  C                   const(128)
       *
+     D tm              DS                  likeds(tm_t) based(ptm)
+     D size            S             10I 0
+     D mSec            S             10I 0
+     D mSecStr         S             10A   varying
       *  PatternLayout handle
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -26427,7 +26345,28 @@ srccssid=  "01141">
             when pattern = 'd';      // Date
                tmpText = %char(%date(LogEvent_getTime(i_pLogEvent)): *jobrun);
             when pattern = 'z';      // Timestamp
-               tmpText = %char(LogEvent_getTime(i_pLogEvent));
+               if (handle.tmStmpPattern.value = '');
+                 tmpText = %char(LogEvent_getTime(i_pLogEvent));
+               else;
+                 ptm = localtime(time(*null));
+                 size = strftime(%addr(buffer): %size(buffer)
+                               : handle.tmStmpPattern.value: tm);
+                 tmpText = %subst(buffer: 1: size);
+                 if (handle.tmStmpPattern.isMSec);
+                   mSec = %subdt(%timestamp(): *mseconds);
+                   mSecStr = %char(mSec);
+                   if (handle.tmStmpPattern.length <= %len(mSecStr));
+                     mSecStr = %subst(mSecStr: 1: handle.tmStmpPattern.length);
+                   else;
+                     LogLog_warning('Incorrect mSec-length: '
+                                   + %char(handle.tmStmpPattern.length) + '. '
+                                   + 'Value too short: ' + mSecStr + '. '
+                                   + 'Check appender property: timestampPattern'
+                                   );
+                   endif;
+                   tmpText = %scanrpl('%ms': mSecStr: tmpText);
+                 endif;
+               endif;
             when pattern = 'l';      // Logger Name
                tmpText = LogEvent_getLoggerName(i_pLogEvent);
             when pattern = 'm';      // application supplied message
@@ -26601,6 +26540,8 @@ srccssid=  "01141">
                select;
                when parameter = cPARAMETER_CONVERSION_PATTERN;
                   io_handle.pattern = property.value;
+               when parameter = cTIMESTAMP_PATTERN;
+                  io_handle.tmStmpPattern = getTmStmpPattern(property.value);
                when Layout_knowsProperty(parameter);
                   // Ignore all parameters known by super Layout class
                other;
@@ -26619,6 +26560,85 @@ srccssid=  "01141">
       /END-FREE
       *
      P loadConfiguration...
+     P                 E
+      *
+      *=========================================================================
+      *  Returns the number of digits of the '%%ms' pattern value.
+      *=========================================================================
+     P getTmStmpPattern...
+     P                 B
+     D                 PI                  likeds(tmStmpPattern_t)
+     D  i_pattern                   128A   const varying
+      *
+      *  Return value
+     D tmStmpPattern   DS                  likeds(tmStmpPattern_t) inz
+      *
+      *  Local fields
+     D x               S             10I 0
+     D y               S             10I 0
+     D length          S             10I 0
+     D char            S              1A
+     D value           S             20A   varying
+      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      /FREE
+
+         clear tmStmpPattern;
+         tmStmpPattern.value = '';
+         tmStmpPattern.isMSec = *off;
+         tmStmpPattern.length = 0;
+
+         if (i_pattern = '');
+           return tmStmpPattern;
+         endif;
+
+         x = %scan(MSECS_PATTERN: i_pattern);
+         if (x = 0);
+           return tmStmpPattern;
+         endif;
+
+         x = x + %len(MSECS_PATTERN);
+         y = x;
+         value = '';
+
+         // Get digits following '%ms'...
+         dow (y <= %len(i_pattern));
+           char = %subst(i_pattern: y: 1);
+           if (char >= '0' and char <= '9');
+             value += char;
+           else;
+             leave;
+           endif;
+           y += 1;
+         enddo;
+
+         // Produce return value
+         tmStmpPattern.isMSec = *on;
+         tmStmpPattern.length = 6;
+         tmStmpPattern.value = i_pattern;
+
+         // Override mSec length
+         if (y > x);
+           monitor;
+             length = y - x;
+             tmStmpPattern.length = %int(%subst(i_pattern: x: length));
+             tmStmpPattern.value = %replace('': i_pattern: x: length);
+           on-error;
+             LogLog_error('mSec-length pattern is not numeric: '
+                         + i_pattern + '. '
+                         + 'Check appender property: timestampPattern'
+                         );
+           endmon;
+         endif;
+
+         // Change '%ms' to '%%ms', because the first '%'
+         // is removed by strftime().
+         tmStmpPattern.value = %scanrpl(MSECS_PATTERN
+                                      : '%' + MSECS_PATTERN
+                                      : tmStmpPattern.value);
+
+         return tmStmpPattern;
+
+      /END-FREE
      P                 E
       *
       *=========================================================================
