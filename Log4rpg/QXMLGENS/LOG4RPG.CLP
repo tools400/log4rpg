@@ -92,12 +92,12 @@
                           XTOSRCF(QLOG4RPG  ) XOBJTYPE(*PGM   ) +
                           XGENCRT(*NO ) XPARAM(*BLANK)
 
-             XMLGENMBR  XMBR(LOG4_PROPS) XMBRATR(PROPS) +
+             XMLGENMBR  XMBR(LOG4_EXP4 ) XMBRATR(RPGLE) +
                           XFROMSRCF(QLOG4RPG  ) XFROMSRCL(LOG4RPGDVP) +
                           XTOSRCF(QLOG4RPG  ) XOBJTYPE(*PGM   ) +
                           XGENCRT(*NO ) XPARAM(*BLANK)
 
-             XMLGENMBR  XMBR(LOG4_X1   ) XMBRATR(RPGLE) +
+             XMLGENMBR  XMBR(LOG4_PROPS) XMBRATR(PROPS) +
                           XFROMSRCF(QLOG4RPG  ) XFROMSRCL(LOG4RPGDVP) +
                           XTOSRCF(QLOG4RPG  ) XOBJTYPE(*PGM   ) +
                           XGENCRT(*NO ) XPARAM(*BLANK)
@@ -133,11 +133,6 @@
                           XGENCRT(*NO ) XPARAM(*BLANK)
 
              XMLGENMBR  XMBR(LOG4_X1P7 ) XMBRATR(PROPS) +
-                          XFROMSRCF(QLOG4RPG  ) XFROMSRCL(LOG4RPGDVP) +
-                          XTOSRCF(QLOG4RPG  ) XOBJTYPE(*PGM   ) +
-                          XGENCRT(*NO ) XPARAM(*BLANK)
-
-             XMLGENMBR  XMBR(LOG4_X2   ) XMBRATR(RPGLE) +
                           XFROMSRCF(QLOG4RPG  ) XFROMSRCL(LOG4RPGDVP) +
                           XTOSRCF(QLOG4RPG  ) XOBJTYPE(*PGM   ) +
                           XGENCRT(*NO ) XPARAM(*BLANK)
