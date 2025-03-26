@@ -18,7 +18,7 @@
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Änderung                                 *
+      *  Datum       Name          ï¿½nderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -31,7 +31,8 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
-      *       >>PARM<< TGTRLS(V6R1M0  );                                    *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
+      *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
       *     >>EXECUTE<<                                                     *
@@ -85,7 +86,7 @@
      D  i_level                            const  like(LOG4RPG_level_t         )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          select;
          when i_level = cLOG4RPG_LEVEL_DEBUG;
             return cLOG4RPG_PRIORITY_DEBUG;
@@ -100,7 +101,7 @@
          other;
             return cLOG4RPG_PRIORITY_NONE;
          endsl;
- 
+
       /END-FREE
       *
      P Level_toInt...
@@ -123,7 +124,7 @@
      D  i_priority                         const  like(LOG4RPG_priority_t      )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          select;
          when i_priority = cLOG4RPG_PRIORITY_DEBUG;
             return cLOG4RPG_LEVEL_DEBUG;
@@ -138,7 +139,7 @@
          other;
             return '';
          endsl;
- 
+
       /END-FREE
       *
      P Level_toString...

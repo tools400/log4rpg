@@ -18,7 +18,7 @@
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Änderung                                 *
+      *  Datum       Name          ï¿½nderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -31,7 +31,8 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
-      *       >>PARM<< TGTRLS(V6R1M0  );                                    *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
+      *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
       *     >>EXECUTE<<                                                     *
@@ -98,64 +99,64 @@
      D index           S             10I 0 inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          string = %trim(i_value);
- 
+
          if (string = '');
             return i_default;
          endif;
- 
+
          string = f_ucase(string);
          multiplier = 1;
- 
+
          dou '1';
- 
+
             index = %scan('KB': i_value);
             if (index <> 0);
                multiplier = 1024;
                string     = %trimR(%subst(string: 1: index));
                leave;
             endif;
- 
+
             index = %scan('MB': i_value);
             if (index <> 0);
                multiplier = 1024 * 1024;
                string     = %trimR(%subst(string: 1: index));
                leave;
             endif;
- 
+
             index = %scan('GB': i_value);
             if (index <> 0);
                multiplier = 1024 * 1024 * 1024;
                string     = %trimR(%subst(string: 1: index));
                leave;
             endif;
- 
+
             index = %check('0123456789 ': string);
             if (index > 0);
                LogLog_error('[' + string + '] is not in proper int form.');
                LogLog_error('[' + i_value + '] not in expected format.');
             endif;
- 
+
          enddo;
- 
+
          if (string = '');
             return i_default;
          endif;
- 
+
          monitor;
             fileSize = atoi(string) * multiplier;
          on-error;
             LogLog_error('[' + string + '] is not in proper int form.');
             LogLog_error('[' + i_value + '] not in expected format.');
          endmon;
- 
+
          if (fileSize = 0);
             return i_default;
          endif;
- 
+
          return fileSize;
- 
+
       /END-FREE
       *
      P OptionConverter_toFileSize...
@@ -164,10 +165,10 @@
       *=========================================================================
       *  Converts a given property to a RPG boolean value.
       *=========================================================================
-      *  Example:   0     ->   cFalse
-      *             1     ->   cTrue
-      *             false ->   cFalse
-      *             true  ->   cTrue
+      *  Example:   0     ->   *OFF
+      *             1     ->   *ON
+      *             false ->   *OFF
+      *             true  ->   *ON
       *=========================================================================
      P OptionConverter_toBoolean...
      P                 B                   export
@@ -181,24 +182,24 @@
      D string          S                   like(i_value)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          string = %trim(i_value);
- 
+
          if (string = '');
             return i_default;
          endif;
- 
+
          string = f_lcase(string);
- 
+
          select;
          when (string = '1' or string = 'true');
-            return cTrue;
+            return *on;
          when (string = '0' or string = 'false');
-            return cFalse;
+            return *off;
          endsl;
- 
+
          return i_default;
- 
+
       /END-FREE
       *
      P OptionConverter_toBoolean...
@@ -219,15 +220,15 @@
      D string          S                   like(i_value)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          string = %trim(i_value);
- 
+
          if (string = '');
             return i_default;
          endif;
- 
+
          return f_val(string);
- 
+
       /END-FREE
       *
      P OptionConverter_toInt...

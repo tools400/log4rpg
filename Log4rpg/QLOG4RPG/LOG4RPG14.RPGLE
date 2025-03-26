@@ -18,7 +18,7 @@
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Änderung                                 *
+      *  Datum       Name          ï¿½nderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -31,7 +31,8 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
-      *       >>PARM<< TGTRLS(V6R1M0  );                                    *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
+      *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
       *     >>EXECUTE<<                                                     *
@@ -85,7 +86,7 @@
      D  i_debugMode                        const  like(LOG4RPG_debugMode_t  )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          select;
          when i_debugMode = cLOG4RPG_DEBUG_QUIET;
             return cLOG4RPG_INT_DEBUG_QUIET;
@@ -98,7 +99,7 @@
          other;
             return cLOG4RPG_INT_DEBUG_OFF;
          endsl;
- 
+
       /END-FREE
       *
      P DebugMode_toInt...
@@ -121,7 +122,7 @@
      D  i_debugMode                   5I 0 const
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          select;
          when i_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
             return cLOG4RPG_DEBUG_QUIET;
@@ -134,7 +135,7 @@
          other;
             return '';
          endsl;
- 
+
       /END-FREE
       *
      P DebugMode_toString...
@@ -157,16 +158,16 @@
      D  i_debugMode                        const  like(LOG4RPG_debugMode_t  )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (i_debugMode = cLOG4RPG_DEBUG_QUIET) or
  B01        (i_debugMode = cLOG4RPG_DEBUG_OFF  ) or
             (i_debugMode = cLOG4RPG_DEBUG_ON   ) or
             (i_debugMode = cLOG4RPG_DEBUG_VERBOSE);
-            return cTrue;
+            return *on;
          else;
-            return cFalse;
+            return *off;
          endif;
- 
+
       /END-FREE
       *
      P DebugMode_isValid...

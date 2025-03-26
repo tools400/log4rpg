@@ -18,7 +18,7 @@
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Änderung                                 *
+      *  Datum       Name          ï¿½nderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -31,7 +31,8 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
-      *       >>PARM<< TGTRLS(V6R1M0  );                                    *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
+      *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
       *     >>EXECUTE<<                                                     *
@@ -100,23 +101,23 @@
      D tempFltList     DS                  likeds(handle_t       ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          LogLog_verbose('Creating filter list ...');
- 
+
          pFltList = FilterList_null();
- 
+
          // Initialize filter list handle
          clear tempFltList;
          tempFltList.pMap = BasicMap_new();
- 
+
          // Return properties list to caller
          pFltList = %alloc(%size(handle_t));
          fltList = tempFltList;
- 
+
          LogLog_verbose('+ Allocated memory for filter list.');
- 
+
          return pFltList;
- 
+
       /END-FREE
       *
      P FilterList_new...
@@ -144,9 +145,9 @@
      D                                     based(i_pFltList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return BasicMap_getNumE(fltList.pMap);
- 
+
       /END-FREE
       *
      P FilterList_getNumE...
@@ -178,13 +179,13 @@
      D                                     based(i_pFltList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          pFilter = i_pFilter;
- 
+
          return BasicMap_put(fltList.pMap: Filter_getName(pFilter)
                                          : %addr(pFilter)
                                          : %len(pFilter ));
- 
+
       /END-FREE
       *
      P FilterList_put...
@@ -214,9 +215,9 @@
      D                                     based(i_pFltList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return BasicMap_remove(fltList.pMap: i_fltName);
- 
+
       /END-FREE
       *
      P FilterList_remove...
@@ -248,12 +249,12 @@
      D                                     based(i_pFltList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          BasicMap_get(fltList.pMap: i_fltName: %addr(pFilter)
                                              : %size(pFilter));
- 
+
          return pFilter;
- 
+
       /END-FREE
       *
      P FilterList_get...
@@ -282,9 +283,9 @@
      D                                     based(i_pFltList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return BasicMap_containsKey(fltList.pMap: i_fltName);
- 
+
       /END-FREE
       *
      P FilterList_exist...
@@ -312,13 +313,13 @@
      D                                                    ListIterator_t) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          clear fltIter;
          fltIter.pFltList = i_pFltList;
          fltIter.lastFlt  = 0;
- 
+
          return fltIter;
- 
+
       /END-FREE
       *
      P FilterList_getIterator...
@@ -353,21 +354,21 @@
      D                                     based(io_fltIter.pFltList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          pFilter = Filter_null();
- 
+
          if FilterList_getNumE(io_fltIter.pFltList) = 0;
             return pFilter;
          endif;
- 
+
          io_fltIter.lastFlt = 1;
- 
+
          fltName = BasicMap_getKeyByIndex(fltList.pMap
                                           : io_fltIter.lastFlt);
          pFilter = FilterList_get(io_fltIter.pFltList: fltName);
- 
+
          return pFilter;
- 
+
       /END-FREE
       *
      P FilterList_getFirst...
@@ -402,21 +403,21 @@
      D                                     based(io_fltIter.pFltList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          pFilter = Filter_null();
- 
+
          if FilterList_getNumE(io_fltIter.pFltList) <= io_fltIter.lastFlt;
             return pFilter;
          endif;
- 
+
          io_fltIter.lastFlt = io_fltIter.lastFlt + 1;
- 
+
          fltName = BasicMap_getKeyByIndex(fltList.pMap
                                           : io_fltIter.lastFlt);
          pFilter = FilterList_get(io_fltIter.pFltList: fltName);
- 
+
          return pFilter;
- 
+
       /END-FREE
       *
      P FilterList_getNext...
@@ -439,7 +440,7 @@
      D  io_pFltList                               like(LOG4RPG_pFilterList_t )
       *
       *  Return value
-     D isDeleted       S               N   inz(cFalse)
+     D isDeleted       S               N   inz(*off)
       *
       *  Helper fields
      D name            S                   like(LOG4RPG_filterName_t  ) inz
@@ -452,41 +453,41 @@
      D                                     based(io_pFltList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if BasicMap_isNull(fltList.pMap);
-            return cTrue;
+            return *on;
          endif;
- 
+
          LogLog_verbose('Deleting filter list ...');
- 
+
          p_assert(FilterList_getNumE(io_pFltList) = 0
                   : 'All filters should have been removed from this +
                      filter list by the logger or the repository.');
- 
+
          fltIter = FilterList_getIterator(io_pFltList);
- 
+
          dow FilterList_getNumE(io_pFltList) > 0;
             pFilter = FilterList_getFirst(fltIter);
             name = Filter_getName(pFilter);
             FilterList_remove(io_pFltList: name);
             Filter_delete(pFilter);
          enddo;
- 
+
          if BasicMap_delete(fltList.pMap) = 0;
-            isDeleted = cTrue;
+            isDeleted = *on;
          else;
-            isDeleted = cFalse;
+            isDeleted = *off;
          endif;
- 
+
          clear fltList;
          dealloc(N) io_pFltList;
- 
+
          io_pFltList = FilterList_null();
- 
+
          LogLog_verbose('- Freed memory of filter list.');
- 
+
          return isDeleted;
- 
+
       /END-FREE
       *
      P FilterList_delete...
@@ -514,13 +515,13 @@
      D                                     based(i_pFltList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if i_pFltList = FilterList_null();
-            return cTrue;
+            return *on;
          else;
             return BasicMap_isNull(fltList.pMap);
          endif;
- 
+
       /END-FREE
       *
      P FilterList_isNull...
@@ -542,9 +543,9 @@
      D                 PI                         like(LOG4RPG_pFilterList_t )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return BasicMap_null();
- 
+
       /END-FREE
       *
      P FilterList_null...

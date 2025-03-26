@@ -18,7 +18,7 @@
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Änderung                                 *
+      *  Datum       Name          ï¿½nderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  25.10.2006  Th.Raddatz    Replaced data structure logEvent with    *
       *                            object LogEvent.                         *
@@ -49,7 +49,8 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
-      *       >>PARM<< TGTRLS(V6R1M0  );                                    *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
+      *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
       *     >>EXECUTE<<                                                     *
@@ -231,7 +232,7 @@
      D  i_prefix                           const  like(LOG4RPG_prefix_t        )
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  Helper fields
      D tempHandle      DS                  likeds(handle_t          ) inz
@@ -240,12 +241,12 @@
      D handle          DS                  likeds(handle_t ) based(io_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          clear tempHandle;
- 
+
          // Initialize handle
          tempHandle.pSuper          = i_pSuper;
-         tempHandle.isOpen          = cFalse;
+         tempHandle.isOpen          = *off;
          tempHandle.hFile           = *NULL;
          tempHandle.outQ            = '*N/LOG4RPG';
          tempHandle.splfname        = 'LOG4RPG';
@@ -259,19 +260,19 @@
          tempHandle.rightMargin     = cDEFAULT_RIGHT_MARGIN;
          tempHandle.datePattern     = 'yyyy-MM-dd';
          tempHandle.dateValue       = '';
- 
+
          // Initialize handle from configuration properties
          if (i_pPropList <> *NULL) and not PropertyList_isNull(i_pPropList);
             loadConfiguration(tempHandle: i_pPropList: i_prefix);
          endif;
- 
+
          io_pHandle = %alloc(%size(tempHandle));
          handle = tempHandle;
- 
+
          LogLog_debug('Loaded instance of [' + cTHIS_CLASS + '].');
- 
+
          return isDone;
- 
+
       /END-FREE
       *
      P DailyRollingPrintAppender_new...
@@ -296,9 +297,9 @@
      D  i_pHandle                      *   const
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
-         return cTrue;
- 
+
+         return *on;
+
       /END-FREE
       *
      P DailyRollingPrintAppender_requiresLayout...
@@ -324,7 +325,7 @@
      D  i_pLogEvent                        const like(LOG4RPG_pLogEvent_t )
       *
       *  Return value
-     D isDone          S               N   inz(cFalse)
+     D isDone          S               N   inz(*off)
       *
       *  Helper fields
      D isText          S               N   inz
@@ -337,17 +338,17 @@
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return if there is no text
          if LogEvent_textLength(i_pLogEvent) = 0;
-            return cTrue;
+            return *on;
          endif;
- 
+
          // Open the appender for output is it is not yet open
          if not handle.isOpen;
             openAppender(i_pHandle);
          endif;
- 
+
          // Check if a new file must be started.
          if isNewFileCondition(handle);
             if handle.isOpen;
@@ -355,37 +356,37 @@
             endif;
             openAppender(i_pHandle);
          endif;
- 
+
          // Write to file
          f_clrErrno();
- 
+
          pageWidth = handle.width - handle.leftMargin - handle.rightMargin;
          text = LogEvent_getFirstLineOfText(i_pLogEvent: isText: pageWidth);
          dow isText;
- 
+
             if handle.leftMargin > 0;
                text = f_space(handle.leftMargin) + text;
             endif;
- 
+
             %len(text) = handle.width;   // Add trailing blanks to clear
                                          // print line of QSYSPRT
- 
+
             monitor;
                text = text;
                pRIOFB = Rwrite(handle.hFile: %addr(text)+2: %len(text));
                if RIOFB.numByt = 0;
-                  isDone = cFalse;
+                  isDone = *off;
                else;
-                  isDone = cTrue;
+                  isDone = *on;
                endif;
             on-error;
                p_rmvPgmMsg(cMsg_Rmv_All: *omit: cMsg_Same: cMsg_ToMyself);
-               isDone = cFalse;
+               isDone = *off;
             endmon;
- 
+
             text = LogEvent_getNextLineOfText(i_pLogEvent: isText: pageWidth);
          enddo;
- 
+
          if not isDone;
             LogLog_error('Failed to write logEevent to file [' +
                           handle.outQ + ']');
@@ -393,9 +394,9 @@
                LogLog_errorMsg(f_cvtErrnoToMsg(f_errno));
             endif;
          endif;
- 
+
          return isDone;
- 
+
       /END-FREE
       *
      P DailyRollingPrintAppender_doAppend...
@@ -427,11 +428,11 @@
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          loadConfiguration(handle: i_pPropList: i_prefix);
- 
+
          return;
- 
+
       /END-FREE
       *
      P DailyRollingPrintAppender_setProperties...
@@ -455,30 +456,30 @@
      D  io_pHandle                     *
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  Appender handle
      D handle          DS                  likeds(handle_t ) based(io_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Close file if it is left open
          if handle.isOpen;
             closeAppender(io_pHandle);
          endif;
- 
+
          // Clear handle data
          clear handle;
- 
+
          // Free handle memory
          dealloc(N) io_pHandle;
- 
+
          LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
- 
-         isDone = cTrue;
- 
+
+         isDone = *on;
+
          return isDone;
- 
+
       /END-FREE
       *
      P DailyRollingPrintAppender_delete...
@@ -496,7 +497,7 @@
      D  i_pHandle                      *   const
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  Appender handle
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
@@ -505,14 +506,14 @@
      D cmd             S            512A   inz varying
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Set end of livetime of file
          handle.dateValue = replaceVariables(handle.datePattern);
- 
+
          // Open new instance of file
          if handle.hFile = *NULL;
             cmd   = getOverwriteCmd(handle);
- 
+
             monitor;
                p_rmvPgmMsg(cMsg_Rmv_All: *omit: cMsg_Same: cMsg_ToMyself);
                qcmdexc(cmd: %len(cmd));
@@ -520,20 +521,20 @@
                p_rmvPgmMsg(cMsg_Rmv_All: *omit: cMsg_Same: cMsg_ToMyself);
                LogLog_error('Error on OVRPRTF with command ' + cmd);
             endmon;
- 
+
             handle.hFile = Ropen('*LIBL/QSYSPRT': 'wr');
- 
+
             if handle.hFile = *NULL;
-               isDone = cFalse;
+               isDone = *off;
             else;
-               isDone = cTrue;
-               handle.isOpen = cTrue;
+               isDone = *on;
+               handle.isOpen = *on;
             endif;
- 
+
          endif;
- 
+
          return isDone;
- 
+
       /END-FREE
       *
      P openAppender...
@@ -551,23 +552,23 @@
      D  i_pHandle                      *   const
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  Appender handle
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if Rclose(handle.hFile) = 0;
-            handle.isOpen = cFalse;
+            handle.isOpen = *off;
             handle.hFile  = *NULL;
-            isDone = cTrue;
+            isDone = *on;
          else;
-            isDone = cFalse;
+            isDone = *off;
          endif;
- 
+
          return isDone;
- 
+
       /END-FREE
       *
      P closeAppender...
@@ -585,23 +586,23 @@
      D  i_handle                           const  likeds(handle_t )
       *
       *  Return value
-     D isNewFile       S               N   inz(cFalse)
+     D isNewFile       S               N   inz(*off)
       *
       *  Helper fields
      D cmpDateValue    S                   like(i_handle.dateValue  ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          cmpdateValue = replaceVariables(i_handle.datePattern);
- 
+
          if i_handle.dateValue <> cmpDateValue;
-            isNewFile = cTrue;
+            isNewFile = *on;
          else;
-            isNewFile = cFalse;
+            isNewFile = *off;
          endif;
- 
+
          return isNewFile;
- 
+
       /END-FREE
       *
      P isNewFileCondition...
@@ -630,16 +631,16 @@
      D hours           S              2S 0 inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          timestamp = %timestamp();
          days    = %subdt(timestamp: *DAYS    );
          months  = %subdt(timestamp: *MONTHS  );
          years   = %subdt(timestamp: *YEARS   );
          minutes = %subdt(timestamp: *MINUTES );
          hours   = %subdt(timestamp: *HOURS   );
- 
+
          string = i_string;
- 
+
          string = f_replace(cDATE_PATTERN_DAYS
                             : %editc(days   : 'X'): string);
          string = f_replace(cDATE_PATTERN_MONTHS
@@ -650,9 +651,9 @@
                             : %editc(minutes: 'X'): string);
          string = f_replace(cDATE_PATTERN_HOURS
                             : %editc(hours  : 'X'): string);
- 
+
          return string;
- 
+
       /END-FREE
       *
      P replaceVariables...
@@ -676,9 +677,9 @@
      D qOutq           DS                  likeds(qObj_t   ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          qOutQ = getOutQ(i_handle.outQ);
- 
+
          cmd = 'OVRPRTF ' +
                   'FILE(QSYSPRT) ' +
                   'TOFILE(*FILE) ' +
@@ -692,9 +693,9 @@
                   'USRDTA('''   + i_handle.usrDta         + ''') ' +
                   'SPLFNAME('   + i_handle.splfname       + ') ' +
                   'OVRSCOPE(*CALLLVL)';
- 
+
          return cmd;
- 
+
       /END-FREE
       *
      P getOverwriteCmd...
@@ -718,15 +719,15 @@
      D x               S             10I 0 inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
             if i_outQ = '';
                qOutQ.name = '*N';
                qOutQ.lib  = '*N';
                return qOutQ;
             endif;
- 
+
             x = %scan('/': i_outQ);
- 
+
             if (x > 1) and (x < %len(i_outQ));
                qOutQ.name = %subst(i_outQ: x+1);
                qOutQ.lib  = f_left(i_outQ: x-1);
@@ -734,9 +735,9 @@
                qOutQ.name = i_outQ;
                qOutQ.lib  = '*N';
             endif;
- 
+
          return qOutQ;
- 
+
       /END-FREE
       *
      P getOutQ...
@@ -763,20 +764,20 @@
      D                                                    ListIterator_t) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          prefix = f_lcase(i_prefix);
- 
+
          propIter = PropertyList_getIterator(i_pPropList);
- 
+
          property = PropertyList_getFirst(propIter);
- 
+
          dow property.key <> '';
- 
+
             if (prefix = '') or (f_startsWith(prefix: property.key) and
  B03                             %len(property.key) > %len(prefix));
- 
+
                parameter = f_lcase(%subst(property.key: %len(prefix) + 1));
- 
+
                select;
                when parameter = cPARAMETER_OUTQ;
                   io_handle.outQ        = property.value;
@@ -821,14 +822,14 @@
                                   property.key            +
                                  '] in [' + cTHIS_CLASS + ']');
                endsl;
- 
+
             endif;
- 
+
             property = PropertyList_getNext(propIter);
          enddo;
- 
+
          return;
- 
+
       /END-FREE
       *
      P loadConfiguration...

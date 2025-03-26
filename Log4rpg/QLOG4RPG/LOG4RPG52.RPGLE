@@ -18,7 +18,7 @@
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Änderung                                 *
+      *  Datum       Name          ï¿½nderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  25.10.2006  Th.Raddatz    Replaced data structure logEvent with    *
       *                            object LogEvent.                         *
@@ -39,7 +39,8 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
-      *       >>PARM<< TGTRLS(V6R1M0  );                                    *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
+      *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
       *     >>EXECUTE<<                                                     *
@@ -109,19 +110,19 @@
      D  i_prefix                           const  like(LOG4RPG_prefix_t        )
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  Appender handle
      D handle          DS                  likeds(handle_t ) based(io_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          io_pHandle = *NULL;
- 
+
          LogLog_debug('Loaded instance of [' + cTHIS_CLASS + '].');
- 
+
          return isDone;
- 
+
       /END-FREE
       *
      P NullAppender_new...
@@ -146,9 +147,9 @@
      D  i_pHandle                      *   const
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
-         return cFalse;
- 
+
+         return *off;
+
       /END-FREE
       *
      P NullAppender_requiresLayout...
@@ -174,17 +175,17 @@
      D  i_pLogEvent                        const like(LOG4RPG_pLogEvent_t )
       *
       *  Return value
-     D isDone          S               N   inz(cFalse)
+     D isDone          S               N   inz(*off)
       *
       *  Appender handle
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
-         isDone = cTrue;
- 
+
+         isDone = *on;
+
          return isDone;
- 
+
       /END-FREE
       *
      P NullAppender_doAppend...
@@ -216,9 +217,9 @@
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return;
- 
+
       /END-FREE
       *
      P NullAppender_setProperties...
@@ -242,19 +243,19 @@
      D  io_pHandle                     *
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  Appender handle
      D handle          DS                  likeds(handle_t ) based(io_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
- 
-         isDone = cTrue;
- 
+
+         isDone = *on;
+
          return isDone;
- 
+
       /END-FREE
       *
      P NullAppender_delete...

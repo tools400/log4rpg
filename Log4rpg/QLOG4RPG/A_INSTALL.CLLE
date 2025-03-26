@@ -23,10 +23,8 @@
 
              DCL        VAR(&SRCLIB    ) TYPE(*CHAR) LEN( 10)
              DCL        VAR(&FAILED    ) TYPE(*DEC ) LEN( 10 0) VALUE(0)
-             DCL        VAR(&FAILEDSTR ) TYPE(*CHAR) LEN( 10)
+             DCL        VAR(&FAILED_STR) TYPE(*CHAR) LEN( 10)
              DCL        VAR(&DBGVIEW   ) TYPE(*CHAR) LEN( 10) VALUE(*LIST)
-             DCL        VAR(&TGTRLS    ) TYPE(*CHAR) LEN( 10) VALUE(*CURRENT)
-             DCL        VAR(&COMPILEOPT) TYPE(*CHAR) LEN(100)
              DCL        VAR(&OPTIMIZE  ) TYPE(*CHAR) LEN( 10) VALUE(*NONE)
 
              DCL        VAR(&BASICS1LIB) TYPE(*CHAR) LEN( 10) VALUE('*LIBL')
@@ -130,10 +128,34 @@
 
              DLTMOD     MODULE(&TOLIB/LOG4SHBAPC)
              MONMSG     MSGID(CPF0000)
-             DLTMOD     MODULE(&TOLIB/LOG4SOCK  )
+             DLTMOD     MODULE(&TOLIB/LOG4SOCK)
              MONMSG     MSGID(CPF0000)
              DLTPGM     PGM(&TOLIB/LOG4SHBAPC)
              MONMSG     MSGID(CPF0000)
+
+             DLTMOD     MODULE(&TOLIB/LOG4_EXP1)
+             MONMSG     MSGID(CPF0000)
+             DLTPGM     PGM(&TOLIB/LOG4_EXP1)
+             MONMSG     MSGID(CPF0000)
+
+             DLTMOD     MODULE(&TOLIB/LOG4_EXP2)
+             MONMSG     MSGID(CPF0000)
+             DLTPGM     PGM(&TOLIB/LOG4_EXP2)
+             MONMSG     MSGID(CPF0000)
+
+             DLTMOD     MODULE(&TOLIB/LOG4_EXP3)
+             MONMSG     MSGID(CPF0000)
+             DLTPGM     PGM(&TOLIB/LOG4_EXP3)
+             MONMSG     MSGID(CPF0000)
+
+             DLTMOD     MODULE(&TOLIB/LOG4_EXP4)
+             MONMSG     MSGID(CPF0000)
+             DLTPGM     PGM(&TOLIB/LOG4_EXP4)
+             MONMSG     MSGID(CPF0000)
+
+   /* ------------------------------------------- */
+   /*   Delete old objects (obsolete examples)    */
+   /* ------------------------------------------- */
 
              DLTMOD     MODULE(&TOLIB/LOG4_X1   )
              MONMSG     MSGID(CPF0000)
@@ -680,7 +702,7 @@ M43:         CRTPGM     PGM(&TOLIB/LOG4SHBAPC) +
 CRTTSTPGM:
              IF         COND(&CRTTSTPGM *EQ 'YES') THEN(DO)
 
-M50:            CRTRPGMOD  MODULE(&TOLIB/LOG4_X1   ) +
+M50:            CRTRPGMOD  MODULE(&TOLIB/LOG4_EXP1) +
                              SRCFILE(&SRCLIB/&SRCFILE) SRCMBR(*MODULE) +
                              DBGVIEW(&DBGVIEW) TRUNCNBR(*NO) TGTRLS(&TGTRLS) +
                              OPTIMIZE(&OPTIMIZE)
@@ -688,11 +710,11 @@ M50:            CRTRPGMOD  MODULE(&TOLIB/LOG4_X1   ) +
                    CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
                    GOTO       CMDLBL(M51)
                 ENDDO
-                DLTSPLF    FILE(LOG4_X1   ) JOB(*) SPLNBR(*LAST)
+                DLTSPLF    FILE(LOG4_EXP1) JOB(*) SPLNBR(*LAST)
                 MONMSG     MSGID(CPF0000)
 
-M51:            CRTPGM     PGM(&TOLIB/LOG4_X1PGM) +
-                             MODULE(&TOLIB/LOG4_X1) +
+M51:            CRTPGM     PGM(&TOLIB/LOG4_EXP1) +
+                             MODULE(&TOLIB/LOG4_EXP1) +
                              BNDSRVPGM(&LOG4LIB/LOG4RPG) +
                              BNDDIR(QC2LE ) ACTGRP(*NEW) DETAIL(*BASIC) +
                              TGTRLS(&TGTRLS) +
@@ -701,10 +723,10 @@ M51:            CRTPGM     PGM(&TOLIB/LOG4_X1PGM) +
                    CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
                    GOTO       CMDLBL(M52)
                 ENDDO
-                DLTSPLF    FILE(LOG4_X1PGM) JOB(*) SPLNBR(*LAST)
+                DLTSPLF    FILE(LOG4_EXP1) JOB(*) SPLNBR(*LAST)
                 MONMSG     MSGID(CPF0000)
 
-M52:            CRTRPGMOD  MODULE(&TOLIB/LOG4_X2   ) +
+M52:            CRTRPGMOD  MODULE(&TOLIB/LOG4_EXP2) +
                              SRCFILE(&SRCLIB/&SRCFILE) SRCMBR(*MODULE) +
                              DBGVIEW(&DBGVIEW) TRUNCNBR(*NO) TGTRLS(&TGTRLS) +
                              OPTIMIZE(&OPTIMIZE)
@@ -712,11 +734,59 @@ M52:            CRTRPGMOD  MODULE(&TOLIB/LOG4_X2   ) +
                    CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
                    GOTO       CMDLBL(M53)
                 ENDDO
-                DLTSPLF    FILE(LOG4_X2   ) JOB(*) SPLNBR(*LAST)
+                DLTSPLF    FILE(LOG4_EXP2) JOB(*) SPLNBR(*LAST)
                 MONMSG     MSGID(CPF0000)
 
-M53:            CRTPGM     PGM(&TOLIB/LOG4_X2PGM) +
-                             MODULE(&TOLIB/LOG4_X2) +
+M53:            CRTPGM     PGM(&TOLIB/LOG4_EXP2) +
+                             MODULE(&TOLIB/LOG4_EXP2) +
+                             BNDSRVPGM(&LOG4LIB/LOG4RPG) +
+                             BNDDIR(QC2LE ) ACTGRP(*NEW) DETAIL(*BASIC) +
+                             TGTRLS(&TGTRLS) +
+                             TEXT('Sample: Loads config from mbr:LOG4_X1P1')
+                MONMSG     MSGID(CPF0000) EXEC(DO)
+                   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+                   GOTO       CMDLBL(M54)
+                ENDDO
+                DLTSPLF    FILE(LOG4_EXP2) JOB(*) SPLNBR(*LAST)
+                MONMSG     MSGID(CPF0000)
+
+M54:            CRTRPGMOD  MODULE(&TOLIB/LOG4_EXP3) +
+                             SRCFILE(&SRCLIB/&SRCFILE) SRCMBR(*MODULE) +
+                             DBGVIEW(&DBGVIEW) TRUNCNBR(*NO) TGTRLS(&TGTRLS) +
+                             OPTIMIZE(&OPTIMIZE)
+                MONMSG     MSGID(CPF0000) EXEC(DO)
+                   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+                   GOTO       CMDLBL(M55)
+                ENDDO
+                DLTSPLF    FILE(LOG4_EXP3) JOB(*) SPLNBR(*LAST)
+                MONMSG     MSGID(CPF0000)
+
+M55:            CRTPGM     PGM(&TOLIB/LOG4_EXP3) +
+                             MODULE(&TOLIB/LOG4_EXP3) +
+                             BNDSRVPGM(&LOG4LIB/LOG4RPG) +
+                             BNDDIR(QC2LE ) ACTGRP(*NEW) DETAIL(*BASIC) +
+                             TGTRLS(&TGTRLS) +
+                             TEXT('Sample: Loads config from mbr:LOG4_X1P1')
+                MONMSG     MSGID(CPF0000) EXEC(DO)
+                   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+                   GOTO       CMDLBL(M56)
+                ENDDO
+                DLTSPLF    FILE(LOG4_EXP3) JOB(*) SPLNBR(*LAST)
+                MONMSG     MSGID(CPF0000)
+
+M56:            CRTRPGMOD  MODULE(&TOLIB/LOG4_EXP4) +
+                             SRCFILE(&SRCLIB/&SRCFILE) SRCMBR(*MODULE) +
+                             DBGVIEW(&DBGVIEW) TRUNCNBR(*NO) TGTRLS(&TGTRLS) +
+                             OPTIMIZE(&OPTIMIZE)
+                MONMSG     MSGID(CPF0000) EXEC(DO)
+                   CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
+                   GOTO       CMDLBL(M57)
+                ENDDO
+                DLTSPLF    FILE(LOG4_EXP4) JOB(*) SPLNBR(*LAST)
+                MONMSG     MSGID(CPF0000)
+
+M57:            CRTPGM     PGM(&TOLIB/LOG4_EXP4) +
+                             MODULE(&TOLIB/LOG4_EXP4) +
                              BNDSRVPGM(&LOG4LIB/LOG4RPG) +
                              BNDDIR(QC2LE ) ACTGRP(*NEW) DETAIL(*BASIC) +
                              TGTRLS(&TGTRLS) +
@@ -725,13 +795,10 @@ M53:            CRTPGM     PGM(&TOLIB/LOG4_X2PGM) +
                    CHGVAR     VAR(&FAILED) VALUE(&FAILED + 1)
                    GOTO       CMDLBL(CLEAN_UP)
                 ENDDO
-                DLTSPLF    FILE(LOG4_X2PGM) JOB(*) SPLNBR(*LAST)
+                DLTSPLF    FILE(LOG4_EXP4) JOB(*) SPLNBR(*LAST)
                 MONMSG     MSGID(CPF0000)
 
              ENDDO
-
-             CHGVAR     VAR(&FAILEDSTR) VALUE(&FAILED)
-             ADDENVVAR  ENVVAR(QRB_NUMBER_FAILED) VALUE(&FAILEDSTR) REPLACE(*YES)
 
    /* ------------------------------------------- */
    /*   Delete Log4rpg modules                    */
@@ -813,7 +880,36 @@ CLEAN_UP:
              DLTMOD     MODULE(&TOLIB/LOG4SOCK  )
              MONMSG     MSGID(CPF0000)
 
-             DLTMOD     MODULE(&TOLIB/LOG4_X1   )
+   /* ------------------------------------------- */
+   /*   Delete modules of sample programs         */
+   /* ------------------------------------------- */
+
+             DLTMOD     MODULE(&TOLIB/LOG4_EXP1 )
              MONMSG     MSGID(CPF0000)
+
+             DLTMOD     MODULE(&TOLIB/LOG4_EXP2 )
+             MONMSG     MSGID(CPF0000)
+
+             DLTMOD     MODULE(&TOLIB/LOG4_EXP3 )
+             MONMSG     MSGID(CPF0000)
+
+             DLTMOD     MODULE(&TOLIB/LOG4_EXP4 )
+             MONMSG     MSGID(CPF0000)
+
+   /* ------------------------------------------- */
+   /*   Send final status message                 */
+   /* ------------------------------------------- */
+             IF         COND(&FAILED *EQ 0) THEN(DO)
+               SNDPGMMSG  MSGID(CPF9898) MSGF(QCPFMSG) +
+                            MSGDTA('*** Successfully installed LOG4RPG ***') +
+                            TOPGMQ(*PRV (*CTLBDY))
+             ENDDO
+             ELSE CMD(DO)
+               CHGVAR     VAR(&FAILED_STR) VALUE(&FAILED)
+               SNDPGMMSG  MSGID(CPF9897) MSGF(QCPFMSG) +
+                            MSGDTA('ERROR: Failed installing LOG4RPG. Errors:' +
+                                    *BCAT &FAILED_STR) +
+                            TOPGMQ(*PRV (*CTLBDY))
+             ENDDO
 
              ENDPGM

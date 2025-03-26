@@ -15,8 +15,8 @@
       * -----------------------------------------
       *    Refer to: PLOG4RPG
       *
-      *  Returns cTrue if automatic reloading of the
-      *  configuration is enabled, else cFalse.
+      *  Returns *ON if automatic reloading of the
+      *  configuration is enabled, else *OFF.
      D Configurator_isAutoReload...
      D                 PR              N
      D                                     extproc('LOG4RPG08+

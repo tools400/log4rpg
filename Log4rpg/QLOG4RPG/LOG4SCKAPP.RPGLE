@@ -19,7 +19,7 @@
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Änderung                                 *
+      *  Datum       Name          ï¿½nderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  15.11.2006  Th.Raddatz    Fixed probem that parameter 'ccsid'      *
       *                            was not properly handled. Changed        *
@@ -53,7 +53,8 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
-      *       >>PARM<< TGTRLS(V6R1M0  );                                    *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
+      *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
       *     >>EXECUTE<<                                                     *
@@ -251,7 +252,7 @@
      D  i_prefix                           const  like(LOG4RPG_prefix_t        )
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  Helper fields
      D tmpHIconv       DS                  likeds(iconv_t  ) inz
@@ -261,13 +262,13 @@
      D handle          DS                  likeds(handle_t ) based(io_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          clear tmpHandle;
          clear tmpHIconv;
- 
+
          // Initialize handle
          tmpHandle.pSuper          = i_pSuper;   // Handle of the super class 'Appender'
-         tmpHandle.isOpen          = cFalse;
+         tmpHandle.isOpen          = *off;
          tmpHandle.host            = '';
          tmpHandle.IP              = 0;
          tmpHandle.port            = 4448;
@@ -276,25 +277,25 @@
          tmpHandle.connTimeout     = 5000;      // measured in milliseconds
          tmpHandle.reConnDelay     = 30000;     // measured in milliseconds
          tmpHandle.lastConnTime    = *loval;
-         tmpHandle.isIconv         = cFalse;
+         tmpHandle.isIconv         = *off;
          tmpHandle.hIconv          = tmpHIconv;
- 
+
          // Initialize handle from configuration properties
          if (i_pPropList <> *NULL) and not PropertyList_isNull(i_pPropList);
             loadConfiguration(tmpHandle: i_pPropList: i_prefix);
          endif;
- 
+
          // Initialize Character Conversion
          initIconv(tmpHandle);
- 
+
          // Create appender handle
          io_pHandle = %alloc(%size(tmpHandle));
          handle = tmpHandle;
- 
+
          LogLog_debug('Loaded instance of [' + cTHIS_CLASS + '].');
- 
+
          return isDone;
- 
+
       /END-FREE
       *
      P XMLSocketAppender_new...
@@ -319,9 +320,9 @@
      D  i_pHandle                      *   const
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
-         return cTrue;
- 
+
+         return *on;
+
       /END-FREE
       *
      P XMLSocketAppender_requiresLayout...
@@ -366,12 +367,12 @@
      D CRLF            C                   const(x'0D25')
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Return if there is no text
          if LogEvent_textLength(i_pLogEvent) = 0;
-            return cTrue;
+            return *on;
          endif;
- 
+
          // Open the appender for output if it is not yet open
          if not handle.isOpen;
             if (handle.lastConnTime +
@@ -380,13 +381,13 @@
                   LogLog_error('Trying to connect to host again in ' +
                                %char(%int(handle.reConnDelay)) + ' ms.');
                   handle.lastConnTime = %timestamp();
-                  return cFalse;
+                  return *off;
                endif;
             else;
-               return cFalse;
+               return *off;
             endif;
          endif;
- 
+
          monitor;
             // Add CRLF to log Event
             LogEvent_appendText(i_pLogEvent: CRLF);
@@ -404,7 +405,7 @@
             if rc_iconv <> 0;
                LogLog_error('iconv() returned with rc = ' + %char(rc_iconv));
             endif;
- 
+
             // Write to socket.
             rc = send(handle.sockDesc: pOutBuf: outLength - outBufLen: 0);
             p_assert(rc = outLength - outBufLen
@@ -412,16 +413,16 @@
          on-error;
             // Do nothing here
          endmon;
- 
+
          // Free temporary working area
          if pInpBuf <> *NULL;
             dealloc(N) pInpBuf;
          endif;
- 
+
          if pOutBuf <> *NULL;
             dealloc(N) pOutBuf;
          endif;
- 
+
          // Check return code of send() procedure
          if rc < 0;
             errno = f_errno();
@@ -429,7 +430,7 @@
                          handle.host + ':' + %char(handle.port) + ']');
             msg = f_cvtErrnoToMsg(errno);
             LogLog_errorMsg(msg);
- 
+
             if errno = EPIPE_C;   // Broken pipe
                if handle.isOpen;
                   if closeAppender(i_pHandle);
@@ -437,12 +438,12 @@
                   endif;
                endif;
             endif;
- 
-            return cFalse;
+
+            return *off;
          endif;
- 
-         return cTrue;
- 
+
+         return *on;
+
       /END-FREE
       *
      P XMLSocketAppender_doAppend...
@@ -477,27 +478,27 @@
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          oldCcsid = handle.ccsid;
- 
+
          loadConfiguration(handle: i_pPropList: i_prefix);
- 
+
          if oldCcsid <> handle.ccsid;
- 
+
             if handle.isIconv;
                if iconv_close(handle.hIconv) = 0;
-                  handle.isIconv = cFalse;
+                  handle.isIconv = *off;
                endif;
             endif;
- 
+
             if not handle.isIconv;
                initIconv(handle);
             endif;
- 
+
          endif;
- 
+
          return;
- 
+
       /END-FREE
       *
      P XMLSocketAppender_setProperties...
@@ -521,38 +522,38 @@
      D  io_pHandle                     *
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  Appender handle
      D handle          DS                  likeds(handle_t ) based(io_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Close socket if it is left open
          if handle.isOpen;
             if closeAppender(io_pHandle);
                handle.lastConnTime = *loval;
             endif;
          endif;
- 
+
          // End character conversion
          if handle.isIconv;
             iconv_close(handle.hIconv);
-            handle.isIconv = cFalse;
+            handle.isIconv = *off;
          endif;
- 
+
          // Clear handle data
          clear handle;
- 
+
          // Free handle memory
          dealloc(N) io_pHandle;
- 
+
          LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
- 
-         isDone = cTrue;
- 
+
+         isDone = *on;
+
          return isDone;
- 
+
       /END-FREE
       *
      P XMLSocketAppender_delete...
@@ -590,19 +591,19 @@
      D sockAddr        DS                  likeds(sockaddr_in_t) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Resolve host name to IP address long
          if handle.IP = 0;
             tmpIPLong = inet_addr(handle.host);
             if tmpIPLong = INADDR_NONE;
                tmpIPLong = 0;
- 
+
                if (f_lcase(handle.host) = 'localclient');
                   tmpHost = Job_getTcpIpAddr();
                   if (tmpHost = '');
                      LogLog_error('Failed to resolve  host [' +
                                    handle.host + ']');
-                     return cFalse;
+                     return *off;
                   endif;
                   tmpIPLong = inet_addr(tmpHost);
                else;
@@ -610,43 +611,43 @@
                   if pHostent = *NULL;
                      LogLog_error('Failed to resolve  host [' +
                                    handle.host + ']');
-                     return cFalse;
+                     return *off;
                   endif;
- 
+
                   tmpIPLong = hostAdr;
                endif;
- 
+
             endif;
- 
+
             handle.IP = tmpIPLong;
          endif;
- 
+
          // Create socket
          rc = socket(AF_INET: SOCK_STREAM: IPPROTO_IP);
          if rc < 0;
             LogLog_error('Failed to create socket for connection to host [' +
                           handle.host + ':' + %char(handle.port) + ']');
-            return cFalse;
+            return *off;
          endif;
- 
+
          tmpSockDesc = rc;
- 
+
          LogLog_debug('Created socket [' + %char(tmpSockDesc) +
                       '] to host [' + handle.host  + ':' +
                                       %char(handle.port) + ']');
- 
+
          // Turn socket into non-blocking mode
          flags = fcntl(tmpSockDesc: F_GETFL);
          if flags < 0;
             LogLog_warning('Failed to retrieve socket flags');
          endif;
- 
+
          flags = %bitor(flags: O_NONBLOCK);
- 
+
          if fcntl(tmpSockDesc: F_SETFL: flags) < 0;
             LogLog_warning('Failed to set socket flags');
          endif;
- 
+
          // Connect to host
          sockAddr.sin_Family = AF_INET;
          sockAddr.sin_Port   = handle.port;
@@ -671,7 +672,7 @@
                                ' ms when trying to connect to +
                                 host [' + handle.host + ':' +
                                           %char(handle.port) + ']');
-                  return cFalse;
+                  return *off;
                when rc > 0;   // Connected!
                   optLen = %size(errVal);
                   getsockopt(tmpSockDesc: SOL_SOCKET: SO_ERROR
@@ -682,7 +683,7 @@
                                    handle.host + ':' + %char(handle.port) +']');
                      LogLog_error('--> ' + %char(errVal) + ': ' +
                                            f_strerror(errVal) );
-                     return cFalse;
+                     return *off;
                   endif;
                other;         // Error
                   closeSocket(tmpSockDesc);
@@ -690,7 +691,7 @@
                                 handle.host + ':' + %char(handle.port) + ']');
                   LogLog_error('--> ' + %char(f_errno()) + ': ' +
                                         f_strerror(f_errno()) );
-                  return cFalse;
+                  return *off;
                endsl;
             else;
                closeSocket(tmpSockDesc);
@@ -698,31 +699,31 @@
                              handle.host + ':' + %char(handle.port) + ']');
                LogLog_error('--> ' + %char(f_errno()) + ': ' +
                                      f_strerror(f_errno()) );
-               return cFalse;
+               return *off;
             endif;
          endif;
- 
+
          LogLog_debug('Connected to host [' + handle.host  + ':' +
                                               %char(handle.port) + ']');
- 
+
          // Turn socket into blocking mode
          flags = fcntl(tmpSockDesc: F_GETFL);
          if flags < 0;
             LogLog_warning('Failed to retrieve socket flags');
          endif;
- 
+
          flags = %bitand(flags: %bitnot(O_NONBLOCK));
- 
+
          if fcntl(tmpSockDesc: F_SETFL: flags) < 0;
             LogLog_warning('Failed to set socket flags');
          endif;
- 
+
          // Set return value
          handle.sockDesc = tmpSockDesc;
-         handle.isOpen   = cTrue;
- 
-         return cTrue;
- 
+         handle.isOpen   = *on;
+
+         return *on;
+
       /END-FREE
       *
      P openAppender...
@@ -740,17 +741,17 @@
      D  i_pHandle                      *   const
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       *
       *  Appender handle
      D handle          DS                  likeds(handle_t ) based(i_pHandle)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if closeSocket(handle.sockDesc) = 0;
-            handle.isOpen   = cFalse;
+            handle.isOpen   = *off;
             handle.sockDesc = cSOCKET_NULL;
-            isDone = cTrue;
+            isDone = *on;
             LogLog_debug('Disconnected from host [' + handle.host  + ':' +
                                                       %char(handle.port) + ']');
          else;
@@ -758,11 +759,11 @@
                           handle.host + ':' + %char(handle.port) + ']');
             LogLog_error('--> ' + %char(f_errno()) + ': ' +
                                   f_strerror(f_errno()) );
-            isDone = cFalse;
+            isDone = *off;
          endif;
- 
+
          return isDone;
- 
+
       /END-FREE
       *
      P closeAppender...
@@ -780,7 +781,7 @@
      D  io_handle                                 likeds(handle_t )
       *
       *  Return value
-     D isIconv         S               N   inz(cFalse)
+     D isIconv         S               N   inz(*off)
       *
       *  Local fields
      D tmpHIconv       DS                  likeds(iconv_t  ) inz
@@ -789,9 +790,9 @@
      D msg             DS                  likeds(msg_t    ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          clear tmpHIconv;
- 
+
          clear fromCode;
          fromCode.ccsid         = 0;
          fromCode.conversionA   = 0;
@@ -800,7 +801,7 @@
          fromCode.inpLenOpt     = 0;
          fromCode.errOptMxdDta  = 1;
          fromCode.reserved      = *ALLx'00';
- 
+
          clear toCode;
          toCode.ccsid         = io_handle.ccsid;
          toCode.conversionA   = 0;
@@ -809,24 +810,24 @@
          toCode.inpLenOpt     = 0;
          toCode.errOptMxdDta  = 0;
          toCode.reserved      =   *ALLx'00';
- 
+
          tmpHIconv = QtqIconv_open(toCode: fromCode);
          if tmpHIconv.return_value = -1;
             LogLog_error('Failed to initialize character conversion');
             msg = f_cvtErrnoToMsg(f_errno());
             LogLog_errorMsg(msg);
-            io_handle.isIconv = cFalse;
+            io_handle.isIconv = *off;
          else;
             LogLog_debug('Initialized character translation for CCSID=' +
                          %char(io_handle.ccsid));
-            io_handle.isIconv = cTrue;
+            io_handle.isIconv = *on;
             io_handle.hIconv  = tmpHIconv;
          endif;
- 
+
          isIconv = io_handle.isIconv;
- 
+
          return isIconv;
- 
+
       /END-FREE
       *
      P initIconv...
@@ -853,20 +854,20 @@
      D                                                    ListIterator_t) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          prefix = f_lcase(i_prefix);
- 
+
          propIter = PropertyList_getIterator(i_pPropList);
- 
+
          property = PropertyList_getFirst(propIter);
- 
+
          dow property.key <> '';
- 
+
             if (prefix = '') or (f_startsWith(prefix: property.key) and
  B03                             %len(property.key) > %len(prefix));
- 
+
                parameter = f_lcase(%subst(property.key: %len(prefix) + 1));
- 
+
                select;
                when parameter = cPARAMETER_REMOTE_HOST;
                   io_handle.host        = property.value;
@@ -893,14 +894,14 @@
                                   property.key            +
                                  '] in [' + cTHIS_CLASS + ']');
                endsl;
- 
+
             endif;
- 
+
             property = PropertyList_getNext(propIter);
          enddo;
- 
+
          return;
- 
+
       /END-FREE
       *
      P loadConfiguration...

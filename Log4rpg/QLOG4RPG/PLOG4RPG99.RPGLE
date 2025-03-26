@@ -63,7 +63,7 @@
      D                                     ')
      D  i_logName                          const  like(LOG4RPG_loggerName_t)
       *
-      *  Returns cTrue, if the given object name is valid, else cFalse.
+      *  Returns *ON if the given object name is valid, else *OFF.
      D isValidObjectName...
      D                 PR              N
      D                                     extproc('LOG4RPG99+
@@ -71,5 +71,25 @@
      D                                     ')
      D  i_name                       10A   const  varying
      D  o_pos                        10I 0        options(*nopass)
+      *
+      *  Resolves the library name.
+     D rslvLibName...
+     D                 PR            10A
+     D                                     extproc('LOG4RPG99+
+     D                                     _rslvLibName+
+     D                                     ')
+     D  i_obj                        10A   const
+     D  i_lib                        10A   const
+     D  i_objType                    10A   const
+      *
+      *  Resolve member name.
+     D rslvMbrName...
+     D                 PR            10A
+     D                                     extproc('LOG4RPG99+
+     D                                     _rslvMbrName+
+     D                                     ')
+     D  i_file                       10A   const
+     D  i_lib                        10A   const
+     D  i_mbr                        10A   const
       *
       /ENDIF

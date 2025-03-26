@@ -1,8 +1,6 @@
       /IF NOT DEFINED(PLOG4SOCK)
       /DEFINE PLOG4SOCK
       *
-      /COPY QLOG4RPG,FDQJOB
-      *
       * -----------------------------------------
       *  Type definitions
       * -----------------------------------------
@@ -57,7 +55,7 @@
      D                                     extproc('LOG4SOCK+
      D                                     _Job_getTcpIpAddr+
      D                                     ')
-     D  i_qJob                             const  likeds(qJob_t   )
+     D  i_qJob                             const  likeds(LOG4RPG_qJob_t)
      D                                            options(*nopass)
       *
       * -----------------------------------------

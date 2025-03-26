@@ -18,7 +18,7 @@
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Änderung                                 *
+      *  Datum       Name          ï¿½nderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -31,7 +31,8 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
-      *       >>PARM<< TGTRLS(V6R1M0  );                                    *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
+      *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
       *     >>EXECUTE<<                                                     *
@@ -42,14 +43,19 @@
       *=====================================================================*
       *
       * -----------------------------------------
+      *  Imported functions
+      * -----------------------------------------
+      /COPY QLOG4RPG,PLOG4RPG                      Public API Specification
+      *
+      * -----------------------------------------
       *  Exported functions
       * -----------------------------------------
       /COPY QLOG4RPG,PLOG4RPG02
       *
       * -----------------------------------------
-      *  Type definitions
+      *  Internal type templates
       * -----------------------------------------
-      /COPY QLOG4RPG,PTYPES                        Private type definitions
+      /COPY QLOG4RPG,PTYPES
       *
      D handle_t...
      D                 DS                  qualified               based(pDummy)
@@ -100,23 +106,23 @@
      D tempLogList     DS                  likeds(handle_t       ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          LogLog_verbose('Creating logger list ...');
- 
+
          pLogList = LoggerList_null();
- 
+
          // Initialize appender list handle
          clear tempLogList;
          tempLogList.pMap = BasicMap_new();
- 
+
          // Return properties list to caller
          pLogList = %alloc(%size(handle_t));
          logList = tempLogList;
- 
+
          LogLog_verbose('+ Allocated memory for logger list.');
- 
+
          return pLogList;
- 
+
       /END-FREE
       *
      P LoggerList_new...
@@ -144,9 +150,9 @@
      D                                     based(i_pLogList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return BasicMap_getNumE(logList.pMap);
- 
+
       /END-FREE
       *
      P LoggerList_getNumE...
@@ -179,13 +185,13 @@
      D                                     based(i_pLogList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          pLogger = i_pLogger;
- 
+
          return BasicMap_put(logList.pMap: Logger_getName(pLogger)
                                          : %addr(pLogger)
                                          : %len(pLogger ));
- 
+
       /END-FREE
       *
      P LoggerList_put...
@@ -215,9 +221,9 @@
      D                                     based(i_pLogList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return BasicMap_remove(logList.pMap: i_logName);
- 
+
       /END-FREE
       *
      P LoggerList_remove...
@@ -249,12 +255,12 @@
      D                                     based(i_pLogList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          BasicMap_get(logList.pMap: i_logName: %addr(pLogger)
                                              : %size(pLogger));
- 
+
          return pLogger;
- 
+
       /END-FREE
       *
      P LoggerList_get...
@@ -283,9 +289,9 @@
      D                                     based(i_pLogList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return BasicMap_containsKey(logList.pMap: i_logName);
- 
+
       /END-FREE
       *
      P LoggerList_exist...
@@ -313,13 +319,13 @@
      D                                                    ListIterator_t) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          clear logIter;
          logIter.pLogList = i_pLogList;
          logIter.lastLog  = 0;
- 
+
          return logIter;
- 
+
       /END-FREE
       *
      P LoggerList_getIterator...
@@ -354,21 +360,21 @@
      D                                     based(io_logIter.pLogList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          pLogger = Logger_null();
- 
+
          if LoggerList_getNumE(io_logIter.pLogList) = 0;
             return pLogger;
          endif;
- 
+
          io_logIter.lastLog = 1;
- 
+
          logName = BasicMap_getKeyByIndex(logList.pMap
                                        : io_logIter.lastLog);
          pLogger = LoggerList_get(io_logIter.pLogList: logName);
- 
+
          return pLogger;
- 
+
       /END-FREE
       *
      P LoggerList_getFirst...
@@ -403,21 +409,21 @@
      D                                     based(io_logIter.pLogList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          pLogger = Logger_null();
- 
+
          if LoggerList_getNumE(io_logIter.pLogList) <= io_logIter.lastLog;
             return pLogger;
          endif;
- 
+
          io_logIter.lastLog = io_logIter.lastLog + 1;
- 
+
          logName = BasicMap_getKeyByIndex(logList.pMap
                                        : io_logIter.lastLog);
          pLogger = LoggerList_get(io_logIter.pLogList: logName);
- 
+
          return pLogger;
- 
+
       /END-FREE
       *
      P LoggerList_getNext...
@@ -440,7 +446,7 @@
      D  io_pLogList                               like(LOG4RPG_pLoggerList_t )
       *
       *  Return value
-     D isDeleted       S               N   inz(cFalse)
+     D isDeleted       S               N   inz(*off)
       *
       *  Helper fields
      D logIter         DS                  likeds(LOG4RPG_Logger...
@@ -452,37 +458,37 @@
      D                                     based(io_pLogList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if BasicMap_isNull(logList.pMap);
-            return cTrue;
+            return *on;
          endif;
- 
+
          LogLog_verbose('Deleting logger list ...');
- 
+
          p_assert(LoggerList_getNumE(io_pLogList) = 0
                   : 'All loggers should have been removed from this +
                      logger list by the repository.');
- 
+
          logIter = LoggerList_getIterator(io_pLogList);
- 
+
          dow LoggerList_getNumE(io_pLogList) > 0;
             pLogger = LoggerList_getFirst(logIter);
             LoggerList_remove(io_pLogList: Logger_getName(pLogger));
             Logger_delete(pLogger);
          enddo;
- 
+
          if BasicMap_delete(logList.pMap) = 0;
-            isDeleted = cTrue;
+            isDeleted = *on;
          else;
-            isDeleted = cFalse;
+            isDeleted = *off;
          endif;
- 
+
          io_pLogList = LoggerList_null();
- 
+
          LogLog_verbose('- Deleted Logger list');
- 
+
          return isDeleted;
- 
+
       /END-FREE
       *
      P LoggerList_delete...
@@ -510,13 +516,13 @@
      D                                     based(i_pLogList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if i_pLogList = LoggerList_null();
-            return cTrue;
+            return *on;
          else;
             return BasicMap_isNull(logList.pMap);
          endif;
- 
+
       /END-FREE
       *
      P LoggerList_isNull...
@@ -541,9 +547,9 @@
      D logList         S                   like(LOG4RPG_pLoggerList_t ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return BasicMap_null();
- 
+
       /END-FREE
       *
      P LoggerList_null...

@@ -41,7 +41,7 @@
      /*     >>PARM<< BNDSRVPGM(*LIBL/IFS       +                               */
      /*                        *LIBL/BASICS1   );                              */
      /*     >>PARM<< TEXT('Tools/400 - Log4rpg');                              */
-     /*     >>PARM<< TGTRLS(V6R1M0  );                                         */
+     /*     >>PARM<< TGTRLS(V7R3M0  );                                         */
      /*     >>PARM<< DETAIL(*BASIC);                                           */
      /*   >>END-COMPILE<<                                                      */
      /*                                                                        */

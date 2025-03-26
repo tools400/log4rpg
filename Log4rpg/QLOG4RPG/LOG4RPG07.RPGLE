@@ -18,7 +18,7 @@
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Änderung                                 *
+      *  Datum       Name          ï¿½nderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  16.10.2006 Th.Raddatz     Fix bug in PropertyList_loadFromUrl().   *
       *                            Now returning cFalse on unknown URL      *
@@ -47,6 +47,9 @@
       *                            memory of the PropertyList handle is     *
       *                            correctly freed.                         *
       *                                                                     *
+      *  23.03.2025                Resolve special library and member       *
+      *                            values (*LIBL, *FIRST).                  *
+      *                                                                     *
       *=====================================================================*
       *   >>PRE-COMPILER<<                                                  *
       *                                                                     *
@@ -57,7 +60,8 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
-      *       >>PARM<< TGTRLS(V6R1M0  );                                    *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
+      *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
       *     >>EXECUTE<<                                                     *
@@ -196,7 +200,7 @@
      D tempPropList    DS                  likeds(handle_t       ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Get optional parameters
          // ... pString
          if %parms() >= p_pString;
@@ -204,22 +208,22 @@
          else;
             isPresent = 0;
          endif;
- 
+
          if isPresent = 1;
             pString = i_pString;
          else;
             pString = *NULL;
          endif;
- 
+
          LogLog_verbose('Creating properties list ...');
- 
+
          pPropList = PropertyList_null();
- 
+
          // Initialize property list handle
          clear tempPropList;
          tempPropList.pMap    = BasicMap_new();
          tempPropList.url     = '';
- 
+
          // Load properties from string
          if pString <> *NULL;
             if not loadPropertiesFromString(tempPropList.pMap: pString);
@@ -227,15 +231,15 @@
             endif;
             tempPropList.url = '';
          endif;
- 
+
          // Return properties list to caller
          pPropList = %alloc(%size(handle_t));
          propList = tempPropList;
- 
+
          LogLog_verbose('+ Allocated memory for properties list.');
- 
+
          return pPropList;
- 
+
       /END-FREE
       *
      P PropertyList_new...
@@ -266,28 +270,28 @@
      D                                     based(i_pPropList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Load properties ...
          select;
          // ... from stream file
          when Url_getProtocol(i_url) = 'file';
             if not loadPropertiesFromStmf(propList.pMap: Url_getPath(i_url));
-               return cFalse;
+               return *off;
             endif;
             propList.url = i_url;
          when Url_getProtocol(i_url) = 'mbr';
             if not loadPropertiesFromMbr(propList.pMap: Url_getPath(i_url));
-               return cFalse;
+               return *off;
             endif;
             propList.url = 'mbr:' + %trim(g_file) + '.' + %trim(g_mbr);
          other;
             LogLog_warning('Unknown URL protocol: ' +
                             Url_getProtocol(i_url));
-            return cFalse;
+            return *off;
          endsl;
- 
-         return cTrue;
- 
+
+         return *on;
+
       /END-FREE
       *
      P PropertyList_loadFromUrl...
@@ -317,9 +321,9 @@
      D                                     based(i_pPropList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return propList.url;
- 
+
       /END-FREE
       *
      P PropertyList_getUrl...
@@ -348,9 +352,9 @@
      D                                     based(i_pPropList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return BasicMap_getNumE(propList.pMap);
- 
+
       /END-FREE
       *
      P PropertyList_getNumE...
@@ -384,13 +388,13 @@
      D                                     based(i_pPropList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          property = i_property;
- 
+
          return BasicMap_put(propList.pMap: property.key
                                           : %addr(property.value)
                                           : %len(property.value) + 2);
- 
+
       /END-FREE
       *
      P PropertyList_put...
@@ -423,11 +427,11 @@
      D                                     based(i_pPropList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          BasicMap_get(propList.pMap: i_key: %addr(value): %size(value));
- 
+
          return value;
- 
+
       /END-FREE
       *
      P PropertyList_get...
@@ -460,13 +464,13 @@
      D                                     based(i_pPropList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          clear propIter;
          propIter.pPropList = i_pPropList;
          propIter.lastProp  = 0;
- 
+
          return propIter;
- 
+
       /END-FREE
       *
      P PropertyList_getIterator...
@@ -499,22 +503,22 @@
      D                                     based(io_propIter.pPropList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if PropertyList_getNumE(io_propIter.pPropList) = 0;
             return property;
          endif;
- 
+
          io_propIter.lastProp = 1;
- 
+
          property.key = BasicMap_getKeyByIndex(propList.pMap
                                                : io_propIter.lastProp);
          BasicMap_getValueByIndex(propList.pMap
                                   : io_propIter.lastProp
                                   : %addr(property.value)
                                   : %size(property.value));
- 
+
          return property;
- 
+
       /END-FREE
       *
      P PropertyList_getFirst...
@@ -547,22 +551,22 @@
      D                                     based(io_propIter.pPropList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if PropertyList_getNumE(io_propIter.pPropList) <= io_propIter.lastProp;
             return property;
          endif;
- 
+
          io_propIter.lastProp = io_propIter.lastProp + 1;
- 
+
          property.key = BasicMap_getKeyByIndex(propList.pMap
                                                : io_propIter.lastProp);
          BasicMap_getValueByIndex(propList.pMap
                                   : io_propIter.lastProp
                                   : %addr(property.value)
                                   : %size(property.value));
- 
+
          return property;
- 
+
       /END-FREE
       *
      P PropertyList_getNext...
@@ -594,9 +598,9 @@
      D                                     based(i_pPropList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return BasicMap_containsKey(propList.pMap: i_key);
- 
+
       /END-FREE
       *
      P PropertyList_containsKey...
@@ -626,11 +630,11 @@
      D                                     based(i_pPropList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          BasicMap_remove(propList.pMap: i_key);
- 
+
          return;
- 
+
       /END-FREE
       *
      P PropertyList_remove...
@@ -663,16 +667,16 @@
      D                                     based(i_pPropList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          numE = BasicMap_getNumE(propList.pMap);
- 
+
          for x = 1 to numE;
             key = BasicMap_getKeyByIndex(propList.pMap: 1);
             BasicMap_remove(propList.pMap: key);
          endfor;
- 
+
          return;
- 
+
       /END-FREE
       *
      P PropertyList_clear...
@@ -696,33 +700,33 @@
      D  io_pPropList                              like(LOG4RPG_pPropertyList_t )
       *
       *  Return value
-     D isDeleted       S               N   inz(cFalse)
+     D isDeleted       S               N   inz(*off)
       *
       *  Property list handle
      D propList        DS                  likeds(handle_t    )
      D                                     based(io_pPropList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          LogLog_verbose('Deleting properties list ...');
- 
+
          if (not BasicMap_isNull(propList.pMap));
             BasicMap_delete(propList.pMap);
          endif;
- 
+
          propList.url = '';
- 
+
          clear propList;
          dealloc(N) io_pPropList;
- 
+
          io_pPropList = PropertyList_null();
- 
+
          LogLog_verbose('- Freed memory of properties list.');
- 
-         isDeleted = cTrue;
- 
+
+         isDeleted = *on;
+
          return isDeleted;
- 
+
       /END-FREE
       *
      P PropertyList_delete...
@@ -751,13 +755,13 @@
      D                                     based(i_pPropList)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if i_pPropList = PropertyList_null();
-            return cTrue;
+            return *on;
          else;
             return BasicMap_isNull(propList.pMap);
          endif;
- 
+
       /END-FREE
       *
      P PropertyList_isNull...
@@ -778,9 +782,9 @@
      D                 PI                         like(LOG4RPG_pPropertyList_t )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return BasicMap_null();
- 
+
       /END-FREE
       *
      P PropertyList_null...
@@ -799,7 +803,7 @@
      D  i_path                             const  like(LOG4RPG_path_t       )
       *
       *  Return value
-     D isLoaded        S               N   inz(cFalse)
+     D isLoaded        S               N   inz(*off)
       *
       *  Helper fields
      D hFile           S                   like(ifs_hFile_t ) inz
@@ -808,15 +812,15 @@
      D msg             DS                  likeds(msg_t             ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          LogLog_debug('Loading properties from file [' + i_path + '] ...');
- 
+
          // Test, if configuration file exists
          if not f_isIfsFile(i_path: msg);
             LogLog_warningMsg(msg);
             return isLoaded;
          endif;
- 
+
          hFile = f_openIfsFile(i_path
                                : O_RDONLY + O_SHARE_RDONLY + O_TEXTDATA
                                : *omit: *omit: msg);
@@ -824,27 +828,27 @@
             LogLog_warningMsg(msg);
             return isLoaded;
          endif;
- 
+
          bytesRed = f_readLineIfsFile(hFile
                                       : %addr(buffer): %size(buffer): *omit);
          dow   bytesRed <> cIFS_EOF;
- 
+
             if bytesRed > 0;
                addPropertyToList(i_pMap: %subst(buffer: 1: bytesRed));
             endif;
- 
+
             bytesRed = f_readLineIfsFile(hFile
                                          : %addr(buffer): %size(buffer): *omit);
          enddo;
- 
+
          f_closeIfsFile(hFile);
- 
+
          LogLog_verbose('Loaded properties from file [' + i_path + '].');
- 
-         isLoaded = cTrue;
- 
+
+         isLoaded = *on;
+
          return isLoaded;
- 
+
       /END-FREE
       *
      P loadPropertiesFromStmf...
@@ -863,14 +867,14 @@
      D  i_path                             const  like(LOG4RPG_path_t       )
       *
       *  Return value
-     D isLoaded        S               N   inz(cFalse)
+     D isLoaded        S               N   inz(*off)
       *
       *  Helper fields
      D file            S             10A   inz
      D lib             S             10A   inz
      D member          S             10A   inz
      D length          S             10I 0 inz
-     D warnLength      S               N   inz(cFalse)
+     D warnLength      S               N   inz(*off)
       *
      D inBufMbr        DS                  qualified
      D  data                        512A
@@ -879,16 +883,37 @@
      D  srcSeq                        6S 2
      D  srcDat                        6S 0
      D  srcDta                      500A
+      *
+     D isPathUpdated   S               N
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
+         isPathUpdated = *off;
+
          LogLog_debug('Loading properties from member [' + i_path + '] ...');
- 
+
          getMbrLocation(i_path: file: lib: member);
          if (f_ucase(lib) = cLOG4RPG_LIB_SEARCH);
             lib = searchMemberAndReturnLibrary(file: member);
          endif;
- 
+
+         if (f_startsWith('*': lib));
+           lib = rslvLibName(file: lib: '*FILE');
+           isPathUpdated = *on;
+         endif;
+
+         if (f_startsWith('*': member));
+           member = rslvMbrName(file: lib: member);
+           isPathUpdated = *on;
+         endif;
+
+         if (isPathUpdated);
+           LogLog_debug('Resolved member to ['
+                       +  %trim(lib) + '/' + %trim(file)
+                       + '(' + %trim(member) + ')'
+                       + '] ...');
+         endif;
+
          // Test, if configuration file exists
          if not f_exist(file: lib: '*FILE': member);
             LogLog_warning('Member ' + %trim(member) + ' in file ' +
@@ -896,32 +921,32 @@
                             %trim(lib)  + ' does not exist.');
             return isLoaded;
          endif;
- 
+
          g_file = %trim(lib) + '/' + %trim(file);
          g_mbr  = %trim(member);
- 
+
          open(E) MBR;
- 
+
          if %error();
             LogLog_warning('Could not open member [' + %trim(member) + '].');
             return isLoaded;
          endif;
- 
+
          p_rmvPgmMsg(cMsg_Rmv_All: *omit: cMsg_Same: cMsg_ToMyself);
- 
+
          setll 1 MBR;
- 
+
          dow %found(MBR);
             if g_mbrInf.sourceFile = 'Y';
                read MBR inBufSrcMbr;
             else;
                read MBR inBufMbr;
             endif;
- 
+
             if %eof(MBR);
                leave;
             endif;
- 
+
             if g_mbrInf.sourceFile = 'Y';
                length = g_mbrInf.rcdLength - (%size(inBufSrcMbr.SrcSeq) +
                                               %size(inBufSrcMbr.SrcDat));
@@ -935,7 +960,7 @@
                      // LogLog_warning('Record length of properties file +
                      //                 exceeded maximum of ' +
                      //                 %char(%len(inBufMbr.data)) + ' byte.');
-                     warnLength = cTrue;
+                     warnLength = *on;
                   endif;
                else;
                   length = g_mbrInf.rcdLength;
@@ -945,15 +970,15 @@
                                                 : length));
             endif;
          enddo;
- 
+
          close MBR;
- 
+
          LogLog_verbose('Loaded properties from member [' + i_path + '].');
- 
-         isLoaded = cTrue;
- 
+
+         isLoaded = *on;
+
          return isLoaded;
- 
+
       /END-FREE
       *
      P loadPropertiesFromMbr...
@@ -972,27 +997,27 @@
      D  i_pString                      *   const  options(*string           )
       *
       *  Return value
-     D isLoaded        S               N   inz(cFalse)
+     D isLoaded        S               N   inz(*off)
       *
       *  Helper fields
      D pToken          S               *   inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          LogLog_debug('Loading properties from string ...');
- 
+
          pToken = strtok(i_pString: ';');
          dow pToken <> *NULL;
             addPropertyToList(i_pMap: %str(pToken));
             pToken = strtok(*NULL: ';');
          enddo;
- 
+
          LogLog_verbose('Loaded properties from string.');
- 
-         isLoaded = cTrue;
- 
+
+         isLoaded = *on;
+
          return isLoaded;
- 
+
       /END-FREE
       *
      P loadPropertiesFromString...
@@ -1018,30 +1043,30 @@
      D property        DS                  likeds(LOG4RPG_Property_t) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          buffer = %trim(i_buffer);
- 
+
          if buffer = '';
             return;
          endif;
- 
+
          char   = %subst(buffer: 1: 1);
- 
+
          if (char <> '#') and (char <> ';') and (char <> '!');
             x = %scan('=': buffer);
             if (x > 1) and (x < %len(buffer));
- 
+
                property.key   = f_lcase(%trim(%subst(buffer: 1: x-1)));
                property.value = %trim(%subst(buffer: x+1));
- 
+
                BasicMap_put(i_pMap: property.key
                                   : %addr(property.value)
                                   : %len(property.value) + 2);
             endif;
          endif;
- 
+
          return;
- 
+
       /END-FREE
       *
      P addPropertyToList...
@@ -1067,21 +1092,21 @@
      D closingChar     S              1A   inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          o_file = '';
          o_lib  = '';
          o_mbr  = '';
- 
+
          if i_path = '';
             LogLog_warning('Specified path is *BLANKS.');
             return;
          endif;
- 
+
          path = f_ucase(%trim(i_path));
- 
+
          // Get library name from path
          x = %scan('/': path);
- 
+
          select;
          when x > 11;
             LogLog_warning('Library name is too long.');
@@ -1103,7 +1128,7 @@
          other;
             o_lib = '*LIBL';
          endsl;
- 
+
          // Get file name from path
          x = %scan('(': path);
          if x > 0;
@@ -1116,7 +1141,7 @@
                x = %len(path) + 1;
             endif;
          endif;
- 
+
          select;
          when x > 11;
             LogLog_warning('File name is too long.');
@@ -1135,7 +1160,7 @@
             LogLog_warning('Path is: ' + i_path);
             return;
          endsl;
- 
+
          // Get member name from path
          if closingChar = '';
             x = %len(path) + 1;
@@ -1148,7 +1173,7 @@
                return;
             endif;
          endif;
- 
+
          select;
          when x > 11;
             LogLog_warning('Member name is too long.');
@@ -1161,9 +1186,9 @@
             LogLog_warning('Path is: ' + i_path);
             return;
          endsl;
- 
+
          return;
- 
+
       /END-FREE
       *
      P getMbrLocation...
@@ -1196,7 +1221,7 @@
      D errCode         DS                  likeds(errCode_t        ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if (not f_exist('QGYOLOBJ': '*LIBL': '*PGM'));
             LogLog_warning('Open List of Objects (QGYOLOBJ) API not found.');
             LogLog_warning('- Please install the Host Servers option of i5/OS');
@@ -1204,10 +1229,10 @@
                            ' special value.');
             return '*LIBL';
          endif;
- 
+
          qObj.name = i_file;
          qObj.lib  = '*LIBL';
- 
+
          authCtrl.length     = %size(authCtrl);
          authCtrl.callLvl    = 0;
          authCtrl.ofsObjAuth = %size(authCtrl) - %size(authCtrl.objAuthList)
@@ -1218,7 +1243,7 @@
          authCtrl.reserved_1 = *ALLx'00';
          authCtrl.objAuthList.auth(1) = '*USE';
          authCtrl.libAuthList.auth(1) = '*USE';
- 
+
          selectCtrl.length     = %size(selectCtrl);
          selectCtrl.value      = 0;   // 0=select; 1=omit
          selectCtrl.ofsStat    = %size(selectCtrl) -
@@ -1226,15 +1251,15 @@
          selectCtrl.numStat    = 1;
          selectCtrl.reserved_1 = 0;
          selectCtrl.statList.stat(1) = ' ';   // return no-eeror entries only
- 
+
          clear objInf;
          clear listInf;
-         errCode = f_newApiErrCode(cTrue);
- 
+         errCode = f_newApiErrCode(*on);
+
          monitor;
             QGYOLOBJ(objInf: 0: listInf: -1: sortInf: qObj: '*ALL':
                      authCtrl: selectCtrl: 0: '': errCode);
- 
+
             i = 0;
             dow (i < listInf.totalRcds);
                i = i + 1;
@@ -1245,15 +1270,15 @@
                   return objInf.lib;
                endif;
             enddo;
- 
+
             // Close list of objects
             QGYCLST(listInf.hREquest: errCode);
          on-error;
             return '*LIBL';
          endmon;
- 
+
          return '*LIBL';
- 
+
       /END-FREE
       *
      P searchMemberAndReturnLibrary...

@@ -18,7 +18,7 @@
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Änderung                                 *
+      *  Datum       Name          ï¿½nderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  27.10.2006  Th.Raddatz    Replaced data structure logEvent with    *
       *                            object LogEvent.                         *
@@ -37,7 +37,8 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
-      *       >>PARM<< TGTRLS(V6R1M0  );                                    *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
+      *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
       *     >>EXECUTE<<                                                     *
@@ -106,14 +107,14 @@
      D  i_prefix                           const  like(LOG4RPG_prefix_t        )
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          LogLog_debug('Loaded instance of [' + cTHIS_CLASS + '].');
- 
+
          return isDone;
- 
+
       /END-FREE
       *
      P SimpleLayout_new...
@@ -143,14 +144,14 @@
      D string          S                   like(LOG4RPG_formattedText_t) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          string = Level_toString(LogEvent_getPriority(i_pLogEvent)) + ' - ' +
                                  LogEvent_getText(i_pLogEvent);
- 
+
          LogEvent_setText(i_pLogEvent: string);
- 
+
          return;
- 
+
       /END-FREE
       *
      P SimpleLayout_format...
@@ -179,9 +180,9 @@
      D  i_prefix                           const  like(LOG4RPG_prefix_t        )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return;
- 
+
       /END-FREE
       *
      P SimpleLayout_setProperties...
@@ -205,16 +206,16 @@
      D  io_pHandle                     *
       *
       *  Return value
-     D isDone          S               N                         inz(cFalse)
+     D isDone          S               N                         inz(*off)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
- 
-         isDone = cTrue;
- 
+
+         isDone = *on;
+
          return isDone;
- 
+
       /END-FREE
       *
      P SimpleLayout_delete...

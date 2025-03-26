@@ -19,7 +19,7 @@
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Änderung                                 *
+      *  Datum       Name          ï¿½nderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -32,7 +32,8 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
-      *       >>PARM<< TGTRLS(V6R1M0  );                                    *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
+      *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
       *     >>EXECUTE<<                                                     *
@@ -166,14 +167,14 @@
      D port            S             10I 0 inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          pipe = atoi(gi_pipe);
          port = atoi(gi_port);
- 
+
          XMLSocketHubAppender_childProcess(pipe: port: gi_debugMode: gi_output);
- 
+
          *inlr = *ON;
- 
+
       /END-FREE
       *
       *=====================================================================*
@@ -205,31 +206,31 @@
      D clients         S             10I 0 dim(cMAX_CLIENTS) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          // Set internal logging to: ON
          Logger_setInternalDebugging(i_debugMode: i_output);
- 
+
          // Show pipe read descriptor and listener port
          LogLog_verbose('Parameter: debug mode      = ' + i_debugMode);
          LogLog_verbose('Parameter: debug output    = ' + i_output   );
          LogLog_verbose('Parameter: pipe descriptor = ' + %char(i_pipe));
          LogLog_verbose('Parameter: listener port   = ' + %char(i_port));
- 
+
          // Create listener socket
          listener = createListener(i_port);
          if listener = SOCKET_NULL;
             return;
          endif;
- 
+
          // Initialize client sockets
          initClients(clients);
- 
+
          dou %shtdn();
- 
+
             // Wait for incoming requests
             maxDesc = makeDescSets(i_pipe: listener
                                    : clients: readSet: writeSet: excpSet);
- 
+
             clear wait;
             wait.tv_sec  = 10;
             wait.tv_usec = 0;
@@ -239,41 +240,41 @@
                LogLog_error('select()-error: ' + f_strerror(f_errno()));
                leave;
             endif;
- 
+
             // Test SHUTDOWN requested
             if %shtdn();
                leave;
             endif;
- 
+
             // Make new client
             if FD_ISSET(listener: readSet);
                acceptClient(listener: clients);
             endif;
- 
+
             // Receive incoming log event and pass it forward to clients
             if FD_ISSET(i_pipe: readSet);
- 
+
                // Receive data ...
                clear buffer;
                numBytes = read(i_pipe: %addr(buffer): %size(buffer));
                if numBytes = 0;   // END-OF-FILE ==> shutdown
                   leave;
                endif;
- 
+
                LogLog_verbose(%char(numBytes) + ' received from pipe');
                LogLog_verbose('-> ' + %trimR(%subst(buffer: 1: 40)) + '...');
- 
+
                // ... pass forward to clients
                doClients(clients: writeSet: %addr(buffer): numBytes);
- 
+
             endif;
- 
+
          enddo;
- 
+
          if %shtdn();
             LogLog_verbose('Processing SHUTDOWN request ...');
          endif;
- 
+
          // House keeping ...
          // ... close listener socket
          if listener <> SOCKET_NULL;
@@ -281,16 +282,16 @@
             LogLog_verbose('Listener socket closed: ' + %char(listener));
             listener = SOCKET_NULL;
          endif;
- 
+
          // ... close client sockets
          closeClients(clients);
- 
+
          // ... close pipe
          rc = close(i_pipe);
          LogLog_verbose('Pipe closed: ' + %char(i_pipe));
- 
+
          return;
- 
+
       /END-FREE
       *
      P XMLSocketHubAppender_childProcess...
@@ -310,13 +311,13 @@
      D x               S             10I 0 inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          for x = 1 to cMAX_CLIENTS;
             io_clients(x) = SOCKET_NULL;
          endfor;
- 
+
          return;
- 
+
       /END-FREE
       *
      P initClients...
@@ -340,10 +341,10 @@
      D rc              S             10I 0 inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          for x = 1 to cMAX_CLIENTS;
             if io_clients(x) <> SOCKET_NULL;
- 
+
                // Test if client is ready
                if FD_ISSET(io_clients(x): i_writeSet);
                   // Forward data to client
@@ -351,17 +352,17 @@
                else;
                   rc = SOCKET_ERROR;
                endif;
- 
+
                // On error close client
                if rc = SOCKET_ERROR;
                   closeClient(io_clients(x));
                endif;
- 
+
             endif;
          endfor;
- 
+
          return;
- 
+
       /END-FREE
       *
      P doClients...
@@ -382,15 +383,15 @@
      D rc              S             10I 0 inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          for x = 1 to cMAX_CLIENTS;
             if io_clients(x) <> SOCKET_NULL;
                rc = closeClient(io_clients(x));
             endif;
          endfor;
- 
+
          return;
- 
+
       /END-FREE
       *
      P closeClients...
@@ -410,15 +411,15 @@
      D rc              S             10I 0 inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
             rc = close(io_client);
- 
+
             LogLog_debug('Closed client: ' + %char(io_client));
- 
+
             io_client = SOCKET_NULL;
- 
+
          return rc;
- 
+
       /END-FREE
       *
      P closeClient...
@@ -444,19 +445,19 @@
      D sockAddr        DS                  likeds(sockaddr_in_t) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          dou 1=1;
- 
+
             LogLog_verbose('Creating listener socket ...');
- 
+
             tmpListener = socket(AF_INET: SOCK_STREAM: IPPROTO_IP);
             if tmpListener = SOCKET_ERROR;
                LogLog_error('socket()-error: ' + f_strerror(f_errno()));
                leave;
             endif;
- 
+
             LogLog_verbose('Setting socket option: SO_REUSEADDR');
- 
+
             rc = setsockopt(tmpListener: SOL_SOCKET
                                        : SO_REUSEADDR
                                        : %addr(i_port)
@@ -465,9 +466,9 @@
                LogLog_error('setsockopt()-error: ' + f_strerror(f_errno()));
                leave;
             endif;
- 
+
             LogLog_verbose('Binding socket to port: ' + %char(i_port));
- 
+
             sockAddr.sin_Family = AF_INET;
             sockAddr.sin_Port   = i_port;
             sockAddr.sin_addr   = INADDR_ANY;
@@ -477,28 +478,28 @@
                LogLog_error('bind()-error: ' + f_strerror(f_errno()));
                leave;
             endif;
- 
+
             LogLog_verbose('Starting listening for port: ' + %char(i_port));
- 
+
             rc = listen(tmpListener: 0);
             if rc = SOCKET_ERROR;
                LogLog_error('listen()-error: ' + f_strerror(f_errno()));
                leave;
             endif;
- 
+
             listener = tmpListener;
             tmpListener = SOCKET_NULL;
- 
+
             LogLog_verbose('Listener socket created: ' + %char(listener));
          enddo;
- 
+
          if tmpListener <> SOCKET_NULL;
             rc = close(tmpListener);
             tmpListener = SOCKET_NULL;
          endif;
- 
+
          return listener;
- 
+
       /END-FREE
       *
      P createListener...
@@ -524,9 +525,9 @@
      D clientAddr      DS                  likeds(sockaddr_in_t) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          dou 1=1;
- 
+
             // Accept incoming request
             addrLength = %size(clientAddr);
             rc = accept(i_listener: %addr(clientAddr): addrLength);
@@ -534,24 +535,24 @@
                LogLog_error('accept()-error: ' + f_strerror(f_errno()));
                leave;
             endif;
- 
+
             client = rc;
- 
+
             // Lookup free client slot
             x = %lookup(SOCKET_NULL: io_clients);
             if x = 0;
                LogLog_debug('client-array-error: Array full');
                return;
             endif;
- 
+
             // Add client to client list
             io_clients(x) = client;
- 
+
             LogLog_debug('Accepted connection to client: ' + %char(client));
          enddo;
- 
+
          return;
- 
+
       /END-FREE
       *
      P acceptClient...
@@ -579,11 +580,11 @@
      D x               S             10I 0 inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          FD_ZERO(o_readSet);
          FD_ZERO(o_writeSet);
          FD_ZERO(o_excpSet);
- 
+
          // Build write set for client descriptors
          for x = 1 to cMAX_CLIENTS;
             if i_clients(x) <> SOCKET_NULL;
@@ -593,22 +594,22 @@
                endif;
             endif;
          endfor;
- 
+
          // Build read set for pipe and listener descriptor
          FD_SET(i_pipe: o_readSet);
          if i_pipe > maxDesc;
             maxDesc = i_pipe;
          endif;
- 
+
          FD_SET(i_listener: o_readSet);
          if i_listener > maxDesc;
             maxDesc = i_listener;
          endif;
- 
+
          o_excpSet  = o_readSet;
- 
+
          return maxDesc;
- 
+
       /END-FREE
       *
      P makeDescSets...

@@ -18,7 +18,7 @@
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          Änderung                                 *
+      *  Datum       Name          ï¿½nderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -31,7 +31,8 @@
       *     >>COMPILE<<                                                     *
       *       >>PARM<< TRUNCNBR(*NO);                                       *
       *       >>PARM<< DBGVIEW(*LIST);                                      *
-      *       >>PARM<< TGTRLS(V6R1M0  );                                    *
+      *       >>PARM<< OPTION(*EVENTF);                                     *
+      *       >>PARM<< TGTRLS(V7R3M0  );                                    *
       *     >>END-COMPILE<<                                                 *
       *                                                                     *
       *     >>EXECUTE<<                                                     *
@@ -88,7 +89,7 @@
       * -----------------------------------------
       *  Global fields
       * -----------------------------------------
-     D g_isInit        S               N   inz(cFalse)
+     D g_isInit        S               N   inz(*off)
       *
       * -----------------------------------------
       *  Program status data structure
@@ -133,13 +134,13 @@
      D tempFilter      DS                  likeds(handle_t              ) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          initializeModule();
- 
+
          LogLog_debug('Creating filter [' + i_fltName + '] ...');
- 
+
          pFilter = Filter_null();
- 
+
          // Get optional parameters ...
          // ... property string
          if %parms() >= p_pPropString;
@@ -147,51 +148,51 @@
          else;
             isPresent = 0;
          endif;
- 
+
          if isPresent = 1;
             pPropString = i_pPropString;
          else;
             pPropString = *NULL;
          endif;
- 
+
          // Initialize filter
          tempFilter.name    = i_fltName;
          if not ClassLoader_resolveFilter(i_fltImpl: tempFilter.filterImpl);
             return pFilter;
          endif;
          tempFilter.pNextFilter = Filter_null();
- 
+
          // Create properties list
          if pPropString <> *NULL;
             pPropList = PropertyList_new(pPropString);
          else;
             pPropList = PropertyList_null();
          endif;
- 
+
          // Create filter handle
          pFilter  = %alloc(%size(handle_t));
          filter   = tempFilter;
- 
+
          // Instanciate filter implementation object
          g_pFilter_new = filter.filterImpl.procNew.procptr;
          SrvPgmFilter_new(pFilter
                           : filter.filterImpl.pHandle
                           : pPropList
                           : '');
- 
+
          // Destroy properties list
          if not PropertyList_isNull(pPropList);
             PropertyList_delete(pPropList);
          endif;
- 
+
          // Add filter to the repository
          Repository_addFilter(pFilter);
- 
+
          LogLog_verbose('+ Allocated memory for filter [' +
                            filter.name + '].');
- 
+
          return pFilter;
- 
+
       /END-FREE
       *
      P Filter_new...
@@ -227,18 +228,18 @@
      D                                     based(i_pFilter  )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          LogLog_verbose('-> Filtering log event of logger [' +
                             LogEvent_getLoggerName(i_pLogEvent) + ']...');
- 
+
          g_pFilter_decide = filter.filterImpl.procDecide.procptr;
          decision = SrvPgmFilter_decide(filter.filterImpl.pHandle
                                         : i_pLogEvent);
- 
+
          LogLog_verbose('-> Decision: ' + %char(decision));
- 
+
          return decision;
- 
+
       /END-FREE
       *
      P Filter_decide...
@@ -265,9 +266,9 @@
      D                                     based(i_pFilter)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return filter.name;
- 
+
       /END-FREE
       *
      P Filter_getName...
@@ -294,9 +295,9 @@
      D                                     based(i_pFilter)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return filter.pNextFilter;
- 
+
       /END-FREE
       *
      P Filter_getNext...
@@ -325,11 +326,11 @@
      D                                     based(i_pFilter)
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          filter.pNextFilter = i_pNextFilter;
- 
+
          return;
- 
+
       /END-FREE
       *
      P Filter_setNext...
@@ -360,15 +361,15 @@
      D                                     based(i_pFilter  )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          g_pFilter_setProperties =
                filter.filterImpl.procSetProperties.procptr;
          SrvPgmFilter_setProperties(filter.filterImpl.pHandle
                                     : i_pPropList
                                     : i_prefix);
- 
+
          return;
- 
+
       /END-FREE
       *
      P Filter_setProperties...
@@ -392,7 +393,7 @@
      D  io_pFilter                                like(LOG4RPG_pFilter_t       )
       *
       *  Return value
-     D isDeleted       S               N   inz(cFalse)
+     D isDeleted       S               N   inz(*off)
       *
       *  Helper fields
      D name            S                   like(filter.name  ) inz
@@ -402,32 +403,32 @@
      D                                     based(io_pFilter  )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          initializeModule();
- 
+
          if not Repository_existFilter(filter.name);
             io_pFilter = Filter_null();
-            return cTrue;
+            return *on;
          endif;
- 
+
          LogLog_verbose('Deleting filter [' + filter.name + '] ...');
- 
+
          name = filter.name;
- 
+
          // Remove filter from repository
          Repository_removeFilter(filter.name);
- 
+
          // Delete filter
          g_pFilter_delete = filter.filterImpl.procDelete.procptr;
          isDeleted = SrvPgmFilter_delete(filter.filterImpl.pHandle);
- 
+
          dealloc(N) io_pFilter;
          io_pFilter = Filter_null();
- 
+
          LogLog_verbose('- Freed memory of filter [' + name + '].');
- 
+
          return isDeleted;
- 
+
       /END-FREE
       *
      P Filter_delete...
@@ -452,15 +453,15 @@
      D  i_parameter                        const  like(LOG4RPG_Property_key_t  )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          select;
          when i_parameter = cPARAMETER_NEXT_FILTER or
               f_startsWith(cPARAMETER_NEXT_FILTER + '.': i_parameter);
-            return cTrue;
+            return *on;
          other;
-            return cFalse;
+            return *off;
          endsl;
- 
+
       /END-FREE
       *
      P Filter_knowsProperty...
@@ -484,22 +485,22 @@
      D  i_pFilter                          const  like(LOG4RPG_pFilter_t       )
       *
       *  Return value
-     D isNull          S               N   inz(cFalse)
+     D isNull          S               N   inz(*off)
       *
       *  Filter handle
      D filter          DS                  likeds(handle_t)
      D                                     based(i_pFilter  )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if i_pFilter = Filter_null();
-            isNull = cTrue;
+            isNull = *on;
          else;
-            isNull = cFalse;
+            isNull = *off;
          endif;
- 
+
          return isNull;
- 
+
       /END-FREE
       *
      P Filter_isNull...
@@ -521,9 +522,9 @@
      D                 PI                         like(LOG4RPG_pFilter_t       )
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          return *NULL;
- 
+
       /END-FREE
       *
      P Filter_null...
@@ -544,19 +545,19 @@
       *  Helper fields
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
- 
+
          if g_isInit;
             return;
          endif;
- 
+
          Loglog_verbose('Initializing module ' + sds.modContProc + '...');
- 
+
          Repository_initialize();
- 
-         g_isInit = cTrue;
- 
+
+         g_isInit = *on;
+
          return;
- 
+
       /END-FREE
       *
      P initializeModule...
