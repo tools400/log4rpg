@@ -355,7 +355,7 @@
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
 
-         xmlString =                                                                        //RADDAT
+         xmlString =                                                                        
             '<?xml version="1.0" ';
 
          if handle.encoding <> '';

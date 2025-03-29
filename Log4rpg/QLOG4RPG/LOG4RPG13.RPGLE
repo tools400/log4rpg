@@ -1085,7 +1085,7 @@
  B01
          if (Node_getParent(pChild) = Node_null());
             logName = Logger_getName(pChild);
-            LogLog_debug('Parent not found. Set parent of node [' + logName                 //RADDAT
+            LogLog_debug('Parent not found. Set parent of node [' + logName                 
                           + '] to ''root''.');
             Node_addChild(Repository_getLogger(cROOT_LOGGER): pChild);
          endif;

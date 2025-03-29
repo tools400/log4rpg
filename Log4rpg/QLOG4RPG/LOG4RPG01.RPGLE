@@ -1167,7 +1167,7 @@
                                      : g_stubOfs);
          logLoggingEvent(i_hLogger: Level_toInt(i_level)
                          : %trimR(f_rtvMsgText(i_msg: *omit))
-                            : caller                                                        //RADDAT
+                            : caller                                                        
                             : errMsg);
 
          return;

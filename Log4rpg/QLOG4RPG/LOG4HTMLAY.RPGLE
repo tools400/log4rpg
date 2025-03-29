@@ -389,84 +389,84 @@
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
 
-         htmlString =                                                                       //RADDAT
+         htmlString =
             '<!DOCTYPE HTML PUBLIC "-// 3C//DTD HTML 4.01 Transitional//EN" +
              "http://www.w3.org/TR/html4/loose.dtd">' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<html>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<head>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<title>' + handle.title + '</title>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<style type="text/css">' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<!--' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             'body, table {font-family: arial,sans-serif; font-size: x-small;}' +
              Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             'th {background: #336699; color: #FFFFFF; text-align: left;}' +
              Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '-->' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '</style>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '</head>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<body bgcolor="#FFFFFF" topmargin="6" leftmargin="6">' +
              Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<hr size="1" noshade>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             'Log session start time ' + %char(%date: *JOBRUN) + ', ' +
                                         %char(%time: *JOBRUN) +
              '<br>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<br>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<table cellspacing="0" cellpadding="4" border="1" +
              bordercolor="#224466" width="100%">' +
              Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<tr>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<th>Time</th>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<th>Job</th>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<th>Level</th>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<th>Logger</th>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<th>Proc:Line</th>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<th>Message</th>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '</tr>' + Layout_newLine();
 
          return htmlString;
@@ -504,10 +504,10 @@
          htmlString =
             '</table>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<br>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '</body></html>' + Layout_newLine();
 
          return htmlString;
