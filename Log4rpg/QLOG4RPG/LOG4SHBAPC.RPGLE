@@ -218,7 +218,17 @@
 
          // Create listener socket
          listener = createListener(i_port);
+         if listener = SOCKET_ERROR;
+            LogLog_error('createListener(' + %char(i_port) + ')-error: '
+                        + f_strerror(f_errno()));
+            return;
+         endif;
+
          if listener = SOCKET_NULL;
+            LogLog_error('createListener(' + %char(i_port) + ')-error: '
+                        + f_strerror(f_errno())
+                        + '. Socket is NULL.'
+                        );
             return;
          endif;
 
