@@ -526,7 +526,7 @@
          dow property.key <> '';
 
             if (prefix = '') or (f_startsWith(prefix: property.key) and
- B03                             %len(property.key) > %len(prefix));
+                                 %len(property.key) > %len(prefix));
 
                parameter = f_lcase(%subst(property.key: %len(prefix) + 1));
 

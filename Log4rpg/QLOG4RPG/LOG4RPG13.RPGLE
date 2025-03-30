@@ -1082,7 +1082,7 @@
             x = f_scanR('.': logName: x-1);
             pChild = pParent;
          enddo;
- B01
+    
          if (Node_getParent(pChild) = Node_null());
             logName = Logger_getName(pChild);
             LogLog_debug('Parent not found. Set parent of node [' + logName                 

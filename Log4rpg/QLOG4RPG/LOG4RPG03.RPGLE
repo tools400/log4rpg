@@ -271,7 +271,7 @@
 
          // Layout text of logging event
          if Appender_requiresLayout(i_pAppender) and
- B02        not Layout_isNull(appender.pLayout);
+            not Layout_isNull(appender.pLayout);
             Layout_format(appender.pLayout: i_pLogEvent);
          endif;
 

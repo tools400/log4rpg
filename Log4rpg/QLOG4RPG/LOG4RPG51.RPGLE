@@ -774,7 +774,7 @@
          dow property.key <> '';
 
             if (prefix = '') or (f_startsWith(prefix: property.key) and
- B03                             %len(property.key) > %len(prefix));
+                                 %len(property.key) > %len(prefix));
 
                parameter = f_lcase(%subst(property.key: %len(prefix) + 1));
 
@@ -816,7 +816,7 @@
                when parameter = cPARAMETER_DATE_PATTERN;
                   io_handle.datePattern = property.value;
                when Appender_knowsProperty(parameter);
- B03              // Ignore all parameters known by super Appender class
+                  // Ignore all parameters known by super Appender class
                other;
                   LogLog_warning('No such property ['     +
                                   property.key            +

@@ -160,7 +160,7 @@
       /FREE
 
          if (i_debugMode = cLOG4RPG_DEBUG_QUIET) or
- B01        (i_debugMode = cLOG4RPG_DEBUG_OFF  ) or
+            (i_debugMode = cLOG4RPG_DEBUG_OFF  ) or
             (i_debugMode = cLOG4RPG_DEBUG_ON   ) or
             (i_debugMode = cLOG4RPG_DEBUG_VERBOSE);
             return *on;

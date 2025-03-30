@@ -474,7 +474,7 @@
          endif;
 
          isEnabled =
- B01        cLOG4RPG_PRIORITY_DEBUG >= getPriorityFromHierarchy(i_hLogger);
+            cLOG4RPG_PRIORITY_DEBUG >= getPriorityFromHierarchy(i_hLogger);
 
          return isEnabled;
 
@@ -616,7 +616,7 @@
          endif;
 
          isEnabled =
- B01        cLOG4RPG_PRIORITY_INFO >= getPriorityFromHierarchy(i_hLogger);
+            cLOG4RPG_PRIORITY_INFO >= getPriorityFromHierarchy(i_hLogger);
 
          return isEnabled;
 
@@ -758,7 +758,7 @@
          endif;
 
          isEnabled =
- B01        cLOG4RPG_PRIORITY_WARN >= getPriorityFromHierarchy(i_hLogger);
+            cLOG4RPG_PRIORITY_WARN >= getPriorityFromHierarchy(i_hLogger);
 
          return isEnabled;
 
@@ -900,7 +900,7 @@
          endif;
 
          isEnabled =
- B01        cLOG4RPG_PRIORITY_ERROR >= getPriorityFromHierarchy(i_hLogger);
+            cLOG4RPG_PRIORITY_ERROR >= getPriorityFromHierarchy(i_hLogger);
 
          return isEnabled;
 
@@ -1042,7 +1042,7 @@
          endif;
 
          isEnabled =
- B01        cLOG4RPG_PRIORITY_FATAL >= getPriorityFromHierarchy(i_hLogger);
+            cLOG4RPG_PRIORITY_FATAL >= getPriorityFromHierarchy(i_hLogger);
 
          return isEnabled;
 
@@ -1167,7 +1167,7 @@
                                      : g_stubOfs);
          logLoggingEvent(i_hLogger: Level_toInt(i_level)
                          : %trimR(f_rtvMsgText(i_msg: *omit))
-                            : caller                                                        
+                            : caller
                             : errMsg);
 
          return;
