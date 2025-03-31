@@ -22,6 +22,7 @@
 //   >>COMPILE<<
 //     >>PARM<< TRUNCNBR(*NO);
 //     >>PARM<< DBGVIEW(*LIST);
+//     >>PARM<< OPTION(*EVENTF);
 //   >>END-COMPILE<<
 //   >>EXECUTE<<
 //   >>CMD<<    CRTPGM       PGM(&LI/&OB) +
@@ -63,7 +64,7 @@ ctl-opt expropts(*resdecpos) extbinint(*yes);
 // ------------------------------------
 //
 dcl-pr PGM_ENTRY_POINT extpgm('LOG4_EXP4');
-  gi_properties char(32) options(*nopass) const;
+  gi_config char(64) options(*nopass) const;
 end-pr;
 
 //=====================================================================*
@@ -71,11 +72,11 @@ end-pr;
 //=====================================================================*
 dcl-proc PGM_ENTRY_POINT;
   dcl-pi *n;
-    gi_properties char(32) options(*nopass) const;
+    gi_config char(64) options(*nopass) const;
   end-pi;
 
-   if (%parms() >= %parmnum(gi_properties));
-     main(%trim(gi_properties));
+   if (%parms() >= %parmnum(gi_config));
+     main(%subst(gi_config: 1: %scan(' ': gi_config)));
    else;
      main('mbr:QLOG4RPG.LOG4_X1P1');
    endif;
@@ -87,20 +88,20 @@ end-proc;
 //=====================================================================*
 dcl-proc main;
   dcl-pi *n;
-    i_properties varchar(32) value;
+    i_config varchar(32) value;
   end-pi;
 
- //  Helper fields
- dcl-s hLog1 like(LOG4RPG_hLogger_t);
- dcl-s hLog2 like(LOG4RPG_hLogger_t);
+  //  Helper fields
+  dcl-s hLog1 like(LOG4RPG_hLogger_t);
+  dcl-s hLog2 like(LOG4RPG_hLogger_t);
 
- dcl-s x int(10) inz(10000);
- dcl-s startTime timestamp;
- dcl-s endTime timestamp;
- dcl-s mSecs int(20);
- // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  dcl-s x int(10) inz(10000);
+  dcl-s startTime timestamp;
+  dcl-s endTime timestamp;
+  dcl-s mSecs int(20);
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  Configurator_loadPropertiesConfiguration(i_properties);
+  Configurator_loadPropertiesConfiguration(i_config);
 
   hLog1 = Logger_getRootLogger();
   hLog2 = Logger_getLogger('de.tools400');

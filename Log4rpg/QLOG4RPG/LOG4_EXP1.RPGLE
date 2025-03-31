@@ -29,13 +29,23 @@ ctl-opt main(main);
 /include QLOG4RPG,PLOG4RPG
 
 dcl-pr main extpgm('LOG4_EXP1');
+  gi_config char(64) options(*nopass) const;
 end-pr;
 
 dcl-proc main;
   dcl-pi *n;
+    gi_config char(64) options(*nopass) const;
   end-pi;
 
+  dcl-s config like(gi_config);
+
   dcl-s hLogger like(LOG4RPG_hLogger_t);
+
+  if (%parms() >= %parmnum(gi_config));
+    config = %subst(gi_config: 1: %scan(' ': gi_config));
+  else;
+    config = 'mbr:LOG4RPGDVP/QLOG4RPG(LOG4_X1P1)';
+  endif;
 
   // Enable internal debug log for the configuration steps
   // before property 'log4rpg.debug' is set to 'off, printer'.
