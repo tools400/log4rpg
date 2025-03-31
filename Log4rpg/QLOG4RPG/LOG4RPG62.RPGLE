@@ -153,6 +153,9 @@
       *  Return value
      D isDone          S               N                         inz(*off)
       *
+     D REPLACEMENT_CHARACTER...
+     D                 S              1C   inz(u'00F7')
+      *
       *  Helper fields
      D tempHandle      DS                  likeds(handle_t          ) inz
       *
@@ -166,7 +169,7 @@
          // Initialize handle
          tempHandle.pSuper        = i_pSuper;   // Handle of the super class 'Layout'
          tempHandle.rplUnprtChars = *off;
-         tempHandle.substitutionChar = '�';
+         tempHandle.substitutionChar = REPLACEMENT_CHARACTER;
          tempHandle.encoding         = '';
 
          // Initialize handle from configuration properties
@@ -355,25 +358,7 @@
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
 
-         xmlString =                                                                        
-            '<?xml version="1.0" ';
-
-         if handle.encoding <> '';
-            xmlString = xmlString +
-            'encoding="' + handle.encoding + '" ';
-         endif;
-
-         xmlString = xmlString +
-            '?>' + Layout_newLine();
-
-         xmlString = xmlString +
-            '<!DOCTYPE log4j:eventSet SYSTEM "log4j.dtd">' +
-             Layout_newLine();
-
-         xmlString = xmlString +
-            '<log4j:eventSet version="1.2" +
-             xmlns:log4j="http://jakarta.apache.org/log4j/">' +
-             Layout_newLine();
+         xmlString = '';
 
          return xmlString;
 
@@ -407,8 +392,7 @@
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
 
-         xmlString =
-            '</log4j:eventSet>' + Layout_newLine();
+         xmlString = '';
 
          return xmlString;
 
