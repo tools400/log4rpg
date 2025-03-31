@@ -137,6 +137,11 @@
                           XTOSRCF(QLOG4RPG  ) XOBJTYPE(*PGM   ) +
                           XGENCRT(*NO ) XPARAM(*BLANK)
 
+             XMLGENMBR  XMBR(LOG4_X1P8 ) XMBRATR(PROPS) +
+                          XFROMSRCF(QLOG4RPG  ) XFROMSRCL(LOG4RPGDVP) +
+                          XTOSRCF(QLOG4RPG  ) XOBJTYPE(*PGM   ) +
+                          XGENCRT(*NO ) XPARAM(*BLANK)
+
              XMLGENMBR  XMBR(LOG4HTMLAY) XMBRATR(RPGLE) +
                           XFROMSRCF(QLOG4RPG  ) XFROMSRCL(LOG4RPGDVP) +
                           XTOSRCF(QLOG4RPG  ) XOBJTYPE(*PGM   ) +
