@@ -17,7 +17,7 @@ With Log4rpg it is possible to enable and disable logging just by modifying a co
 
 ## Usage
 
-Using Log4rpg is very close to using Log4j. Additional information is available on the [Using Log4rpg](USAGE.md) page.
+Detailed documentation is privided on the [Log4rpg](documentation/Log4rpg.md) documentation pages.
 
 ## Installation
 
