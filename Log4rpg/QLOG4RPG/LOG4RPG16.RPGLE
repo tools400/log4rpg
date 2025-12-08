@@ -18,7 +18,7 @@
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          �nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  13.06.2008  Th.Raddatz    Changed Log4rpg to log empty messages.   *
       *                                                                     *

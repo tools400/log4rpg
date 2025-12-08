@@ -18,7 +18,7 @@
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          �nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  27.10.2006  Th.Raddatz    Added feature to completely enable/      *
       *                            disable Log4rpg. Logger_isLogging().     *

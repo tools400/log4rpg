@@ -18,7 +18,7 @@
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          �nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  13.06.2008  Th.Raddatz    Enhanced the Log4rpg stub module         *
       *                            to optionally load the Log4rpg service   *

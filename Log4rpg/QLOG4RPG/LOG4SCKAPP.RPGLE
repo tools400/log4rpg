@@ -19,7 +19,7 @@
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          �nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  15.11.2006  Th.Raddatz    Fixed probem that parameter 'ccsid'      *
       *                            was not properly handled. Changed        *

@@ -18,7 +18,7 @@
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          �nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  16.10.2006 Th.Raddatz     Fix bug in PropertyList_loadFromUrl().   *
       *                            Now returning cFalse on unknown URL      *

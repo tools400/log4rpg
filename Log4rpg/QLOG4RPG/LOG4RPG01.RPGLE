@@ -18,7 +18,7 @@
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          �nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  17.10.2006  Th.Raddatz    Fixed that Logger_addAppender() failed   *
       *                            when attempting to add an appender to    *

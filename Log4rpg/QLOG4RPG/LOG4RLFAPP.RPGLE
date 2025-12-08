@@ -19,7 +19,7 @@
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name          �nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  31.08.2008  Th.Raddatz    Now correctly passing a file name to     *
       *                            f_renameIfsFile().                       *
