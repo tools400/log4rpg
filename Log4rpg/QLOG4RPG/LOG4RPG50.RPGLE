@@ -622,6 +622,7 @@
 
          handle.hFile = f_openIfsFile(handle.path: O_CREAT + O_APPEND
                                                            + O_TEXTDATA
+                                                           + O_TEXT_CREAT
                                                            + SHARE_MODE
                                                            + O_WRONLY
                                                            + O_CCSID

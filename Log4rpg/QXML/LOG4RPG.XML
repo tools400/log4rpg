@@ -51,7 +51,7 @@
       appblddate CDATA #REQUIRED
      >
      ]>
-<upload  appname="LOG4RPG"  appauthor="Thomas Raddatz"  appblddate=" 3/26/2025">
+<upload  appname="LOG4RPG"  appauthor="Thomas Raddatz"  appblddate="12/08/2025">
 <install_instructions><![CDATA[
      *----------------------------------------------------------------      ------
      *  1. Upload entire XML to your AS/400 to a source file 112 long, into any mbr
@@ -1295,7 +1295,7 @@ mbrtext =  "Log4rpg - Installer                               "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
      /* =================================================================== */
      /*   >>PRE-COMPILER<<                                                  */
@@ -2225,7 +2225,7 @@ mbrtext =  "History LOG4RPG Service Program                   "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
 LOG4RPG - A Tools/400 Service Program
 -------------------------------------
@@ -2249,6 +2249,19 @@ and service programs (BND).
 -----------------------
       History
 -----------------------
+
+
+Version 1.13.1
+--------------
+
+Changed: Enabled file appenders to write CCSID 1208. Requires service
+         program IFS v1.9.6 or higher.
+
+
+Version 1.13
+------------
+
+Changed: Refactored prototypes.
 
 
 Version 1.12
@@ -2558,7 +2571,7 @@ mbrtext =  "Log4rpg Make File                                 "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
 PGM
 
@@ -2746,7 +2759,7 @@ mbrtext =  "Prototypes of CEE APIs                   (include)"
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
  DEF  /IF NOT DEFINED(CEELIB)
  DEF  /DEFINE CEELIB
@@ -2902,7 +2915,7 @@ mbrtext =  "Prototypes of C-Library                  (include)"
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
  DEF  /IF NOT DEFINED(CLIB)
  DEF  /DEFINE CLIB
@@ -3862,7 +3875,7 @@ mbrtext =  "Prototypes of C-Library   Record IO      (include)"
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
  DEF  /IF NOT DEFINED(CLIB2)
  DEF  /DEFINE CLIB2
@@ -4063,7 +4076,7 @@ mbrtext =  "Log4rpg Make File                                 "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
 PGM
 
@@ -4388,17 +4401,17 @@ mbrtext =  "Copyright information                             "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /if not defined(COPYRIGHT_DSPEC)
      H COPYRIGHT('+
-     HLOG4RPG V1.13 - 23.03.2025 - mailto:thomas.raddatz@tools400.de')
+     HLOG4RPG V1.13.1 - 08.12.2025 - mailto:thomas.raddatz@tools400.de')
       /eof
       /endif
      D cLOG4RPG_VERSION...
-     D                 C                   '1.13'
+     D                 C                   '1.13.1'
      D cLOG4RPG_DATE...
-     D                 C                   '23.03.2025'
+     D                 C                   '08.12.2025'
 ]]>  </copysrc>
 </mbr>
 <sendmsg  sendmsgid="CPF9897" sendmsgtype = "*STATUS   "><![CDATA[
@@ -4412,7 +4425,7 @@ mbrtext =  "H-Specification                                   "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(H_SPEC)
       /DEFINE H_SPEC
@@ -4444,7 +4457,7 @@ mbrtext =  "Example 1 - Properties From Stream File           "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
 **free
 //=====================================================================
@@ -4477,13 +4490,23 @@ ctl-opt main(main);
 /include QLOG4RPG,PLOG4RPG
 
 dcl-pr main extpgm('LOG4_EXP1');
+  gi_config char(64) options(*nopass) const;
 end-pr;
 
 dcl-proc main;
   dcl-pi *n;
+    gi_config char(64) options(*nopass) const;
   end-pi;
 
+  dcl-s config like(gi_config);
+
   dcl-s hLogger like(LOG4RPG_hLogger_t);
+
+  if (%parms() >= %parmnum(gi_config));
+    config = %subst(gi_config: 1: %scan(' ': gi_config));
+  else;
+    config = 'mbr:LOG4RPGDVP/QLOG4RPG(LOG4_X1P1)';
+  endif;
 
   // Enable internal debug log for the configuration steps
   // before property 'log4rpg.debug' is set to 'off, printer'.
@@ -4510,7 +4533,7 @@ mbrtext =  "Example 2 - Properties From Member                "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
 **free
 //=====================================================================
@@ -4539,22 +4562,32 @@ ctl-opt main(main);
 /include QLOG4RPG,PLOG4RPG
 
 dcl-pr main extpgm('LOG4_EXP1');
+  gi_config char(64) options(*nopass) const;
 end-pr;
 
 dcl-proc main;
   dcl-pi *n;
+    gi_config char(64) options(*nopass) const;
   end-pi;
+
+  dcl-s config like(gi_config);
 
   dcl-s hRootLogger like(LOG4RPG_hLogger_t);
   dcl-s hChildLogger1 like(LOG4RPG_hLogger_t);
   dcl-s hSubLogger1 like(LOG4RPG_hLogger_t);
   dcl-s hSubLogger2 like(LOG4RPG_hLogger_t);
 
+  if (%parms() >= %parmnum(gi_config));
+    config = %subst(gi_config: 1: %scan(' ': gi_config));
+  else;
+    config = 'mbr:LOG4RPGDVP/QLOG4RPG(LOG4_X1P2)';
+  endif;
+
   // Enable internal debug log for the configuration steps
   // before property 'log4rpg.debug' is set to 'off, printer'.
   Logger_setInternalDebugging(cLOG4RPG_DEBUG_ON: cLOG4RPG_DEBUG_OUTPUT_PRINTER);
 
-  Configurator_loadPropertiesConfiguration('mbr:LOG4RPGDVP/QLOG4RPG(LOG4_X1P2)');
+  Configurator_loadPropertiesConfiguration(config);
 
   hRootLogger = Logger_getRootLogger();
   hChildLogger1 = Logger_getLogger('de.tools400');
@@ -4613,7 +4646,7 @@ mbrtext =  "Example 3 - Programmatically Log4rpg Configuration"
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
 **free
 //=====================================================================
@@ -4663,7 +4696,7 @@ dcl-proc main;
 
   hAppender = Appender_new('appender'
                          : '*LIBL/LOG4RPG(DailyRollingFileAppender)'
-                         : 'path=/home/raddatz/log4_x1p0.log;');
+                         : 'path=/home/raddatz/log4_x1p0.log;ccsid=1208');
   Appender_setLayout(hAppender: hLayout);
 
   // Configure the root logger
@@ -4697,7 +4730,7 @@ mbrtext =  "Example 4 - Speed Test                            "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
 **free
 //=====================================================================
@@ -4723,6 +4756,7 @@ srccssid=  "01141">
 //   >>COMPILE<<
 //     >>PARM<< TRUNCNBR(*NO);
 //     >>PARM<< DBGVIEW(*LIST);
+//     >>PARM<< OPTION(*EVENTF);
 //   >>END-COMPILE<<
 //   >>EXECUTE<<
 //   >>CMD<<    CRTPGM       PGM(&LI/&OB) +
@@ -4764,7 +4798,7 @@ ctl-opt expropts(*resdecpos) extbinint(*yes);
 // ------------------------------------
 //
 dcl-pr PGM_ENTRY_POINT extpgm('LOG4_EXP4');
-  gi_properties char(32) options(*nopass) const;
+  gi_config char(64) options(*nopass) const;
 end-pr;
 
 //=====================================================================*
@@ -4772,11 +4806,11 @@ end-pr;
 //=====================================================================*
 dcl-proc PGM_ENTRY_POINT;
   dcl-pi *n;
-    gi_properties char(32) options(*nopass) const;
+    gi_config char(64) options(*nopass) const;
   end-pi;
 
-   if (%parms() >= %parmnum(gi_properties));
-     main(%trim(gi_properties));
+   if (%parms() >= %parmnum(gi_config));
+     main(%subst(gi_config: 1: %scan(' ': gi_config)));
    else;
      main('mbr:QLOG4RPG.LOG4_X1P1');
    endif;
@@ -4788,20 +4822,20 @@ end-proc;
 //=====================================================================*
 dcl-proc main;
   dcl-pi *n;
-    i_properties varchar(32) value;
+    i_config varchar(32) value;
   end-pi;
 
- //  Helper fields
- dcl-s hLog1 like(LOG4RPG_hLogger_t);
- dcl-s hLog2 like(LOG4RPG_hLogger_t);
+  //  Helper fields
+  dcl-s hLog1 like(LOG4RPG_hLogger_t);
+  dcl-s hLog2 like(LOG4RPG_hLogger_t);
 
- dcl-s x int(10) inz(10000);
- dcl-s startTime timestamp;
- dcl-s endTime timestamp;
- dcl-s mSecs int(20);
- // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  dcl-s x int(10) inz(10000);
+  dcl-s startTime timestamp;
+  dcl-s endTime timestamp;
+  dcl-s mSecs int(20);
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  Configurator_loadPropertiesConfiguration(i_properties);
+  Configurator_loadPropertiesConfiguration(i_config);
 
   hLog1 = Logger_getRootLogger();
   hLog2 = Logger_getLogger('de.tools400');
@@ -4840,7 +4874,7 @@ mbrtext =  "Configures various Appenders, Layouts and Filters "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
 # -----------------------------------------------------------------------
 #  Enable/disable Log4rpg
@@ -5023,7 +5057,7 @@ mbrtext =  "Configures a DailyRollingFileAppender             "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
 
 log4rpg.debug=off, printer
@@ -5056,7 +5090,7 @@ mbrtext =  "Configures a DailyRollingPrintAppender            "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
 
 log4rpg.debug=off, printer
@@ -5089,7 +5123,7 @@ mbrtext =  "Configures a DailyRollingFileAppender + HTMLLayout"
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
 
 log4rpg.debug=off, printer
@@ -5099,6 +5133,7 @@ log4rpg.logger.de.tools400=INFO
 
 log4rpg.appender.htmlFile=DailyRollingFileAppender
 log4rpg.appender.htmlFile.path=log4_x1p3.html
+log4rpg.appender.htmlFile.ccsid=1208
 log4rpg.appender.htmlFile.layout=*LIBL/LOG4HTMLAY(HTMLLayout)
 
 // Enforce a new file every minute!
@@ -5122,7 +5157,7 @@ mbrtext =  "Configures a XMLSocketAppender for Chainsaw       "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
 
 log4rpg.debug=off, printer
@@ -5131,7 +5166,7 @@ log4rpg.rootLogger=DEBUG, chainsaw
 log4rpg.logger.de.tools400=INFO
 
 log4rpg.appender.chainsaw=*LIBL/LOG4SCKAPP(XMLSocketAppender)
-log4rpg.appender.chainsaw.remoteHost=xxx.xxx.xxx.xxx
+log4rpg.appender.chainsaw.remoteHost=localclient
 log4rpg.appender.chainsaw.port=4448
 log4rpg.appender.chainsaw.layout=XMLLayout
 log4rpg.appender.chainsaw.filter=appName
@@ -5155,7 +5190,7 @@ mbrtext =  "Configures a DailyRollingFileAppender + XMLLayout "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
 
 log4rpg.debug=off, printer
@@ -5165,6 +5200,7 @@ log4rpg.logger.de.tools400=INFO
 
 log4rpg.appender.xmlFile=DailyRollingFileAppender
 log4rpg.appender.xmlFile.path=log4_x1p5.xml
+log4rpg.appender.xmlFile.ccsid=1208
 log4rpg.appender.xmlFile.layout=XMLLayout
 
 // Enforce a new file every day!
@@ -5188,7 +5224,7 @@ mbrtext =  "Configures a XMLSocketHubAppender for Chainsaw    "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
 
 log4rpg.debug=verbose , printer
@@ -5221,7 +5257,7 @@ mbrtext =  "Configures a RollingFileAppender                  "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
 
 log4rpg.debug=off, printer
@@ -5244,6 +5280,39 @@ log4rpg.appender.file.layout.conversionPattern=%z [%-5p] %L/%P(%M).%F (%S) %m%n
 ]]>  </copysrc>
 </mbr>
 <sendmsg  sendmsgid="CPF9897" sendmsgtype = "*STATUS   "><![CDATA[
+Installing LOG4_X1P8  type PROPS - in progress.
+]]>  </sendmsg>
+<!-- START OF MEMBER  -->
+<mbr
+mbrname =  "LOG4_X1P8 "
+mbrtype =  "PROPS     "
+mbrtext =  "Configures a DailyRollingFileAppender + SimpleLayo"
+srcfile =  "QLOG4RPG  "
+srclib  =  "selected  "
+srclen  =  "00112"
+srccssid=  "00273">
+<copysrc><![CDATA[
+
+log4rpg.debug=off, printer
+
+log4rpg.rootLogger=DEBUG, file
+log4rpg.logger.de.tools400=INFO
+
+log4rpg.appender.file=DailyRollingFileAppender
+log4rpg.appender.file.path=log4_x1p8.txt
+log4rpg.appender.file.layout=SimpleLayout
+
+// Enforce a new file every day!
+log4rpg.appender.file.datePattern=_yyyy-MM-dd.
+
+
+
+
+
+
+]]>  </copysrc>
+</mbr>
+<sendmsg  sendmsgid="CPF9897" sendmsgtype = "*STATUS   "><![CDATA[
 Installing LOG4HTMLAY  type RPGLE - in progress.
 ]]>  </sendmsg>
 <!-- START OF MEMBER  -->
@@ -5254,7 +5323,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: HTMLLayout              "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PROTOTYPES_ONLY)
       *=====================================================================*
@@ -5277,7 +5346,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  07.11.2006  Th.Raddatz    Added missing '</title>' tag.            *
       *                                                                     *
@@ -5647,84 +5716,84 @@ srccssid=  "01141">
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
 
-         htmlString =                                                                       //RADDAT
+         htmlString =
             '<!DOCTYPE HTML PUBLIC "-// 3C//DTD HTML 4.01 Transitional//EN" +
              "http://www.w3.org/TR/html4/loose.dtd">' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<html>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<head>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<title>' + handle.title + '</title>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<style type="text/css">' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<!--' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             'body, table {font-family: arial,sans-serif; font-size: x-small;}' +
              Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             'th {background: #336699; color: #FFFFFF; text-align: left;}' +
              Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '-->' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '</style>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '</head>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<body bgcolor="#FFFFFF" topmargin="6" leftmargin="6">' +
              Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<hr size="1" noshade>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             'Log session start time ' + %char(%date: *JOBRUN) + ', ' +
                                         %char(%time: *JOBRUN) +
              '<br>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<br>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<table cellspacing="0" cellpadding="4" border="1" +
              bordercolor="#224466" width="100%">' +
              Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<tr>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<th>Time</th>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<th>Job</th>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<th>Level</th>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<th>Logger</th>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<th>Proc:Line</th>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<th>Message</th>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '</tr>' + Layout_newLine();
 
          return htmlString;
@@ -5762,10 +5831,10 @@ srccssid=  "01141">
          htmlString =
             '</table>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '<br>' + Layout_newLine();
 
-         htmlString = htmlString +                                                          //RADDAT
+         htmlString = htmlString +
             '</body></html>' + Layout_newLine();
 
          return htmlString;
@@ -5885,7 +5954,7 @@ srccssid=  "01141">
          dow property.key <> '';
 
             if (prefix = '') or (f_startsWith(prefix: property.key) and
- B03                             %len(property.key) > %len(prefix));
+                                 %len(property.key) > %len(prefix));
 
                parameter = %subst(property.key: %len(prefix) + 1);
 
@@ -5962,7 +6031,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: PropertyFilter          "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PROTOTYPES_ONLY)
       *=====================================================================*
@@ -5985,7 +6054,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -6337,7 +6406,7 @@ srccssid=  "01141">
          dow property.key <> '';
 
             if (prefix = '') or (f_startsWith(prefix: property.key) and
- B03                             %len(property.key) > %len(prefix));
+                                 %len(property.key) > %len(prefix));
 
                parameter = %subst(property.key: %len(prefix) + 1);
 
@@ -6380,7 +6449,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: RollingFileAppender     "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PROTOTYPES_ONLY)
       *=====================================================================*
@@ -6403,7 +6472,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  31.08.2008  Th.Raddatz    Now correctly passing a file name to     *
       *                            f_renameIfsFile().                       *
@@ -7038,6 +7107,7 @@ srccssid=  "01141">
 
          handle.hFile = f_openIfsFile(handle.path: O_CREAT + O_APPEND
                                                            + O_TEXTDATA
+                                                           + O_TEXT_CREAT
                                                            + SHARE_MODE
                                                            + O_WRONLY
                                                            + O_CCSID
@@ -7530,7 +7600,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Export List                     "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
      /* ====================================================================== */
      /* >>PRE-COMPILER<<                                                       */
@@ -8765,7 +8835,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Export List - Stub Service Pgm  "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
      /* ====================================================================== */
      /* >>PRE-COMPILER<<                                                       */
@@ -8908,7 +8978,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Stub                            "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       *=====================================================================*
       *  SrvPgm: LOG4RPG - Stub                                             *
@@ -8930,7 +9000,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  13.06.2008  Th.Raddatz    Enhanced the Log4rpg stub module         *
       *                            to optionally load the Log4rpg service   *
@@ -10669,7 +10739,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: Logger                  "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       *=====================================================================*
       *  SrvPgm: LOG4RPG - Logger                                           *
@@ -10691,7 +10761,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  17.10.2006  Th.Raddatz    Fixed that Logger_addAppender() failed   *
       *                            when attempting to add an appender to    *
@@ -11147,7 +11217,7 @@ srccssid=  "01141">
          endif;
 
          isEnabled =
- B01        cLOG4RPG_PRIORITY_DEBUG >= getPriorityFromHierarchy(i_hLogger);
+            cLOG4RPG_PRIORITY_DEBUG >= getPriorityFromHierarchy(i_hLogger);
 
          return isEnabled;
 
@@ -11289,7 +11359,7 @@ srccssid=  "01141">
          endif;
 
          isEnabled =
- B01        cLOG4RPG_PRIORITY_INFO >= getPriorityFromHierarchy(i_hLogger);
+            cLOG4RPG_PRIORITY_INFO >= getPriorityFromHierarchy(i_hLogger);
 
          return isEnabled;
 
@@ -11431,7 +11501,7 @@ srccssid=  "01141">
          endif;
 
          isEnabled =
- B01        cLOG4RPG_PRIORITY_WARN >= getPriorityFromHierarchy(i_hLogger);
+            cLOG4RPG_PRIORITY_WARN >= getPriorityFromHierarchy(i_hLogger);
 
          return isEnabled;
 
@@ -11573,7 +11643,7 @@ srccssid=  "01141">
          endif;
 
          isEnabled =
- B01        cLOG4RPG_PRIORITY_ERROR >= getPriorityFromHierarchy(i_hLogger);
+            cLOG4RPG_PRIORITY_ERROR >= getPriorityFromHierarchy(i_hLogger);
 
          return isEnabled;
 
@@ -11715,7 +11785,7 @@ srccssid=  "01141">
          endif;
 
          isEnabled =
- B01        cLOG4RPG_PRIORITY_FATAL >= getPriorityFromHierarchy(i_hLogger);
+            cLOG4RPG_PRIORITY_FATAL >= getPriorityFromHierarchy(i_hLogger);
 
          return isEnabled;
 
@@ -11840,7 +11910,7 @@ srccssid=  "01141">
                                      : g_stubOfs);
          logLoggingEvent(i_hLogger: Level_toInt(i_level)
                          : %trimR(f_rtvMsgText(i_msg: *omit))
-                            : caller                                                        //RADDAT
+                            : caller
                             : errMsg);
 
          return;
@@ -13923,7 +13993,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: LoggerList              "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       *=====================================================================*
       *  SrvPgm: LOG4RPG - Object: LoggerList                               *
@@ -13945,7 +14015,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -14495,7 +14565,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: Appender                "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       *=====================================================================*
       *  SrvPgm: LOG4RPG - Object: Appender                                 *
@@ -14517,7 +14587,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  26.10.2006  Th.Raddatz    Introduced Filter to Log4rpg.            *
       *                            Added procedure Appender_knowsProperty().*
@@ -14770,7 +14840,7 @@ srccssid=  "01141">
 
          // Layout text of logging event
          if Appender_requiresLayout(i_pAppender) and
- B02        not Layout_isNull(appender.pLayout);
+            not Layout_isNull(appender.pLayout);
             Layout_format(appender.pLayout: i_pLogEvent);
          endif;
 
@@ -15252,7 +15322,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: AppenderList            "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       *=====================================================================*
       *  SrvPgm: LOG4RPG - Object: AppenderList                             *
@@ -15274,7 +15344,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -15816,11 +15886,11 @@ Installing LOG4RPG07  type RPGLE - in progress.
 <mbr
 mbrname =  "LOG4RPG07 "
 mbrtype =  "RPGLE     "
-mbrtext =  "                                                  "
+mbrtext =  "SrvPgm: LOG4RPG - Object: PropertyList            "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       *=====================================================================*
       *  SrvPgm: LOG4RPG - Object: PropertyList                             *
@@ -15842,7 +15912,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  16.10.2006 Th.Raddatz     Fix bug in PropertyList_loadFromUrl().   *
       *                            Now returning cFalse on unknown URL      *
@@ -17121,7 +17191,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: Configurator            "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       *=====================================================================*
       *  SrvPgm: LOG4RPG - Object: Configurator                             *
@@ -17143,7 +17213,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  26.10.2006  Th.Raddatz    Introduced Filter to Log4rpg.            *
       *                                                                     *
@@ -18533,11 +18603,11 @@ Installing LOG4RPG09  type RPGLE - in progress.
 <mbr
 mbrname =  "LOG4RPG09 "
 mbrtype =  "RPGLE     "
-mbrtext =  "SnvPgm: LOG4RPG - Object: Level                   "
+mbrtext =  "SrvPgm: LOG4RPG - Object: Level                   "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       *=====================================================================*
       *  SrvPgm: LOG4RPG - Object: Level                                    *
@@ -18559,7 +18629,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -18699,7 +18769,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: LogLog                  "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       *=====================================================================*
       *  SrvPgm: LOG4RPG - Object: LogLog                                   *
@@ -18721,7 +18791,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  27.10.2006  Th.Raddatz    Added feature to completely enable/      *
       *                            disable Log4rpg. Logger_isLogging().     *
@@ -19357,7 +19427,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: Layout                  "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       *=====================================================================*
       *  SrvPgm: LOG4RPG - Object: Layout                                   *
@@ -19379,7 +19449,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  27.10.2006  Th.Raddatz    Removed return value from procedure      *
       *                            Layout_format().                         *
@@ -19861,7 +19931,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: ClassLoader             "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       *=====================================================================*
       *  SrvPgm: LOG4RPG - Object: ClassLoader                              *
@@ -19883,7 +19953,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  18.10.2006  Th.Raddatz    Introduced Filter to Log4rpg.            *
       *                                                                     *
@@ -20317,7 +20387,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: Repository              "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       *=====================================================================*
       *  SrvPgm: LOG4RPG - Repository                                       *
@@ -20339,7 +20409,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  25.10.2006  Th.Raddatz    Introduced Filter to Log4rpg.            *
       *                                                                     *
@@ -21403,10 +21473,10 @@ srccssid=  "01141">
             x = f_scanR('.': logName: x-1);
             pChild = pParent;
          enddo;
- B01
+
          if (Node_getParent(pChild) = Node_null());
             logName = Logger_getName(pChild);
-            LogLog_debug('Parent not found. Set parent of node [' + logName                 //RADDAT
+            LogLog_debug('Parent not found. Set parent of node [' + logName
                           + '] to ''root''.');
             Node_addChild(Repository_getLogger(cROOT_LOGGER): pChild);
          endif;
@@ -21496,7 +21566,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: DebugMode               "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       *=====================================================================*
       *  SrvPgm: LOG4RPG - Object: DebugMode                                *
@@ -21518,7 +21588,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -21660,7 +21730,7 @@ srccssid=  "01141">
       /FREE
 
          if (i_debugMode = cLOG4RPG_DEBUG_QUIET) or
- B01        (i_debugMode = cLOG4RPG_DEBUG_OFF  ) or
+            (i_debugMode = cLOG4RPG_DEBUG_OFF  ) or
             (i_debugMode = cLOG4RPG_DEBUG_ON   ) or
             (i_debugMode = cLOG4RPG_DEBUG_VERBOSE);
             return *on;
@@ -21686,7 +21756,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: DebugOutput             "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       *=====================================================================*
       *  SrvPgm: LOG4RPG - Object: DebugOutput                              *
@@ -21708,7 +21778,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -21866,7 +21936,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: LogEvent                "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       *=====================================================================*
       *  SrvPgm: LOG4RPG - Object: LogEvent                                 *
@@ -21888,7 +21958,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  13.06.2008  Th.Raddatz    Changed Log4rpg to log empty messages.   *
       *                                                                     *
@@ -22612,7 +22682,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: Filter                  "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       *=====================================================================*
       *  SrvPgm: LOG4RPG - Object: Filter                                   *
@@ -22634,7 +22704,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -23192,7 +23262,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: FilterList              "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       *=====================================================================*
       *  SrvPgm: LOG4RPG - Object: FilterList                               *
@@ -23214,7 +23284,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -23760,7 +23830,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: DailyRollingFileAppender"
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       *=====================================================================*
       *  SrvPgm: LOG4RPG - Object: DailyRollingFileAppender                 *
@@ -23782,7 +23852,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  25.10.2006  Th.Raddatz    Replaced data structure logEvent with    *
       *                            object LogEvent.                         *
@@ -24386,6 +24456,7 @@ srccssid=  "01141">
 
          handle.hFile = f_openIfsFile(handle.path: O_CREAT + O_APPEND
                                                            + O_TEXTDATA
+                                                           + O_TEXT_CREAT
                                                            + SHARE_MODE
                                                            + O_WRONLY
                                                            + O_CCSID
@@ -24912,7 +24983,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: DailyRollingPrintAppende"
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       *=====================================================================*
       *  SrvPgm: LOG4RPG - Object: DailyRollingPrintAppender                *
@@ -24934,7 +25005,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  25.10.2006  Th.Raddatz    Replaced data structure logEvent with    *
       *                            object LogEvent.                         *
@@ -25690,7 +25761,7 @@ srccssid=  "01141">
          dow property.key <> '';
 
             if (prefix = '') or (f_startsWith(prefix: property.key) and
- B03                             %len(property.key) > %len(prefix));
+                                 %len(property.key) > %len(prefix));
 
                parameter = f_lcase(%subst(property.key: %len(prefix) + 1));
 
@@ -25732,7 +25803,7 @@ srccssid=  "01141">
                when parameter = cPARAMETER_DATE_PATTERN;
                   io_handle.datePattern = property.value;
                when Appender_knowsProperty(parameter);
- B03              // Ignore all parameters known by super Appender class
+                  // Ignore all parameters known by super Appender class
                other;
                   LogLog_warning('No such property ['     +
                                   property.key            +
@@ -25764,7 +25835,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: NullAppender            "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       *=====================================================================*
       *  SrvPgm: LOG4RPG - Object: NullAppender                             *
@@ -25786,7 +25857,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  25.10.2006  Th.Raddatz    Replaced data structure logEvent with    *
       *                            object LogEvent.                         *
@@ -26042,7 +26113,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: PatternLayout           "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       *=====================================================================*
       *  SrvPgm: LOG4RPG - Object: PatternLayout                            *
@@ -26686,7 +26757,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: SimpleLayout            "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       *=====================================================================*
       *  SrvPgm: LOG4RPG - Object: SimpleLayout                             *
@@ -26708,7 +26779,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  27.10.2006  Th.Raddatz    Replaced data structure logEvent with    *
       *                            object LogEvent.                         *
@@ -26924,7 +26995,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: XMLLayout               "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       *=====================================================================*
       *  SrvPgm: LOG4RPG - Object: XMLLayout                                *
@@ -26946,7 +27017,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  27.10.2006  Th.Raddatz    Replaced data structure logEvent with    *
       *                            object LogEvent.                         *
@@ -27081,6 +27152,9 @@ srccssid=  "01141">
       *  Return value
      D isDone          S               N                         inz(*off)
       *
+     D REPLACEMENT_CHARACTER...
+     D                 S              1C   inz(u'00F7')
+      *
       *  Helper fields
      D tempHandle      DS                  likeds(handle_t          ) inz
       *
@@ -27094,7 +27168,7 @@ srccssid=  "01141">
          // Initialize handle
          tempHandle.pSuper        = i_pSuper;   // Handle of the super class 'Layout'
          tempHandle.rplUnprtChars = *off;
-         tempHandle.substitutionChar = ' ';
+         tempHandle.substitutionChar = REPLACEMENT_CHARACTER;
          tempHandle.encoding         = '';
 
          // Initialize handle from configuration properties
@@ -27283,25 +27357,7 @@ srccssid=  "01141">
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
 
-         xmlString =                                                                        //RADDAT
-            '<?xml version="1.0" ';
-
-         if handle.encoding <> '';
-            xmlString = xmlString +
-            'encoding="' + handle.encoding + '" ';
-         endif;
-
-         xmlString = xmlString +
-            '?>' + Layout_newLine();
-
-         xmlString = xmlString +
-            '<!DOCTYPE log4j:eventSet SYSTEM "log4j.dtd">' +
-             Layout_newLine();
-
-         xmlString = xmlString +
-            '<log4j:eventSet version="1.2" +
-             xmlns:log4j="http://jakarta.apache.org/log4j/">' +
-             Layout_newLine();
+         xmlString = '';
 
          return xmlString;
 
@@ -27335,8 +27391,7 @@ srccssid=  "01141">
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
 
-         xmlString =
-            '</log4j:eventSet>' + Layout_newLine();
+         xmlString = '';
 
          return xmlString;
 
@@ -27454,7 +27509,7 @@ srccssid=  "01141">
          dow property.key <> '';
 
             if (prefix = '') or (f_startsWith(prefix: property.key) and
- B03                             %len(property.key) > %len(prefix));
+                                 %len(property.key) > %len(prefix));
 
                parameter = f_lcase(%subst(property.key: %len(prefix) + 1));
 
@@ -27549,7 +27604,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: Synchronisation         "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       *=====================================================================*
       *  SrvPgm: LOG4RPG - Object: Synchronisation                          *
@@ -27571,7 +27626,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -27865,7 +27920,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: Option Converter        "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       *=====================================================================*
       *  SrvPgm: LOG4RPG - Object: Option Converter                         *
@@ -27887,7 +27942,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -28116,7 +28171,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: Helper                  "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       *=====================================================================*
       *  SrvPgm: LOG4RPG - Object: Helper                                   *
@@ -28138,7 +28193,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  08.11.2008  Th.Raddatz    Added procedure: getObject()             *
       *                                                                     *
@@ -28618,7 +28673,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: XMLSocketAppender       "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PROTOTYPES_ONLY)
       *=====================================================================*
@@ -28641,7 +28696,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *  15.11.2006  Th.Raddatz    Fixed probem that parameter 'ccsid'      *
       *                            was not properly handled. Changed        *
@@ -29486,7 +29541,7 @@ srccssid=  "01141">
          dow property.key <> '';
 
             if (prefix = '') or (f_startsWith(prefix: property.key) and
- B03                             %len(property.key) > %len(prefix));
+                                 %len(property.key) > %len(prefix));
 
                parameter = f_lcase(%subst(property.key: %len(prefix) + 1));
 
@@ -29510,7 +29565,7 @@ srccssid=  "01141">
                      OptionConverter_toInt(
                         property.value: cDEFAULT_CONNECTION_TIMEOUT);
                when Appender_knowsProperty(parameter);
- B03              // Ignore all parameters known by super Appender class
+                  // Ignore all parameters known by super Appender class
                other;
                   LogLog_warning('No such property ['     +
                                   property.key            +
@@ -29542,7 +29597,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: XMLSocketHubAppender    "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PROTOTYPES_ONLY)
       *=====================================================================*
@@ -29565,7 +29620,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -29764,7 +29819,17 @@ srccssid=  "01141">
 
          // Create listener socket
          listener = createListener(i_port);
+         if listener = SOCKET_ERROR;
+            LogLog_error('createListener(' + %char(i_port) + ')-error: '
+                        + f_strerror(f_errno()));
+            return;
+         endif;
+
          if listener = SOCKET_NULL;
+            LogLog_error('createListener(' + %char(i_port) + ')-error: '
+                        + f_strerror(f_errno())
+                        + '. Socket is NULL.'
+                        );
             return;
          endif;
 
@@ -30174,7 +30239,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: XMLSocketHubAppender    "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PROTOTYPES_ONLY)
       *=====================================================================*
@@ -30197,7 +30262,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -31095,7 +31160,7 @@ srccssid=  "01141">
          dow property.key <> '';
 
             if (prefix = '') or (f_startsWith(prefix: property.key) and
- B03                             %len(property.key) > %len(prefix));
+                                 %len(property.key) > %len(prefix));
 
                parameter = f_lcase(%subst(property.key: %len(prefix) + 1));
 
@@ -31109,7 +31174,7 @@ srccssid=  "01141">
                      OptionConverter_toInt(
                         property.value: cDEFAULT_CCSID);
                when Appender_knowsProperty(parameter);
- B03              // Ignore all parameters known by super Appender class
+                  // Ignore all parameters known by super Appender class
                other;
                   LogLog_warning('No such property ['     +
                                   property.key            +
@@ -31141,7 +31206,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: Socket Helper           "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       *=====================================================================*
       *  Module: LOG4RPG - Object: Socket Helper                            *
@@ -31167,7 +31232,7 @@ srccssid=  "01141">
       *=====================================================================*
       *  History:                                                           *
       *                                                                     *
-      *  Datum       Name           nderung                                 *
+      *  Datum       Name          Änderung                                 *
       *  ----------  ------------  ---------------------------------------  *
       *                                                                     *
       *=====================================================================*
@@ -31431,7 +31496,7 @@ mbrtext =  "Process Open List APIs                            "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       *
      D qgy_opnListInf_t...
@@ -31546,7 +31611,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Prototypes Appender       public"
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PAPPENDER)
       /DEFINE PAPPENDER
@@ -31657,7 +31722,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Prototypes Filter         public"
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PFILTER)
       /DEFINE PFILTER
@@ -31767,7 +31832,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Prototypes Layout         public"
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLAYOUT)
       /DEFINE PLAYOUT
@@ -31899,7 +31964,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Type Definitions          public"
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4RPG)
       /DEFINE PLOG4RPG
@@ -32697,7 +32762,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Stub                            "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4RPG00)
       /DEFINE PLOG4RPG00
@@ -33110,7 +33175,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: Logger                  "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4RPG01)
       /DEFINE PLOG4RPG01
@@ -33432,7 +33497,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: LoggerList              "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4RPG02)
       /DEFINE PLOG4RPG02
@@ -33573,7 +33638,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: Appender                "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4RPG03)
       /DEFINE PLOG4RPG03
@@ -33693,7 +33758,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: AppenderList            "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4RPG04)
       /DEFINE PLOG4RPG04
@@ -33834,7 +33899,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: Property                "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4RPG06)
       /DEFINE PLOG4RPG06
@@ -33907,7 +33972,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: PropertyList            "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4RPG07)
       /DEFINE PLOG4RPG07
@@ -34077,7 +34142,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: Configurator            "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4RPG08)
       /DEFINE PLOG4RPG08
@@ -34127,7 +34192,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: Level                   "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4RPG09)
       /DEFINE PLOG4RPG09
@@ -34187,7 +34252,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: LogLog                  "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4RPG10)
       /DEFINE PLOG4RPG10
@@ -34315,7 +34380,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: Layout                  "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4RPG11)
       /DEFINE PLOG4RPG11
@@ -34420,7 +34485,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: ClassLoader             "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4RPG12)
       /DEFINE PLOG4RPG12
@@ -34562,7 +34627,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: Repository              "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4RPG13)
       /DEFINE PLOG4RPG13
@@ -34749,7 +34814,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: DebugMode               "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4RPG14)
       /DEFINE PLOG4RPG14
@@ -34813,7 +34878,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: DebugOutput             "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4RPG15)
       /DEFINE PLOG4RPG15
@@ -34873,7 +34938,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: LogEvent                "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4RPG16)
       /DEFINE PLOG4RPG16
@@ -35063,7 +35128,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: Filter                  "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4RPG17)
       /DEFINE PLOG4RPG17
@@ -35164,7 +35229,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: FilterList              "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4RPG18)
       /DEFINE PLOG4RPG18
@@ -35305,7 +35370,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: DailyRollingFileAppender"
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4RPG50)
       /DEFINE PLOG4RPG50
@@ -35383,7 +35448,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: PrinterAppender         "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4RPG51)
       /DEFINE PLOG4RPG51
@@ -35461,7 +35526,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: NullAppender            "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4RPG52)
       /DEFINE PLOG4RPG52
@@ -35539,7 +35604,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: PatternLayout           "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4RPG60)
       /DEFINE PLOG4RPG60
@@ -35609,7 +35674,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: SimpleLayout            "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4RPG61)
       /DEFINE PLOG4RPG61
@@ -35679,7 +35744,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: XMLLayout               "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4RPG62)
       /DEFINE PLOG4RPG62
@@ -35763,7 +35828,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: Synchronisation         "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4RPG97)
       /DEFINE PLOG4RPG97
@@ -35840,7 +35905,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: Option Converter        "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4RPG98)
       /DEFINE PLOG4RPG98
@@ -35899,7 +35964,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: Helper                  "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4RPG99)
       /DEFINE PLOG4RPG99
@@ -36009,7 +36074,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Object: Socket Helper           "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PLOG4SOCK)
       /DEFINE PLOG4SOCK
@@ -36500,7 +36565,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Type defs appenders, layouts    "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PSHARE)
       /DEFINE PSHARE
@@ -36540,7 +36605,7 @@ mbrtext =  "SrvPgm: LOG4RPG - Internal Type Definitions       "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(PTYPES)
       /DEFINE PTYPES
@@ -36622,7 +36687,7 @@ mbrtext =  "Retrieve Job Information (QUSRJOBI) API           "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
       /IF NOT DEFINED(QUSRJOBI)
       /DEFINE QUSRJOBI
@@ -36678,7 +36743,7 @@ mbrtext =  "Programm Status Datenstruktur                     "
 srcfile =  "QLOG4RPG  "
 srclib  =  "selected  "
 srclen  =  "00112"
-srccssid=  "01141">
+srccssid=  "00273">
 <copysrc><![CDATA[
  DEF  /IF NOT DEFINED(SDS)
  DEF  /DEFINE SDS

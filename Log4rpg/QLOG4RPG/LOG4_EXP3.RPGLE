@@ -46,7 +46,7 @@ dcl-proc main;
 
   hAppender = Appender_new('appender'
                          : '*LIBL/LOG4RPG(DailyRollingFileAppender)'
-                         : 'path=/home/raddatz/log4_x1p0.log;');
+                         : 'path=/home/raddatz/log4_x1p0.log;ccsid=1208');
   Appender_setLayout(hAppender: hLayout);
 
   // Configure the root logger

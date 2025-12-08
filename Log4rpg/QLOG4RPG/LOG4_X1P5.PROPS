@@ -6,6 +6,7 @@ log4rpg.logger.de.tools400=INFO
  
 log4rpg.appender.xmlFile=DailyRollingFileAppender
 log4rpg.appender.xmlFile.path=log4_x1p5.xml
+log4rpg.appender.xmlFile.ccsid=1208
 log4rpg.appender.xmlFile.layout=XMLLayout
  
 // Enforce a new file every day!
