@@ -33,7 +33,7 @@ This document focuses on the XML packages and the installer, because it seems as
 The Log4rpg requires two additional service programs:
 
 * [BASICS1](https://sourceforge.net/p/tools400/code/HEAD/tree/rpg-srvpgm/BASICS1/trunk/QXML/)
-* [IFS](https://sourceforge.net/p/tools400/code/HEAD/tree/rpg-srvpgm/BASICS1/trunk/QXML/)
+* [IFS](https://sourceforge.net/p/tools400/code/HEAD/tree/rpg-srvpgm/IFS/trunk/QXML/)
 
 Both service programs are hosted on Sourceforge.
 
@@ -42,7 +42,7 @@ Both service programs are hosted on Sourceforge.
 Start with downloading the XML packages to your PC. Click the link, open the member and click the download link or button:
 
 * [BASICS1](https://sourceforge.net/p/tools400/code/HEAD/tree/rpg-srvpgm/BASICS1/trunk/QXML/)
-* [IFS](https://sourceforge.net/p/tools400/code/HEAD/tree/rpg-srvpgm/BASICS1/trunk/QXML/)
+* [IFS](https://sourceforge.net/p/tools400/code/HEAD/tree/rpg-srvpgm/IFS/trunk/QXML/)
 * [LOG4RPG](https://github.com/tools400/log4rpg/tree/master/Log4rpg/QXML)
 
 Then logon to your IBM i system and follow these steps:
