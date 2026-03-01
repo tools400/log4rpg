@@ -50,6 +50,9 @@
       *  23.03.2025                Resolve special library and member       *
       *                            values (*LIBL, *FIRST).                  *
       *                                                                     *
+      *  01.03.2026 Th. Raddatz    Fix loading properties from UTF-8        *
+      *                            encoded stream files.                    *
+      *                                                                     *
       *=====================================================================*
       *   >>PRE-COMPILER<<                                                  *
       *                                                                     *
@@ -806,10 +809,11 @@
      D isLoaded        S               N   inz(*off)
       *
       *  Helper fields
-     D hFile           S                   like(ifs_hFile_t ) inz
-     D bytesRed        S             10I 0                    inz
-     D buffer          S           1024A                      inz
-     D msg             DS                  likeds(msg_t             ) inz
+     D hFile           S                   like(ifs_hFile_t) inz
+     D bytesRed        S             10I 0 inz
+     D buffer          S           1024A   inz
+     D msg             DS                  likeds(msg_t) inz
+     D st_stat         DS                  likeds(st_stat_t) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
 
@@ -821,9 +825,17 @@
             return isLoaded;
          endif;
 
+         if not f_isIfsFile(i_path: msg);
+            LogLog_warningMsg(msg);
+            return isLoaded;
+         endif;
+
+         stat(i_path: %addr(st_stat));
+
          hFile = f_openIfsFile(i_path
-                               : O_RDONLY + O_SHARE_RDONLY + O_TEXTDATA
-                               : *omit: *omit: msg);
+                               : O_RDONLY + O_SHARE_RDONLY + O_CREAT +
+                                 O_TEXTDATA + O_TEXT_CREAT + O_CCSID
+                               : st_stat.ccsid: *omit: msg);
          if hFile = RC_ERROR;
             LogLog_warningMsg(msg);
             return isLoaded;

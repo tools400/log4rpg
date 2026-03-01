@@ -51,7 +51,7 @@
       appblddate CDATA #REQUIRED
      >
      ]>
-<upload  appname="LOG4RPG"  appauthor="Thomas Raddatz"  appblddate="12/08/2025">
+<upload  appname="LOG4RPG"  appauthor="Thomas Raddatz"  appblddate=" 3/01/2026">
 <install_instructions><![CDATA[
      *----------------------------------------------------------------      ------
      *  1. Upload entire XML to your AS/400 to a source file 112 long, into any mbr
@@ -2251,6 +2251,12 @@ and service programs (BND).
 -----------------------
 
 
+Version 1.13.2
+--------------
+
+Fixed:   Fixed loading properties from UTF-8 encoded stream files.
+
+
 Version 1.13.1
 --------------
 
@@ -4405,13 +4411,13 @@ srccssid=  "00273">
 <copysrc><![CDATA[
       /if not defined(COPYRIGHT_DSPEC)
      H COPYRIGHT('+
-     HLOG4RPG V1.13.1 - 08.12.2025 - mailto:thomas.raddatz@tools400.de')
+     HLOG4RPG V1.13.2 - 01.03.2026 - mailto:thomas.raddatz@tools400.de')
       /eof
       /endif
      D cLOG4RPG_VERSION...
-     D                 C                   '1.13.1'
+     D                 C                   '1.13.2'
      D cLOG4RPG_DATE...
-     D                 C                   '08.12.2025'
+     D                 C                   '01.03.2026'
 ]]>  </copysrc>
 </mbr>
 <sendmsg  sendmsgid="CPF9897" sendmsgtype = "*STATUS   "><![CDATA[
@@ -15944,6 +15950,9 @@ srccssid=  "00273">
       *  23.03.2025                Resolve special library and member       *
       *                            values (*LIBL, *FIRST).                  *
       *                                                                     *
+      *  01.03.2026 Th. Raddatz    Fix loading properties from UTF-8        *
+      *                            encoded stream files.                    *
+      *                                                                     *
       *=====================================================================*
       *   >>PRE-COMPILER<<                                                  *
       *                                                                     *
@@ -16700,10 +16709,11 @@ srccssid=  "00273">
      D isLoaded        S               N   inz(*off)
       *
       *  Helper fields
-     D hFile           S                   like(ifs_hFile_t ) inz
-     D bytesRed        S             10I 0                    inz
-     D buffer          S           1024A                      inz
-     D msg             DS                  likeds(msg_t             ) inz
+     D hFile           S                   like(ifs_hFile_t) inz
+     D bytesRed        S             10I 0 inz
+     D buffer          S           1024A   inz
+     D msg             DS                  likeds(msg_t) inz
+     D st_stat         DS                  likeds(st_stat_t) inz
       * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       /FREE
 
@@ -16715,9 +16725,17 @@ srccssid=  "00273">
             return isLoaded;
          endif;
 
+         if not f_isIfsFile(i_path: msg);
+            LogLog_warningMsg(msg);
+            return isLoaded;
+         endif;
+
+         stat(i_path: %addr(st_stat));
+
          hFile = f_openIfsFile(i_path
-                               : O_RDONLY + O_SHARE_RDONLY + O_TEXTDATA
-                               : *omit: *omit: msg);
+                               : O_RDONLY + O_SHARE_RDONLY + O_CREAT +
+                                 O_TEXTDATA + O_TEXT_CREAT + O_CCSID
+                               : st_stat.ccsid: *omit: msg);
          if hFile = RC_ERROR;
             LogLog_warningMsg(msg);
             return isLoaded;

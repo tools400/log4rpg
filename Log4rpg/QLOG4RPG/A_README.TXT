@@ -22,6 +22,12 @@ and service programs (BND).
 -----------------------
 
 
+Version 1.13.2
+--------------
+
+Fixed:   Fixed loading properties from UTF-8 encoded stream files.
+
+
 Version 1.13.1
 --------------
 
