@@ -1,17 +1,17 @@
-      /IF NOT DEFINED(H_SPEC)
-      /DEFINE H_SPEC
-      *
-      /IF NOT DEFINED(UNIT_TEST)
-     H NOMAIN
-      /ENDIF
-      *  Standard H-Specs
-     H DEBUG
-     H OPTION(*SRCSTMT : *NODEBUGIO)
-     H DECEDIT('0,') DATEDIT(*DMY.)
-     H DATFMT(*ISO ) TIMFMT(*ISO )
-     H EXPROPTS(*RESDECPOS)
-     H EXTBININT(*YES)
-     H CCSID(*CHAR: *JOBRUN)
-     H REQPREXP(*REQUIRE)
-      *
-      /ENDIF
+**free
+/if NOT DEFINED(H_SPEC)
+/define H_SPEC
+
+/if NOT DEFINED(UNIT_TEST)
+ctl-opt nomain;
+/endif
+//  Standard H-Specs
+ctl-opt debug option(*srcstmt: *nodebugio);
+ctl-opt decedit('0,') datedit(*DMY.);
+ctl-opt datfmt(*iso) timfmt(*iso);
+ctl-opt expropts(*resdecpos);
+ctl-opt extbinint(*yes);
+ctl-opt ccsid(*CHAR: *jobrun);
+ctl-opt reqprexp(*require);
+
+/endif

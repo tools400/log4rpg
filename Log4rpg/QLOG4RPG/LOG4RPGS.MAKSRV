@@ -27,9 +27,9 @@
      /* >>END-PRE-COMPILER<<                                                   */
      /* ====================================================================== */
 STRPGMEXP PGMLVL(*CURRENT) SIGNATURE('Version 1.10')
- 
+
   EXPORT SYMBOL('LOG4RPG00_LoggerStub_loadSrvPgm')
- 
+
   EXPORT SYMBOL('LOG4RPG01_Logger_addAppender')
   EXPORT SYMBOL('LOG4RPG01_Logger_debug')
   EXPORT SYMBOL('LOG4RPG01_Logger_debugMsg')
@@ -54,36 +54,36 @@ STRPGMEXP PGMLVL(*CURRENT) SIGNATURE('Version 1.10')
   EXPORT SYMBOL('LOG4RPG01_Logger_setLogging')
   EXPORT SYMBOL('LOG4RPG01_Logger_warn')
   EXPORT SYMBOL('LOG4RPG01_Logger_warnMsg')
- 
+
   EXPORT SYMBOL('LOG4RPG08_Configurator_clearConfiguration')
   EXPORT SYMBOL('LOG4RPG08_Configurator_loadAndWatchPropertiesConfiguration')
   EXPORT SYMBOL('LOG4RPG08_Configurator_loadDefaultConfiguration')
   EXPORT SYMBOL('LOG4RPG08_Configurator_loadPropertiesConfiguration')
- 
+
   EXPORT SYMBOL('LOG4RPG03_Appender_new')
   EXPORT SYMBOL('LOG4RPG03_Appender_null')
   EXPORT SYMBOL('LOG4RPG03_Appender_setFilter')
   EXPORT SYMBOL('LOG4RPG03_Appender_setLayout')
- 
+
   EXPORT SYMBOL('LOG4RPG17_Filter_new')
   EXPORT SYMBOL('LOG4RPG17_Filter_null')
- 
+
   EXPORT SYMBOL('LOG4RPG11_Layout_new')
   EXPORT SYMBOL('LOG4RPG11_Layout_null')
- 
+
   /*   New with V1.10:     */
   EXPORT SYMBOL('LOG4RPG01_Logger_isDebugEnabled')
   EXPORT SYMBOL('LOG4RPG01_Logger_isInfoEnabled')
   EXPORT SYMBOL('LOG4RPG01_Logger_isWarnEnabled')
   EXPORT SYMBOL('LOG4RPG01_Logger_isErrorEnabled')
   EXPORT SYMBOL('LOG4RPG01_Logger_isFatalEnabled')
- 
+
 ENDPGMEXP
- 
+
 STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.8')
- 
+
   EXPORT SYMBOL('LOG4RPG00_LoggerStub_loadSrvPgm')
- 
+
   EXPORT SYMBOL('LOG4RPG01_Logger_addAppender')
   EXPORT SYMBOL('LOG4RPG01_Logger_debug')
   EXPORT SYMBOL('LOG4RPG01_Logger_debugMsg')
@@ -108,21 +108,21 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.8')
   EXPORT SYMBOL('LOG4RPG01_Logger_setLogging')
   EXPORT SYMBOL('LOG4RPG01_Logger_warn')
   EXPORT SYMBOL('LOG4RPG01_Logger_warnMsg')
- 
+
   EXPORT SYMBOL('LOG4RPG08_Configurator_clearConfiguration')
   EXPORT SYMBOL('LOG4RPG08_Configurator_loadAndWatchPropertiesConfiguration')
   EXPORT SYMBOL('LOG4RPG08_Configurator_loadDefaultConfiguration')
   EXPORT SYMBOL('LOG4RPG08_Configurator_loadPropertiesConfiguration')
- 
+
   EXPORT SYMBOL('LOG4RPG03_Appender_new')
   EXPORT SYMBOL('LOG4RPG03_Appender_null')
   EXPORT SYMBOL('LOG4RPG03_Appender_setFilter')
   EXPORT SYMBOL('LOG4RPG03_Appender_setLayout')
- 
+
   EXPORT SYMBOL('LOG4RPG17_Filter_new')
   EXPORT SYMBOL('LOG4RPG17_Filter_null')
- 
+
   EXPORT SYMBOL('LOG4RPG11_Layout_new')
   EXPORT SYMBOL('LOG4RPG11_Layout_null')
- 
+
 ENDPGMEXP

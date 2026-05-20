@@ -1,557 +1,486 @@
-      *=====================================================================*
-      *  SrvPgm: LOG4RPG - Object: LoggerList                               *
-      *=====================================================================*
-      *  Author  :  Thomas Raddatz                                          *
-      *  Date    :  13.06.2006                                              *
-      *  E-mail  :  thomas.raddatz@tools400.de                              *
-      *  Homepage:  www.tools400.de                                         *
-      *=====================================================================*
-      *                                                                     *
-      *  This software is free software, you can redistribute it and/or     *
-      *  modify it under the terms of the GNU General Public License (GPL)  *
-      *  as published by the Free Software Foundation.                      *
-      *                                                                     *
-      *  See GNU General Public License for details.                        *
-      *          http://www.opensource.org                                  *
-      *          http://www.opensource.org/licenses/gpl-license.html        *
-      *                                                                     *
-      *=====================================================================*
-      *  History:                                                           *
-      *                                                                     *
-      *  Datum       Name          Änderung                                 *
-      *  ----------  ------------  ---------------------------------------  *
-      *                                                                     *
-      *=====================================================================*
-      *   >>PRE-COMPILER<<                                                  *
-      *                                                                     *
-      *     >>CRTCMD<<  CRTRPGMOD    MODULE(&LI/&OB) +                      *
-      *                              SRCFILE(&SL/&SF) +                     *
-      *                              SRCMBR(&SM);                           *
-      *                                                                     *
-      *     >>COMPILE<<                                                     *
-      *       >>PARM<< TRUNCNBR(*NO);                                       *
-      *       >>PARM<< DBGVIEW(*LIST);                                      *
-      *       >>PARM<< OPTION(*EVENTF);                                     *
-      *       >>PARM<< TGTRLS(V7R3M0  );                                    *
-      *     >>END-COMPILE<<                                                 *
-      *                                                                     *
-      *     >>EXECUTE<<                                                     *
-      *                                                                     *
-      *   >>END-PRE-COMPILER<<                                              *
-      *=====================================================================*
-      /COPY QLOG4RPG,H_SPEC
-      *=====================================================================*
-      *
-      * -----------------------------------------
-      *  Imported functions
-      * -----------------------------------------
-      /COPY QLOG4RPG,PLOG4RPG                      Public API Specification
-      *
-      * -----------------------------------------
-      *  Exported functions
-      * -----------------------------------------
-      /COPY QLOG4RPG,PLOG4RPG02
-      *
-      * -----------------------------------------
-      *  Internal type templates
-      * -----------------------------------------
-      /COPY QLOG4RPG,PTYPES
-      *
-     D handle_t...
-     D                 DS                  qualified               based(pDummy)
-     D  pMap                               like(BasicMap_handle_t )
-      *
-      * -----------------------------------------
-      *  Prototypes
-      * -----------------------------------------
-      /COPY QBASICS1,PBASICS1                      Basic RPG Extensions
-      /COPY QIFS,PIFS                              IFS Stream file support
-      *
-      /COPY QLOG4RPG,PLOG4RPG10                    LogLog
-      /COPY QLOG4RPG,PLOG4RPG99                    Helpers
-      *
-      * -----------------------------------------
-      *  Private prototypes
-      * -----------------------------------------
-      *
-      * -----------------------------------------
-      *  Global constants
-      * -----------------------------------------
-      *
-      * -----------------------------------------
-      *  Global fields
-      * -----------------------------------------
-      *
-      *=========================================================================
-      *  Creates a new logger list instance.
-      *=========================================================================
-      *  Parameters:
-      *   void
-      *
-      *  Returns:
-      *   pLoggerList   - Returns a handle to the logger list on success, else
-      *                   a NULL handle.
-      *=========================================================================
-     P LoggerList_new...
-     P                 B                   export
-      *
-     D LoggerList_new...
-     D                 PI                         like(LOG4RPG_pLoggerList_t )
-      *
-      *  Return value
-     D logList         DS                  likeds(handle_t       )
-     D                                     based(pLogList)
-      *
-      *  Helper fields
-     D tempLogList     DS                  likeds(handle_t       ) inz
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+**free
+//=====================================================================*
+//  SrvPgm: LOG4RPG - Object: LoggerList                               *
+//=====================================================================*
+//  Author  :  Thomas Raddatz                                          *
+//  Date    :  13.06.2006                                              *
+//  E-mail  :  thomas.raddatz@tools400.de                              *
+//  Homepage:  www.tools400.de                                         *
+//=====================================================================*
+//                                                                     *
+//  This software is free software, you can redistribute it and/or     *
+//  modify it under the terms of the GNU General Public License (GPL)  *
+//  as published by the Free Software Foundation.                      *
+//                                                                     *
+//  See GNU General Public License for details.                        *
+//          http://www.opensource.org                                  *
+//          http://www.opensource.org/licenses/gpl-license.html        *
+//                                                                     *
+//=====================================================================*
+//  History:                                                           *
+//                                                                     *
+//  Datum       Name          Änderung                                 *
+//  ----------  ------------  ---------------------------------------  *
+//                                                                     *
+//=====================================================================*
+//   >>PRE-COMPILER<<                                                  *
+//                                                                     *
+//     >>CRTCMD<<  CRTRPGMOD    MODULE(&LI/&OB) +                      *
+//                              SRCFILE(&SL/&SF) +                     *
+//                              SRCMBR(&SM);                           *
+//                                                                     *
+//     >>COMPILE<<                                                     *
+//       >>PARM<< TRUNCNBR(*NO);                                       *
+//       >>PARM<< DBGVIEW(*LIST);                                      *
+//       >>PARM<< OPTION(*EVENTF);                                     *
+//       >>PARM<< TGTRLS(V7R3M0  );                                    *
+//     >>END-COMPILE<<                                                 *
+//                                                                     *
+//     >>EXECUTE<<                                                     *
+//                                                                     *
+//   >>END-PRE-COMPILER<<                                              *
+//=====================================================================*
+/copy QLOG4RPG,H_SPEC
+//=====================================================================*
+//
+// -----------------------------------------
+//  Imported functions
+// -----------------------------------------
+/copy QLOG4RPG,PLOG4RPG                      Public API Specification
 
-         LogLog_verbose('Creating logger list ...');
+// -----------------------------------------
+//  Exported functions
+// -----------------------------------------
+/copy QLOG4RPG,PLOG4RPG02
 
-         pLogList = LoggerList_null();
+// -----------------------------------------
+//  Internal type templates
+// -----------------------------------------
+/copy QLOG4RPG,PTYPES
 
-         // Initialize appender list handle
-         clear tempLogList;
-         tempLogList.pMap = BasicMap_new();
+dcl-ds handle_t qualified based(pDummy);
+  pMap like(BasicMap_handle_t);
+end-ds;
 
-         // Return properties list to caller
-         pLogList = %alloc(%size(handle_t));
-         logList = tempLogList;
+// -----------------------------------------
+//  Prototypes
+// -----------------------------------------
+/copy QBASICS1,PBASICS1                      Basic RPG Extensions
+/copy QIFS,PIFS                              IFS Stream file support
 
-         LogLog_verbose('+ Allocated memory for logger list.');
+/copy QLOG4RPG,PLOG4RPG10                    LogLog
+/copy QLOG4RPG,PLOG4RPG99                    Helpers
 
-         return pLogList;
+// -----------------------------------------
+//  Private prototypes
+// -----------------------------------------
+//
+// -----------------------------------------
+//  Global constants
+// -----------------------------------------
+//
+// -----------------------------------------
+//  Global fields
+// -----------------------------------------
+//
+//=========================================================================
+//  Creates a new logger list instance.
+//=========================================================================
+//  Parameters:
+//   void
+//
+//  Returns:
+//   pLoggerList   - Returns a handle to the logger list on success, else
+//                   a NULL handle.
+//=========================================================================
+dcl-proc LoggerList_new export;
+  dcl-pi *n like(LOG4RPG_pLoggerList_t);
+  end-pi;
 
-      /END-FREE
-      *
-     P LoggerList_new...
-     P                 E
-      *
-      *=========================================================================
-      *  Returns the number of entries in the specified logger list.
-      *=========================================================================
-      *  Parameters:
-      *   i_pLogList    - Logger list returned by LoggerList_new().
-      *
-      *  Returns:
-      *   numE          - Returns the number of loggers in this
-      *                   logger list on success, else -1.
-      *=========================================================================
-     P LoggerList_getNumE...
-     P                 B                   export
-      *
-     D LoggerList_getNumE...
-     D                 PI            10I 0
-     D  i_pLogList                         const  like(LOG4RPG_pLoggerList_t )
-      *
-      *  Logger list handle
-     D logList         DS                  likeds(handle_t    )
-     D                                     based(i_pLogList)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+//  Return value
+  dcl-ds logList likeds(handle_t) based(pLogList);
 
-         return BasicMap_getNumE(logList.pMap);
+//  Helper fields
+  dcl-ds tempLogList likeds(handle_t) inz;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-      /END-FREE
-      *
-     P LoggerList_getNumE...
-     P                 E
-      *
-      *=========================================================================
-      *  Adds a logger to the specified logger list.
-      *=========================================================================
-      *  Parameters:
-      *   i_pLogList    - Logger list returned by LoggerList_new().
-      *   i_pLogger     - Logger that is added to this logger list.
-      *
-      *  Returns:
-      *   index         - Returns the index of the logger on success,
-      *                   else -1.
-      *=========================================================================
-     P LoggerList_put...
-     P                 B                   export
-      *
-     D LoggerList_put...
-     D                 PI            10I 0
-     D  i_pLogList                         const  like(LOG4RPG_pLoggerList_t )
-     D  i_pLogger                          const  like(LOG4RPG_hLogger_t     )
-      *
-      *  Helper fields
-     D pLogger         S                   like(i_pLogger)
-      *
-      *  Logger list handle
-     D logList         DS                  likeds(handle_t    )
-     D                                     based(i_pLogList)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+LogLog_verbose('Creating logger list ...');
 
-         pLogger = i_pLogger;
+pLogList = LoggerList_null();
 
-         return BasicMap_put(logList.pMap: Logger_getName(pLogger)
-                                         : %addr(pLogger)
-                                         : %len(pLogger ));
+// Initialize appender list handle
+clear tempLogList;
+tempLogList.pMap = BasicMap_new();
 
-      /END-FREE
-      *
-     P LoggerList_put...
-     P                 E
-      *
-      *=========================================================================
-      *  Removes the specified logger from the given logger list.
-      *=========================================================================
-      *  Parameters:
-      *   i_pLogList    - Logger list returned by LoggerList_new().
-      *   i_logName     - Name of the logger that is removed from
-      *                   this logger list.
-      *
-      *  Returns:
-      *   rc            - Returns 0 on success, else -1.
-      *=========================================================================
-     P LoggerList_remove...
-     P                 B                   export
-      *
-     D LoggerList_remove...
-     D                 PI            10I 0
-     D  i_pLogList                         const  like(LOG4RPG_pLoggerList_t )
-     D  i_logName                          const  like(LOG4RPG_loggerName_t  )
-      *
-      *  Logger list handle
-     D logList         DS                  likeds(handle_t    )
-     D                                     based(i_pLogList)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+// Return properties list to caller
+pLogList = %alloc(%size(handle_t));
+logList = tempLogList;
 
-         return BasicMap_remove(logList.pMap: i_logName);
+LogLog_verbose('+ Allocated memory for logger list.');
 
-      /END-FREE
-      *
-     P LoggerList_remove...
-     P                 E
-      *
-      *=========================================================================
-      *  Returns the logger assigned to the specified logger name.
-      *=========================================================================
-      *  Parameters:
-      *   i_pLogList    - Logger list returned by LoggerList_new().
-      *   i_logName     - Name of the logger that is returned.
-      *
-      *  Returns:
-      *   pLogger       - Returns the associated logger on ssuccess, else NULL.
-      *=========================================================================
-     P LoggerList_get...
-     P                 B                   export
-      *
-     D LoggerList_get...
-     D                 PI                         like(LOG4RPG_hLogger_t     )
-     D  i_pLogList                         const  like(LOG4RPG_pLoggerList_t )
-     D  i_logName                          const  like(LOG4RPG_loggerName_t  )
-      *
-      *  Return value
-     D pLogger         S                   like(LOG4RPG_hLogger_t       ) inz
-      *
-      *  Logger list handle
-     D logList         DS                  likeds(handle_t    )
-     D                                     based(i_pLogList)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+return pLogList;
 
-         BasicMap_get(logList.pMap: i_logName: %addr(pLogger)
-                                             : %size(pLogger));
 
-         return pLogger;
+end-proc;
 
-      /END-FREE
-      *
-     P LoggerList_get...
-     P                 E
-      *
-      *=========================================================================
-      *  Tests, if the logger list contains the specified logger.
-      *=========================================================================
-      *  Parameters:
-      *   i_pLogList    - Logger list returned by LoggerList_new().
-      *   i_logName     - Name of the logger.
-      *
-      *  Returns:
-      *   exist         - Returns TRUE if the logger exists, else FALSE.
-      *=========================================================================
-     P LoggerList_exist...
-     P                 B                   export
-      *
-     D LoggerList_exist...
-     D                 PI              N
-     D  i_pLogList                         const  like(LOG4RPG_pLoggerList_t )
-     D  i_logName                          const  like(LOG4RPG_loggerName_t  )
-      *
-      *  Logger list handle
-     D logList         DS                  likeds(handle_t    )
-     D                                     based(i_pLogList)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+//=========================================================================
+//  Returns the number of entries in the specified logger list.
+//=========================================================================
+//  Parameters:
+//   i_pLogList    - Logger list returned by LoggerList_new().
+//
+//  Returns:
+//   numE          - Returns the number of loggers in this
+//                   logger list on success, else -1.
+//=========================================================================
+dcl-proc LoggerList_getNumE export;
+  dcl-pi *n int(10);
+    i_pLogList like(LOG4RPG_pLoggerList_t) const;
+  end-pi;
 
-         return BasicMap_containsKey(logList.pMap: i_logName);
+//  Logger list handle
+  dcl-ds logList likeds(handle_t) based(i_pLogList);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-      /END-FREE
-      *
-     P LoggerList_exist...
-     P                 E
-      *
-      *=========================================================================
-      *  Returns an iterator for the specified logger list.
-      *=========================================================================
-      *  Parameters:
-      *   i_pLogList    - Logger list returned by LoggerList_new().
-      *
-      *  Returns:
-      *   logIter       - Iterator for the logger list.
-      *=========================================================================
-     P LoggerList_getIterator...
-     P                 B                   export
-      *
-     D LoggerList_getIterator...
-     D                 PI                         likeds(LOG4RPG_Logger...
-     D                                                           ListIterator_t)
-     D  i_pLogList                         const  like(LOG4RPG_pLoggerList_t )
-      *
-      *  Return value
-     D logIter         DS                  likeds(LOG4RPG_Logger...
-     D                                                    ListIterator_t) inz
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+return BasicMap_getNumE(logList.pMap);
 
-         clear logIter;
-         logIter.pLogList = i_pLogList;
-         logIter.lastLog  = 0;
 
-         return logIter;
+end-proc;
 
-      /END-FREE
-      *
-     P LoggerList_getIterator...
-     P                 E
-      *
-      *=========================================================================
-      *  Returns the first logger of the specified logger list.
-      *=========================================================================
-      *  Parameters:
-      *   i_logIter     - Iteratur returned by LoggerList_getIterator().
-      *
-      *  Returns:
-      *   pLogger       - Returns the first logger in the specified
-      *                   logger list on success, else a NULL handle.
-      *=========================================================================
-     P LoggerList_getFirst...
-     P                 B                   export
-      *
-     D LoggerList_getFirst...
-     D                 PI                         like(LOG4RPG_hLogger_t       )
-     D  io_logIter                                likeds(LOG4RPG_Logger...
-     D                                                           ListIterator_t)
-      *
-      *  Return value
-     D pLogger         S                   like(LOG4RPG_hLogger_t       ) inz
-      *
-      *  Helper fields
-     D logName         S                   like(LOG4RPG_loggerName_t   ) inz
-      *
-      *  Logger list handle
-     D logList         DS                  likeds(handle_t    )
-     D                                     based(io_logIter.pLogList)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+//=========================================================================
+//  Adds a logger to the specified logger list.
+//=========================================================================
+//  Parameters:
+//   i_pLogList    - Logger list returned by LoggerList_new().
+//   i_pLogger     - Logger that is added to this logger list.
+//
+//  Returns:
+//   index         - Returns the index of the logger on success,
+//                   else -1.
+//=========================================================================
+dcl-proc LoggerList_put export;
+  dcl-pi *n int(10);
+    i_pLogList like(LOG4RPG_pLoggerList_t) const;
+    i_pLogger  like(LOG4RPG_hLogger_t) const;
+  end-pi;
 
-         pLogger = Logger_null();
+//  Helper fields
+  dcl-s pLogger like(i_pLogger);
 
-         if LoggerList_getNumE(io_logIter.pLogList) = 0;
-            return pLogger;
-         endif;
+//  Logger list handle
+  dcl-ds logList likeds(handle_t) based(i_pLogList);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-         io_logIter.lastLog = 1;
+pLogger = i_pLogger;
 
-         logName = BasicMap_getKeyByIndex(logList.pMap
-                                       : io_logIter.lastLog);
-         pLogger = LoggerList_get(io_logIter.pLogList: logName);
+return BasicMap_put(logList.pMap: Logger_getName(pLogger)
+                                : %addr(pLogger)
+                                : %len(pLogger ));
 
-         return pLogger;
 
-      /END-FREE
-      *
-     P LoggerList_getFirst...
-     P                 E
-      *
-      *=========================================================================
-      *  Returns the next logger of the specified logger list.
-      *=========================================================================
-      *  Parameters:
-      *   i_logIter     - Iteratur returned by LoggerList_getIterator().
-      *
-      *  Returns:
-      *   pLogger       - Returns the next logger in the specified
-      *                   logger list on success, else a NULL handle.
-      *=========================================================================
-     P LoggerList_getNext...
-     P                 B                   export
-      *
-     D LoggerList_getNext...
-     D                 PI                         like(LOG4RPG_hLogger_t       )
-     D  io_logIter                                likeds(LOG4RPG_Logger...
-     D                                                           ListIterator_t)
-      *
-      *  Return value
-     D pLogger         S                   like(LOG4RPG_hLogger_t       ) inz
-      *
-      *  Helper fields
-     D logName         S                   like(LOG4RPG_loggerName_t   ) inz
-      *
-      *  Logger list handle
-     D logList         DS                  likeds(handle_t    )
-     D                                     based(io_logIter.pLogList)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+end-proc;
 
-         pLogger = Logger_null();
+//=========================================================================
+//  Removes the specified logger from the given logger list.
+//=========================================================================
+//  Parameters:
+//   i_pLogList    - Logger list returned by LoggerList_new().
+//   i_logName     - Name of the logger that is removed from
+//                   this logger list.
+//
+//  Returns:
+//   rc            - Returns 0 on success, else -1.
+//=========================================================================
+dcl-proc LoggerList_remove export;
+  dcl-pi *n int(10);
+    i_pLogList like(LOG4RPG_pLoggerList_t) const;
+    i_logName  like(LOG4RPG_loggerName_t) const;
+  end-pi;
 
-         if LoggerList_getNumE(io_logIter.pLogList) <= io_logIter.lastLog;
-            return pLogger;
-         endif;
+//  Logger list handle
+  dcl-ds logList likeds(handle_t) based(i_pLogList);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-         io_logIter.lastLog = io_logIter.lastLog + 1;
+return BasicMap_remove(logList.pMap: i_logName);
 
-         logName = BasicMap_getKeyByIndex(logList.pMap
-                                       : io_logIter.lastLog);
-         pLogger = LoggerList_get(io_logIter.pLogList: logName);
 
-         return pLogger;
+end-proc;
 
-      /END-FREE
-      *
-     P LoggerList_getNext...
-     P                 E
-      *
-      *=========================================================================
-      *  Deletes the specified logger list.
-      *=========================================================================
-      *  Parameters:
-      *   io_pLogList   - Logger list returned by LoggerList_new().
-      *
-      *  Returns:
-      *   isDeleted     - Returns TRUE on success, else FALSE.
-      *=========================================================================
-     P LoggerList_delete...
-     P                 B                   export
-      *
-     D LoggerList_delete...
-     D                 PI              N
-     D  io_pLogList                               like(LOG4RPG_pLoggerList_t )
-      *
-      *  Return value
-     D isDeleted       S               N   inz(*off)
-      *
-      *  Helper fields
-     D logIter         DS                  likeds(LOG4RPG_Logger...
-     D                                            ListIterator_t        ) inz
-     D pLogger         S                   like(LOG4RPG_hLogger_t       ) inz
-      *
-      *  Logger list handle
-     D logList         DS                  likeds(handle_t    )
-     D                                     based(io_pLogList)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+//=========================================================================
+//  Returns the logger assigned to the specified logger name.
+//=========================================================================
+//  Parameters:
+//   i_pLogList    - Logger list returned by LoggerList_new().
+//   i_logName     - Name of the logger that is returned.
+//
+//  Returns:
+//   pLogger       - Returns the associated logger on ssuccess, else NULL.
+//=========================================================================
+dcl-proc LoggerList_get export;
+  dcl-pi *n like(LOG4RPG_hLogger_t);
+    i_pLogList like(LOG4RPG_pLoggerList_t) const;
+    i_logName  like(LOG4RPG_loggerName_t) const;
+  end-pi;
 
-         if BasicMap_isNull(logList.pMap);
-            return *on;
-         endif;
+//  Return value
+  dcl-s pLogger like(LOG4RPG_hLogger_t) inz;
 
-         LogLog_verbose('Deleting logger list ...');
+//  Logger list handle
+  dcl-ds logList likeds(handle_t) based(i_pLogList);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-         p_assert(LoggerList_getNumE(io_pLogList) = 0
-                  : 'All loggers should have been removed from this +
-                     logger list by the repository.');
+BasicMap_get(logList.pMap: i_logName: %addr(pLogger)
+                                    : %size(pLogger));
 
-         logIter = LoggerList_getIterator(io_pLogList);
+return pLogger;
 
-         dow LoggerList_getNumE(io_pLogList) > 0;
-            pLogger = LoggerList_getFirst(logIter);
-            LoggerList_remove(io_pLogList: Logger_getName(pLogger));
-            Logger_delete(pLogger);
-         enddo;
 
-         if BasicMap_delete(logList.pMap) = 0;
-            isDeleted = *on;
-         else;
-            isDeleted = *off;
-         endif;
+end-proc;
 
-         io_pLogList = LoggerList_null();
+//=========================================================================
+//  Tests, if the logger list contains the specified logger.
+//=========================================================================
+//  Parameters:
+//   i_pLogList    - Logger list returned by LoggerList_new().
+//   i_logName     - Name of the logger.
+//
+//  Returns:
+//   exist         - Returns TRUE if the logger exists, else FALSE.
+//=========================================================================
+dcl-proc LoggerList_exist export;
+  dcl-pi *n ind;
+    i_pLogList like(LOG4RPG_pLoggerList_t) const;
+    i_logName  like(LOG4RPG_loggerName_t) const;
+  end-pi;
 
-         LogLog_verbose('- Deleted Logger list');
+//  Logger list handle
+  dcl-ds logList likeds(handle_t) based(i_pLogList);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-         return isDeleted;
+return BasicMap_containsKey(logList.pMap: i_logName);
 
-      /END-FREE
-      *
-     P LoggerList_delete...
-     P                 E
-      *
-      *=========================================================================
-      *  Tests the specified logger list for a NULL value.
-      *=========================================================================
-      *  Parameters:
-      *   i_logList     - Logger list returned by LoggerList_new().
-      *
-      *  Returns:
-      *   isNull        - Returns TRUE if the handle of the logger list is a
-      *                   NULL handle.
-      *=========================================================================
-     P LoggerList_isNull...
-     P                 B                   export
-      *
-     D LoggerList_isNull...
-     D                 PI              N
-     D  i_pLogList                         const  like(LOG4RPG_pLoggerList_t )
-      *
-      *  Logger list handle
-     D logList         DS                  likeds(handle_t    )
-     D                                     based(i_pLogList)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
 
-         if i_pLogList = LoggerList_null();
-            return *on;
-         else;
-            return BasicMap_isNull(logList.pMap);
-         endif;
+end-proc;
 
-      /END-FREE
-      *
-     P LoggerList_isNull...
-     P                 E
-      *
-      *=========================================================================
-      *  Returns a NULL logger list.
-      *=========================================================================
-      *  Parameters:
-      *   void
-      *
-      *  Returns:
-      *   pLogList      - Logger list NULL handle.
-      *=========================================================================
-     P LoggerList_null...
-     P                 B                   export
-      *
-     D LoggerList_null...
-     D                 PI                         like(LOG4RPG_pLoggerList_t )
-      *
-      *  Return value
-     D logList         S                   like(LOG4RPG_pLoggerList_t ) inz
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+//=========================================================================
+//  Returns an iterator for the specified logger list.
+//=========================================================================
+//  Parameters:
+//   i_pLogList    - Logger list returned by LoggerList_new().
+//
+//  Returns:
+//   logIter       - Iterator for the logger list.
+//=========================================================================
+dcl-proc LoggerList_getIterator export;
 
-         return BasicMap_null();
+  dcl-ds LoggerList_getIteratorPI likeds(LOG4RPG_Logger: ListIterator_t);
+i_pLogList      const  like(LOG4RPG_pLoggerList_t );
+  end-ds;
 
-      /END-FREE
-      *
-     P LoggerList_null...
-     P                 E
-      *
+//  Return value
+  dcl-ds logIter DS likeds(LOG4RPG_Logger: ListIterator_t) inz;
+  end-ds;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+clear logIter;
+logIter.pLogList = i_pLogList;
+logIter.lastLog  = 0;
+
+return logIter;
+
+
+end-proc;
+
+//=========================================================================
+//  Returns the first logger of the specified logger list.
+//=========================================================================
+//  Parameters:
+//   i_logIter     - Iteratur returned by LoggerList_getIterator().
+//
+//  Returns:
+//   pLogger       - Returns the first logger in the specified
+//                   logger list on success, else a NULL handle.
+//=========================================================================
+dcl-proc LoggerList_getFirst export;
+  dcl-pi *n like(LOG4RPG_hLogger_t);
+    io_logIter likeds(LOG4RPG_LoggerListIterator_t);
+  end-pi;
+
+//  Return value
+  dcl-s pLogger like(LOG4RPG_hLogger_t) inz;
+
+//  Helper fields
+  dcl-s logName like(LOG4RPG_loggerName_t) inz;
+
+//  Logger list handle
+  dcl-ds logList likeds(handle_t) based(io_logIter.pLogList);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+pLogger = Logger_null();
+
+if LoggerList_getNumE(io_logIter.pLogList) = 0;
+   return pLogger;
+endif;
+
+io_logIter.lastLog = 1;
+
+logName = BasicMap_getKeyByIndex(logList.pMap
+                              : io_logIter.lastLog);
+pLogger = LoggerList_get(io_logIter.pLogList: logName);
+
+return pLogger;
+
+
+end-proc;
+
+//=========================================================================
+//  Returns the next logger of the specified logger list.
+//=========================================================================
+//  Parameters:
+//   i_logIter     - Iteratur returned by LoggerList_getIterator().
+//
+//  Returns:
+//   pLogger       - Returns the next logger in the specified
+//                   logger list on success, else a NULL handle.
+//=========================================================================
+dcl-proc LoggerList_getNext export;
+  dcl-pi *n like(LOG4RPG_hLogger_t);
+    io_logIter likeds(LOG4RPG_LoggerListIterator_t);
+  end-pi;
+
+//  Return value
+  dcl-s pLogger like(LOG4RPG_hLogger_t) inz;
+
+//  Helper fields
+  dcl-s logName like(LOG4RPG_loggerName_t) inz;
+
+//  Logger list handle
+  dcl-ds logList likeds(handle_t) based(io_logIter.pLogList);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+pLogger = Logger_null();
+
+if LoggerList_getNumE(io_logIter.pLogList) <= io_logIter.lastLog;
+   return pLogger;
+endif;
+
+io_logIter.lastLog = io_logIter.lastLog + 1;
+
+logName = BasicMap_getKeyByIndex(logList.pMap
+                              : io_logIter.lastLog);
+pLogger = LoggerList_get(io_logIter.pLogList: logName);
+
+return pLogger;
+
+
+end-proc;
+
+//=========================================================================
+//  Deletes the specified logger list.
+//=========================================================================
+//  Parameters:
+//   io_pLogList   - Logger list returned by LoggerList_new().
+//
+//  Returns:
+//   isDeleted     - Returns TRUE on success, else FALSE.
+//=========================================================================
+dcl-proc LoggerList_delete export;
+  dcl-pi *n ind;
+    io_pLogList like(LOG4RPG_pLoggerList_t);
+  end-pi;
+
+//  Return value
+  dcl-s isDeleted ind inz(*off);
+
+//  Helper fields
+  dcl-ds logIter DS likeds(LOG4RPG_Logger: ListIterator_t) inz;
+  end-ds;
+  dcl-s pLogger like(LOG4RPG_hLogger_t) inz;
+
+//  Logger list handle
+  dcl-ds logList likeds(handle_t) based(io_pLogList);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+if BasicMap_isNull(logList.pMap);
+   return *on;
+endif;
+
+LogLog_verbose('Deleting logger list ...');
+
+p_assert(LoggerList_getNumE(io_pLogList) = 0
+         : 'All loggers should have been removed from this +
+            logger list by the repository.');
+
+logIter = LoggerList_getIterator(io_pLogList);
+
+dow LoggerList_getNumE(io_pLogList) > 0;
+   pLogger = LoggerList_getFirst(logIter);
+   LoggerList_remove(io_pLogList: Logger_getName(pLogger));
+   Logger_delete(pLogger);
+enddo;
+
+if BasicMap_delete(logList.pMap) = 0;
+   isDeleted = *on;
+else;
+   isDeleted = *off;
+endif;
+
+io_pLogList = LoggerList_null();
+
+LogLog_verbose('- Deleted Logger list');
+
+return isDeleted;
+
+
+end-proc;
+
+//=========================================================================
+//  Tests the specified logger list for a NULL value.
+//=========================================================================
+//  Parameters:
+//   i_logList     - Logger list returned by LoggerList_new().
+//
+//  Returns:
+//   isNull        - Returns TRUE if the handle of the logger list is a
+//                   NULL handle.
+//=========================================================================
+dcl-proc LoggerList_isNull export;
+  dcl-pi *n ind;
+    i_pLogList like(LOG4RPG_pLoggerList_t) const;
+  end-pi;
+
+//  Logger list handle
+  dcl-ds logList likeds(handle_t) based(i_pLogList);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+if i_pLogList = LoggerList_null();
+   return *on;
+else;
+   return BasicMap_isNull(logList.pMap);
+endif;
+
+
+end-proc;
+
+//=========================================================================
+//  Returns a NULL logger list.
+//=========================================================================
+//  Parameters:
+//   void
+//
+//  Returns:
+//   pLogList      - Logger list NULL handle.
+//=========================================================================
+dcl-proc LoggerList_null export;
+  dcl-pi *n like(LOG4RPG_pLoggerList_t);
+  end-pi;
+
+//  Return value
+  dcl-s logList like(LOG4RPG_pLoggerList_t) inz;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+return BasicMap_null();
+
+
+end-proc;
+

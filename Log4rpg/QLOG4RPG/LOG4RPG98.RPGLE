@@ -1,236 +1,222 @@
-      *=====================================================================*
-      *  SrvPgm: LOG4RPG - Object: Option Converter                         *
-      *=====================================================================*
-      *  Author  :  Thomas Raddatz                                          *
-      *  Date    :  22.04.2008                                              *
-      *  E-mail  :  thomas.raddatz@tools400.de                              *
-      *  Homepage:  www.tools400.de                                         *
-      *=====================================================================*
-      *                                                                     *
-      *  This software is free software, you can redistribute it and/or     *
-      *  modify it under the terms of the GNU General Public License (GPL)  *
-      *  as published by the Free Software Foundation.                      *
-      *                                                                     *
-      *  See GNU General Public License for details.                        *
-      *          http://www.opensource.org                                  *
-      *          http://www.opensource.org/licenses/gpl-license.html        *
-      *                                                                     *
-      *=====================================================================*
-      *  History:                                                           *
-      *                                                                     *
-      *  Datum       Name          Änderung                                 *
-      *  ----------  ------------  ---------------------------------------  *
-      *                                                                     *
-      *=====================================================================*
-      *   >>PRE-COMPILER<<                                                  *
-      *                                                                     *
-      *     >>CRTCMD<<  CRTRPGMOD    MODULE(&LI/&OB) +                      *
-      *                              SRCFILE(&SL/&SF) +                     *
-      *                              SRCMBR(&SM);                           *
-      *                                                                     *
-      *     >>COMPILE<<                                                     *
-      *       >>PARM<< TRUNCNBR(*NO);                                       *
-      *       >>PARM<< DBGVIEW(*LIST);                                      *
-      *       >>PARM<< OPTION(*EVENTF);                                     *
-      *       >>PARM<< TGTRLS(V7R3M0  );                                    *
-      *     >>END-COMPILE<<                                                 *
-      *                                                                     *
-      *     >>EXECUTE<<                                                     *
-      *                                                                     *
-      *   >>END-PRE-COMPILER<<                                              *
-      *=====================================================================*
-      /COPY QLOG4RPG,H_SPEC
-      *=====================================================================*
-      *
-      * -----------------------------------------
-      *  Exported functions
-      * -----------------------------------------
-      /COPY QLOG4RPG,PLOG4RPG98
-      *
-      * -----------------------------------------
-      *  Type definitions
-      * -----------------------------------------
-      *
-      * -----------------------------------------
-      *  Prototypes
-      * -----------------------------------------
-      /COPY QLOG4RPG,CLIB                          C-Library
-      /COPY QBASICS1,PBASICS1                      Basic RPG Extensions
-      /COPY QLOG4RPG,PLOG4RPG10                    LogLog
-      *
-      * -----------------------------------------
-      *  Private prototypes
-      * -----------------------------------------
-      *
-      * -----------------------------------------
-      *  Global constants
-      * -----------------------------------------
-      *
-      * -----------------------------------------
-      *  Global fields
-      * -----------------------------------------
-      *
-      * -----------------------------------------
-      *  Program status data structure
-      * -----------------------------------------
-      *
-      *=========================================================================
-      *  Converts a given property to a file-size-value.
-      *=========================================================================
-      *  Example:   512   ->   512 byte
-      *             512KB ->   512 kByte
-      *             512MB ->   512 MByte
-      *             512GB ->   512 GByte
-      *=========================================================================
-     P OptionConverter_toFileSize...
-     P                 B                   export
-      *
-     D OptionConverter_toFileSize...
-     D                 PI            20I 0
-     D  i_value                            value  like(LOG4RPG_Property_value_t)
-     D  i_default                    20I 0 value
-      *
-      *  Return value
-     D fileSize        S             20I 0 inz
-      *
-      *  Helper fields
-     D string          S                   like(i_value)
-     D multiplier      S             10I 0 inz
-     D index           S             10I 0 inz
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+**free
+//=====================================================================*
+//  SrvPgm: LOG4RPG - Object: Option Converter                         *
+//=====================================================================*
+//  Author  :  Thomas Raddatz                                          *
+//  Date    :  22.04.2008                                              *
+//  E-mail  :  thomas.raddatz@tools400.de                              *
+//  Homepage:  www.tools400.de                                         *
+//=====================================================================*
+//                                                                     *
+//  This software is free software, you can redistribute it and/or     *
+//  modify it under the terms of the GNU General Public License (GPL)  *
+//  as published by the Free Software Foundation.                      *
+//                                                                     *
+//  See GNU General Public License for details.                        *
+//          http://www.opensource.org                                  *
+//          http://www.opensource.org/licenses/gpl-license.html        *
+//                                                                     *
+//=====================================================================*
+//  History:                                                           *
+//                                                                     *
+//  Datum       Name          Änderung                                 *
+//  ----------  ------------  ---------------------------------------  *
+//                                                                     *
+//=====================================================================*
+//   >>PRE-COMPILER<<                                                  *
+//                                                                     *
+//     >>CRTCMD<<  CRTRPGMOD    MODULE(&LI/&OB) +                      *
+//                              SRCFILE(&SL/&SF) +                     *
+//                              SRCMBR(&SM);                           *
+//                                                                     *
+//     >>COMPILE<<                                                     *
+//       >>PARM<< TRUNCNBR(*NO);                                       *
+//       >>PARM<< DBGVIEW(*LIST);                                      *
+//       >>PARM<< OPTION(*EVENTF);                                     *
+//       >>PARM<< TGTRLS(V7R3M0  );                                    *
+//     >>END-COMPILE<<                                                 *
+//                                                                     *
+//     >>EXECUTE<<                                                     *
+//                                                                     *
+//   >>END-PRE-COMPILER<<                                              *
+//=====================================================================*
+/copy QLOG4RPG,H_SPEC
+//=====================================================================*
+//
+// -----------------------------------------
+//  Exported functions
+// -----------------------------------------
+/copy QLOG4RPG,PLOG4RPG98
 
-         string = %trim(i_value);
+// -----------------------------------------
+//  Type definitions
+// -----------------------------------------
+//
+// -----------------------------------------
+//  Prototypes
+// -----------------------------------------
+/copy QLOG4RPG,CLIB                          C-Library
+/copy QBASICS1,PBASICS1                      Basic RPG Extensions
+/copy QLOG4RPG,PLOG4RPG10                    LogLog
 
-         if (string = '');
-            return i_default;
-         endif;
+// -----------------------------------------
+//  Private prototypes
+// -----------------------------------------
+//
+// -----------------------------------------
+//  Global constants
+// -----------------------------------------
+//
+// -----------------------------------------
+//  Global fields
+// -----------------------------------------
+//
+// -----------------------------------------
+//  Program status data structure
+// -----------------------------------------
+//
+//=========================================================================
+//  Converts a given property to a file-size-value.
+//=========================================================================
+//  Example:   512   ->   512 byte
+//             512KB ->   512 kByte
+//             512MB ->   512 MByte
+//             512GB ->   512 GByte
+//=========================================================================
+dcl-proc OptionConverter_toFileSize export;
+  dcl-pi *n int(20);
+    i_value   like(LOG4RPG_Property_value_t) value;
+    i_default int(20) value;
+  end-pi;
 
-         string = f_ucase(string);
-         multiplier = 1;
+//  Return value
+  dcl-s fileSize int(20) inz;
 
-         dou '1';
+//  Helper fields
+  dcl-s string like(i_value);
+  dcl-s multiplier int(10) inz;
+  dcl-s index int(10) inz;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-            index = %scan('KB': i_value);
-            if (index <> 0);
-               multiplier = 1024;
-               string     = %trimR(%subst(string: 1: index));
-               leave;
-            endif;
+string = %trim(i_value);
 
-            index = %scan('MB': i_value);
-            if (index <> 0);
-               multiplier = 1024 * 1024;
-               string     = %trimR(%subst(string: 1: index));
-               leave;
-            endif;
+if (string = '');
+   return i_default;
+endif;
 
-            index = %scan('GB': i_value);
-            if (index <> 0);
-               multiplier = 1024 * 1024 * 1024;
-               string     = %trimR(%subst(string: 1: index));
-               leave;
-            endif;
+string = f_ucase(string);
+multiplier = 1;
 
-            index = %check('0123456789 ': string);
-            if (index > 0);
-               LogLog_error('[' + string + '] is not in proper int form.');
-               LogLog_error('[' + i_value + '] not in expected format.');
-            endif;
+dou '1';
 
-         enddo;
+   index = %scan('KB': i_value);
+   if (index <> 0);
+      multiplier = 1024;
+      string     = %trimR(%subst(string: 1: index));
+      leave;
+   endif;
 
-         if (string = '');
-            return i_default;
-         endif;
+   index = %scan('MB': i_value);
+   if (index <> 0);
+      multiplier = 1024 * 1024;
+      string     = %trimR(%subst(string: 1: index));
+      leave;
+   endif;
 
-         monitor;
-            fileSize = atoi(string) * multiplier;
-         on-error;
-            LogLog_error('[' + string + '] is not in proper int form.');
-            LogLog_error('[' + i_value + '] not in expected format.');
-         endmon;
+   index = %scan('GB': i_value);
+   if (index <> 0);
+      multiplier = 1024 * 1024 * 1024;
+      string     = %trimR(%subst(string: 1: index));
+      leave;
+   endif;
 
-         if (fileSize = 0);
-            return i_default;
-         endif;
+   index = %check('0123456789 ': string);
+   if (index > 0);
+      LogLog_error('[' + string + '] is not in proper int form.');
+      LogLog_error('[' + i_value + '] not in expected format.');
+   endif;
 
-         return fileSize;
+enddo;
 
-      /END-FREE
-      *
-     P OptionConverter_toFileSize...
-     P                 E
-      *
-      *=========================================================================
-      *  Converts a given property to a RPG boolean value.
-      *=========================================================================
-      *  Example:   0     ->   *OFF
-      *             1     ->   *ON
-      *             false ->   *OFF
-      *             true  ->   *ON
-      *=========================================================================
-     P OptionConverter_toBoolean...
-     P                 B                   export
-      *
-     D OptionConverter_toBoolean...
-     D                 PI              N
-     D  i_value                            value  like(LOG4RPG_Property_value_t)
-     D  i_default                      N   value
-      *
-      *  Helper fields
-     D string          S                   like(i_value)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+if (string = '');
+   return i_default;
+endif;
 
-         string = %trim(i_value);
+monitor;
+   fileSize = atoi(string) * multiplier;
+on-error;
+   LogLog_error('[' + string + '] is not in proper int form.');
+   LogLog_error('[' + i_value + '] not in expected format.');
+endmon;
 
-         if (string = '');
-            return i_default;
-         endif;
+if (fileSize = 0);
+   return i_default;
+endif;
 
-         string = f_lcase(string);
+return fileSize;
 
-         select;
-         when (string = '1' or string = 'true');
-            return *on;
-         when (string = '0' or string = 'false');
-            return *off;
-         endsl;
 
-         return i_default;
+end-proc;
 
-      /END-FREE
-      *
-     P OptionConverter_toBoolean...
-     P                 E
-      *
-      *=========================================================================
-      *  Converts a given property to a RPG integer value.
-      *=========================================================================
-     P OptionConverter_toInt...
-     P                 B                   export
-      *
-     D OptionConverter_toInt...
-     D                 PI            10I 0
-     D  i_value                            value  like(LOG4RPG_Property_value_t)
-     D  i_default                    10I 0 value
-      *
-      *  Helper fields
-     D string          S                   like(i_value)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+//=========================================================================
+//  Converts a given property to a RPG boolean value.
+//=========================================================================
+//  Example:   0     ->   *OFF
+//             1     ->   *ON
+//             false ->   *OFF
+//             true  ->   *ON
+//=========================================================================
+dcl-proc OptionConverter_toBoolean export;
+  dcl-pi *n ind;
+    i_value   like(LOG4RPG_Property_value_t) value;
+    i_default ind value;
+  end-pi;
 
-         string = %trim(i_value);
+//  Helper fields
+  dcl-s string like(i_value);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-         if (string = '');
-            return i_default;
-         endif;
+string = %trim(i_value);
 
-         return f_val(string);
+if (string = '');
+   return i_default;
+endif;
 
-      /END-FREE
-      *
-     P OptionConverter_toInt...
-     P                 E
-      *
+string = f_lcase(string);
+
+select;
+when (string = '1' or string = 'true');
+   return *on;
+when (string = '0' or string = 'false');
+   return *off;
+endsl;
+
+return i_default;
+
+
+end-proc;
+
+//=========================================================================
+//  Converts a given property to a RPG integer value.
+//=========================================================================
+dcl-proc OptionConverter_toInt export;
+  dcl-pi *n int(10);
+    i_value   like(LOG4RPG_Property_value_t) value;
+    i_default int(10) value;
+  end-pi;
+
+//  Helper fields
+  dcl-s string like(i_value);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+string = %trim(i_value);
+
+if (string = '');
+   return i_default;
+endif;
+
+return f_val(string);
+
+
+end-proc;
+

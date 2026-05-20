@@ -52,9 +52,9 @@
      /*                                                                        */
      /* >>END-PRE-COMPILER<<                                                   */
      /* ====================================================================== */
- 
+
 STRPGMEXP PGMLVL(*CURRENT) SIGNATURE('Version 1.10')
- 
+
   /*   Module: LOG4RPG01   */
   EXPORT SYMBOL('LOG4RPG01_Logger_setLogging')
   EXPORT SYMBOL('LOG4RPG01_Logger_isLogging')
@@ -77,50 +77,50 @@ STRPGMEXP PGMLVL(*CURRENT) SIGNATURE('Version 1.10')
   EXPORT SYMBOL('LOG4RPG01_Logger_null')
   EXPORT SYMBOL('LOG4RPG01_Logger_setLevel')
   EXPORT SYMBOL('LOG4RPG01_Logger_setInternalDebugging')
- 
+
   /*   Module: LOG4RPG08   */
   EXPORT SYMBOL('LOG4RPG08_Configurator_loadDefaultConfiguration')
   EXPORT SYMBOL('LOG4RPG08_Configurator_loadPropertiesConfiguration')
   EXPORT SYMBOL('LOG4RPG08_Configurator_clearConfiguration')
- 
+
   /* -------------------------------------------------------------- */
   /*   These exports belong to the predefined layouts and           */
   /*   appenders.                                                   */
   /* -------------------------------------------------------------- */
- 
+
   /*   Module: LOG4RPG50   */
   EXPORT SYMBOL('DailyRollingFileAppender_new')
   EXPORT SYMBOL('DailyRollingFileAppender_requiresLayout')
   EXPORT SYMBOL('DailyRollingFileAppender_doAppend')
   EXPORT SYMBOL('DailyRollingFileAppender_setProperties')
   EXPORT SYMBOL('DailyRollingFileAppender_delete')
- 
+
   /*   Module: LOG4RPG51   */
   EXPORT SYMBOL('DailyRollingPrintAppender_new')
   EXPORT SYMBOL('DailyRollingPrintAppender_requiresLayout')
   EXPORT SYMBOL('DailyRollingPrintAppender_doAppend')
   EXPORT SYMBOL('DailyRollingPrintAppender_setProperties')
   EXPORT SYMBOL('DailyRollingPrintAppender_delete')
- 
+
   /*   Module: LOG4RPG51   */
   EXPORT SYMBOL('NullAppender_new')
   EXPORT SYMBOL('NullAppender_requiresLayout')
   EXPORT SYMBOL('NullAppender_doAppend')
   EXPORT SYMBOL('NullAppender_setProperties')
   EXPORT SYMBOL('NullAppender_delete')
- 
+
   /*   Module: LOG4RPG60   */
   EXPORT SYMBOL('PatternLayout_delete')
   EXPORT SYMBOL('PatternLayout_format')
   EXPORT SYMBOL('PatternLayout_new')
   EXPORT SYMBOL('PatternLayout_setProperties')
- 
+
   /*   Module: LOG4RPG61   */
   EXPORT SYMBOL('SimpleLayout_delete')
   EXPORT SYMBOL('SimpleLayout_format')
   EXPORT SYMBOL('SimpleLayout_new')
   EXPORT SYMBOL('SimpleLayout_setProperties')
- 
+
   /*   Module: LOG4RPG62   */
   EXPORT SYMBOL('XMLLayout_delete')
   EXPORT SYMBOL('XMLLayout_format')
@@ -128,16 +128,16 @@ STRPGMEXP PGMLVL(*CURRENT) SIGNATURE('Version 1.10')
   EXPORT SYMBOL('XMLLayout_setProperties')
   EXPORT SYMBOL('XMLLayout_getHeader')
   EXPORT SYMBOL('XMLLayout_getFooter')
- 
+
   /* -------------------------------------------------------------- */
   /*   The following exports should be used for developing          */
   /*   appenders and layouts, only.                                 */
   /* -------------------------------------------------------------- */
- 
+
   /*   Module: LOG4RPG03   */
   EXPORT SYMBOL('LOG4RPG03_Appender_getLayout')
   EXPORT SYMBOL('LOG4RPG03_Appender_knowsProperty')
- 
+
   /*   Module: LOG4RPG07   */
   EXPORT SYMBOL('LOG4RPG07_PropertyList_new')
   EXPORT SYMBOL('LOG4RPG07_PropertyList_put')
@@ -153,11 +153,11 @@ STRPGMEXP PGMLVL(*CURRENT) SIGNATURE('Version 1.10')
   EXPORT SYMBOL('LOG4RPG07_PropertyList_delete')
   EXPORT SYMBOL('LOG4RPG07_PropertyList_null')
   EXPORT SYMBOL('LOG4RPG07_PropertyList_isNull')
- 
+
   /*   Module: LOG4RPG09   */
   EXPORT SYMBOL('LOG4RPG09_Level_toInt')
   EXPORT SYMBOL('LOG4RPG09_Level_toString')
- 
+
   /*   Module: LOG4RPG10   */
   EXPORT SYMBOL('LOG4RPG10_LogLog_debug')
   EXPORT SYMBOL('LOG4RPG10_LogLog_debugMsg')
@@ -167,11 +167,11 @@ STRPGMEXP PGMLVL(*CURRENT) SIGNATURE('Version 1.10')
   EXPORT SYMBOL('LOG4RPG10_LogLog_warningMsg')
   EXPORT SYMBOL('LOG4RPG10_LogLog_verbose')
   EXPORT SYMBOL('LOG4RPG10_LogLog_verboseMsg')
- 
+
   /*   Module: LOG4RPG11   */
   EXPORT SYMBOL('LOG4RPG11_Layout_newLine')
   EXPORT SYMBOL('LOG4RPG11_Layout_knowsProperty')
- 
+
   /*   Module: LOG4RPG16   */
   EXPORT SYMBOL('LOG4RPG16_LogEvent_setText')
   EXPORT SYMBOL('LOG4RPG16_LogEvent_appendText')
@@ -186,42 +186,42 @@ STRPGMEXP PGMLVL(*CURRENT) SIGNATURE('Version 1.10')
   EXPORT SYMBOL('LOG4RPG16_LogEvent_getPriority')
   EXPORT SYMBOL('LOG4RPG16_LogEvent_getLoggerName')
   EXPORT SYMBOL('LOG4RPG16_LogEvent_getTime')
- 
+
   /*   Module: LOG4RPG17   */
   EXPORT SYMBOL('LOG4RPG17_Filter_knowsProperty')
- 
+
   /*   New with V1.3:      */
   /*   Module: LOG4RPG01   */
   EXPORT SYMBOL('LOG4RPG01_Logger_getInternalDebugMode')           /* V1.3      */
   EXPORT SYMBOL('LOG4RPG01_Logger_getInternalDebugOutput')         /* V1.3      */
- 
+
   /*   New with V1.5:      */
   /*   Module: LOG4RPG08   */
   EXPORT SYMBOL('LOG4RPG08_Configurator_loadAndWatchPropertiesConfiguration')
- 
+
   /*   Exported with V1.5: */
   /*   Module: LOG4RPG11   */
   EXPORT SYMBOL('LOG4RPG11_Layout_getFooter')
   EXPORT SYMBOL('LOG4RPG11_Layout_getHeader')
   EXPORT SYMBOL('LOG4RPG11_Layout_isNull')
- 
+
   /*   New with V1.5:      */
   /*   Module: LOG4RPG98   */
   EXPORT SYMBOL('LOG4RPG98_OptionConverter_toBoolean')
   EXPORT SYMBOL('LOG4RPG98_OptionConverter_toFileSize')
   EXPORT SYMBOL('LOG4RPG98_OptionConverter_toInt')
- 
+
   /*   New with V1.6:      */
   /*   Module: LOG4RPG01   */
   EXPORT SYMBOL('LOG4RPG01_setStubOfs Internal Use Only')
   /*   Module: LOG4RPG07   */
   EXPORT SYMBOL('LOG4RPG07_PropertyList_getUrl')
- 
+
   /* -------------------------------------------------------------- */
   /*   The following exports can be used to configure Log4rpg       */
   /*   without a property file.                                     */
   /* -------------------------------------------------------------- */
- 
+
   /*   New with V1.7:      */
   EXPORT SYMBOL('LOG4RPG11_Layout_new')
   EXPORT SYMBOL('LOG4RPG03_Appender_new')
@@ -230,23 +230,23 @@ STRPGMEXP PGMLVL(*CURRENT) SIGNATURE('Version 1.10')
   EXPORT SYMBOL('LOG4RPG01_Logger_addAppender')
   EXPORT SYMBOL('LOG4RPG17_Filter_new')
   EXPORT SYMBOL('LOG4RPG17_Filter_setNext')
- 
+
   /*   New with V1.8:      */
   EXPORT SYMBOL('LOG4RPG99_getObject')
   EXPORT SYMBOL('LOG4RPG99_getProcedure')
   EXPORT SYMBOL('LOG4RPG99_getSrvPgm')
- 
+
   /*   New with V1.10:     */
   EXPORT SYMBOL('LOG4RPG01_Logger_isDebugEnabled')
   EXPORT SYMBOL('LOG4RPG01_Logger_isInfoEnabled')
   EXPORT SYMBOL('LOG4RPG01_Logger_isWarnEnabled')
   EXPORT SYMBOL('LOG4RPG01_Logger_isErrorEnabled')
   EXPORT SYMBOL('LOG4RPG01_Logger_isFatalEnabled')
- 
+
 ENDPGMEXP
- 
+
 STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.8')
- 
+
   /*   Module: LOG4RPG01   */
   EXPORT SYMBOL('LOG4RPG01_Logger_setLogging')
   EXPORT SYMBOL('LOG4RPG01_Logger_isLogging')
@@ -269,50 +269,50 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.8')
   EXPORT SYMBOL('LOG4RPG01_Logger_null')
   EXPORT SYMBOL('LOG4RPG01_Logger_setLevel')
   EXPORT SYMBOL('LOG4RPG01_Logger_setInternalDebugging')
- 
+
   /*   Module: LOG4RPG08   */
   EXPORT SYMBOL('LOG4RPG08_Configurator_loadDefaultConfiguration')
   EXPORT SYMBOL('LOG4RPG08_Configurator_loadPropertiesConfiguration')
   EXPORT SYMBOL('LOG4RPG08_Configurator_clearConfiguration')
- 
+
   /* -------------------------------------------------------------- */
   /*   These exports belong to the predefined layouts and           */
   /*   appenders.                                                   */
   /* -------------------------------------------------------------- */
- 
+
   /*   Module: LOG4RPG50   */
   EXPORT SYMBOL('DailyRollingFileAppender_new')
   EXPORT SYMBOL('DailyRollingFileAppender_requiresLayout')
   EXPORT SYMBOL('DailyRollingFileAppender_doAppend')
   EXPORT SYMBOL('DailyRollingFileAppender_setProperties')
   EXPORT SYMBOL('DailyRollingFileAppender_delete')
- 
+
   /*   Module: LOG4RPG51   */
   EXPORT SYMBOL('DailyRollingPrintAppender_new')
   EXPORT SYMBOL('DailyRollingPrintAppender_requiresLayout')
   EXPORT SYMBOL('DailyRollingPrintAppender_doAppend')
   EXPORT SYMBOL('DailyRollingPrintAppender_setProperties')
   EXPORT SYMBOL('DailyRollingPrintAppender_delete')
- 
+
   /*   Module: LOG4RPG51   */
   EXPORT SYMBOL('NullAppender_new')
   EXPORT SYMBOL('NullAppender_requiresLayout')
   EXPORT SYMBOL('NullAppender_doAppend')
   EXPORT SYMBOL('NullAppender_setProperties')
   EXPORT SYMBOL('NullAppender_delete')
- 
+
   /*   Module: LOG4RPG60   */
   EXPORT SYMBOL('PatternLayout_delete')
   EXPORT SYMBOL('PatternLayout_format')
   EXPORT SYMBOL('PatternLayout_new')
   EXPORT SYMBOL('PatternLayout_setProperties')
- 
+
   /*   Module: LOG4RPG61   */
   EXPORT SYMBOL('SimpleLayout_delete')
   EXPORT SYMBOL('SimpleLayout_format')
   EXPORT SYMBOL('SimpleLayout_new')
   EXPORT SYMBOL('SimpleLayout_setProperties')
- 
+
   /*   Module: LOG4RPG62   */
   EXPORT SYMBOL('XMLLayout_delete')
   EXPORT SYMBOL('XMLLayout_format')
@@ -320,16 +320,16 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.8')
   EXPORT SYMBOL('XMLLayout_setProperties')
   EXPORT SYMBOL('XMLLayout_getHeader')
   EXPORT SYMBOL('XMLLayout_getFooter')
- 
+
   /* -------------------------------------------------------------- */
   /*   The following exports should be used for developing          */
   /*   appenders and layouts, only.                                 */
   /* -------------------------------------------------------------- */
- 
+
   /*   Module: LOG4RPG03   */
   EXPORT SYMBOL('LOG4RPG03_Appender_getLayout')
   EXPORT SYMBOL('LOG4RPG03_Appender_knowsProperty')
- 
+
   /*   Module: LOG4RPG07   */
   EXPORT SYMBOL('LOG4RPG07_PropertyList_new')
   EXPORT SYMBOL('LOG4RPG07_PropertyList_put')
@@ -345,11 +345,11 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.8')
   EXPORT SYMBOL('LOG4RPG07_PropertyList_delete')
   EXPORT SYMBOL('LOG4RPG07_PropertyList_null')
   EXPORT SYMBOL('LOG4RPG07_PropertyList_isNull')
- 
+
   /*   Module: LOG4RPG09   */
   EXPORT SYMBOL('LOG4RPG09_Level_toInt')
   EXPORT SYMBOL('LOG4RPG09_Level_toString')
- 
+
   /*   Module: LOG4RPG10   */
   EXPORT SYMBOL('LOG4RPG10_LogLog_debug')
   EXPORT SYMBOL('LOG4RPG10_LogLog_debugMsg')
@@ -359,11 +359,11 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.8')
   EXPORT SYMBOL('LOG4RPG10_LogLog_warningMsg')
   EXPORT SYMBOL('LOG4RPG10_LogLog_verbose')
   EXPORT SYMBOL('LOG4RPG10_LogLog_verboseMsg')
- 
+
   /*   Module: LOG4RPG11   */
   EXPORT SYMBOL('LOG4RPG11_Layout_newLine')
   EXPORT SYMBOL('LOG4RPG11_Layout_knowsProperty')
- 
+
   /*   Module: LOG4RPG16   */
   EXPORT SYMBOL('LOG4RPG16_LogEvent_setText')
   EXPORT SYMBOL('LOG4RPG16_LogEvent_appendText')
@@ -378,42 +378,42 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.8')
   EXPORT SYMBOL('LOG4RPG16_LogEvent_getPriority')
   EXPORT SYMBOL('LOG4RPG16_LogEvent_getLoggerName')
   EXPORT SYMBOL('LOG4RPG16_LogEvent_getTime')
- 
+
   /*   Module: LOG4RPG17   */
   EXPORT SYMBOL('LOG4RPG17_Filter_knowsProperty')
- 
+
   /*   New with V1.3:      */
   /*   Module: LOG4RPG01   */
   EXPORT SYMBOL('LOG4RPG01_Logger_getInternalDebugMode')           /* V1.3      */
   EXPORT SYMBOL('LOG4RPG01_Logger_getInternalDebugOutput')         /* V1.3      */
- 
+
   /*   New with V1.5:      */
   /*   Module: LOG4RPG08   */
   EXPORT SYMBOL('LOG4RPG08_Configurator_loadAndWatchPropertiesConfiguration')
- 
+
   /*   Exported with V1.5: */
   /*   Module: LOG4RPG11   */
   EXPORT SYMBOL('LOG4RPG11_Layout_getFooter')
   EXPORT SYMBOL('LOG4RPG11_Layout_getHeader')
   EXPORT SYMBOL('LOG4RPG11_Layout_isNull')
- 
+
   /*   New with V1.5:      */
   /*   Module: LOG4RPG98   */
   EXPORT SYMBOL('LOG4RPG98_OptionConverter_toBoolean')
   EXPORT SYMBOL('LOG4RPG98_OptionConverter_toFileSize')
   EXPORT SYMBOL('LOG4RPG98_OptionConverter_toInt')
- 
+
   /*   New with V1.6:      */
   /*   Module: LOG4RPG01   */
   EXPORT SYMBOL('LOG4RPG01_setStubOfs Internal Use Only')
   /*   Module: LOG4RPG07   */
   EXPORT SYMBOL('LOG4RPG07_PropertyList_getUrl')
- 
+
   /* -------------------------------------------------------------- */
   /*   The following exports can be used to configure Log4rpg       */
   /*   without a property file.                                     */
   /* -------------------------------------------------------------- */
- 
+
   /*   New with V1.7:      */
   EXPORT SYMBOL('LOG4RPG11_Layout_new')
   EXPORT SYMBOL('LOG4RPG03_Appender_new')
@@ -422,16 +422,16 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.8')
   EXPORT SYMBOL('LOG4RPG01_Logger_addAppender')
   EXPORT SYMBOL('LOG4RPG17_Filter_new')
   EXPORT SYMBOL('LOG4RPG17_Filter_setNext')
- 
+
   /*   New with V1.8:      */
   EXPORT SYMBOL('LOG4RPG99_getObject')
   EXPORT SYMBOL('LOG4RPG99_getProcedure')
   EXPORT SYMBOL('LOG4RPG99_getSrvPgm')
- 
+
 ENDPGMEXP
- 
+
 STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.7')
- 
+
   /*   Module: LOG4RPG01   */
   EXPORT SYMBOL('LOG4RPG01_Logger_setLogging')
   EXPORT SYMBOL('LOG4RPG01_Logger_isLogging')
@@ -454,50 +454,50 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.7')
   EXPORT SYMBOL('LOG4RPG01_Logger_null')
   EXPORT SYMBOL('LOG4RPG01_Logger_setLevel')
   EXPORT SYMBOL('LOG4RPG01_Logger_setInternalDebugging')
- 
+
   /*   Module: LOG4RPG08   */
   EXPORT SYMBOL('LOG4RPG08_Configurator_loadDefaultConfiguration')
   EXPORT SYMBOL('LOG4RPG08_Configurator_loadPropertiesConfiguration')
   EXPORT SYMBOL('LOG4RPG08_Configurator_clearConfiguration')
- 
+
   /* -------------------------------------------------------------- */
   /*   These exports belong to the predefined layouts and           */
   /*   appenders.                                                   */
   /* -------------------------------------------------------------- */
- 
+
   /*   Module: LOG4RPG50   */
   EXPORT SYMBOL('DailyRollingFileAppender_new')
   EXPORT SYMBOL('DailyRollingFileAppender_requiresLayout')
   EXPORT SYMBOL('DailyRollingFileAppender_doAppend')
   EXPORT SYMBOL('DailyRollingFileAppender_setProperties')
   EXPORT SYMBOL('DailyRollingFileAppender_delete')
- 
+
   /*   Module: LOG4RPG51   */
   EXPORT SYMBOL('DailyRollingPrintAppender_new')
   EXPORT SYMBOL('DailyRollingPrintAppender_requiresLayout')
   EXPORT SYMBOL('DailyRollingPrintAppender_doAppend')
   EXPORT SYMBOL('DailyRollingPrintAppender_setProperties')
   EXPORT SYMBOL('DailyRollingPrintAppender_delete')
- 
+
   /*   Module: LOG4RPG51   */
   EXPORT SYMBOL('NullAppender_new')
   EXPORT SYMBOL('NullAppender_requiresLayout')
   EXPORT SYMBOL('NullAppender_doAppend')
   EXPORT SYMBOL('NullAppender_setProperties')
   EXPORT SYMBOL('NullAppender_delete')
- 
+
   /*   Module: LOG4RPG60   */
   EXPORT SYMBOL('PatternLayout_delete')
   EXPORT SYMBOL('PatternLayout_format')
   EXPORT SYMBOL('PatternLayout_new')
   EXPORT SYMBOL('PatternLayout_setProperties')
- 
+
   /*   Module: LOG4RPG61   */
   EXPORT SYMBOL('SimpleLayout_delete')
   EXPORT SYMBOL('SimpleLayout_format')
   EXPORT SYMBOL('SimpleLayout_new')
   EXPORT SYMBOL('SimpleLayout_setProperties')
- 
+
   /*   Module: LOG4RPG62   */
   EXPORT SYMBOL('XMLLayout_delete')
   EXPORT SYMBOL('XMLLayout_format')
@@ -505,16 +505,16 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.7')
   EXPORT SYMBOL('XMLLayout_setProperties')
   EXPORT SYMBOL('XMLLayout_getHeader')
   EXPORT SYMBOL('XMLLayout_getFooter')
- 
+
   /* -------------------------------------------------------------- */
   /*   The following exports should be used for developing          */
   /*   appenders and layouts, only.                                 */
   /* -------------------------------------------------------------- */
- 
+
   /*   Module: LOG4RPG03   */
   EXPORT SYMBOL('LOG4RPG03_Appender_getLayout')
   EXPORT SYMBOL('LOG4RPG03_Appender_knowsProperty')
- 
+
   /*   Module: LOG4RPG07   */
   EXPORT SYMBOL('LOG4RPG07_PropertyList_new')
   EXPORT SYMBOL('LOG4RPG07_PropertyList_put')
@@ -530,11 +530,11 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.7')
   EXPORT SYMBOL('LOG4RPG07_PropertyList_delete')
   EXPORT SYMBOL('LOG4RPG07_PropertyList_null')
   EXPORT SYMBOL('LOG4RPG07_PropertyList_isNull')
- 
+
   /*   Module: LOG4RPG09   */
   EXPORT SYMBOL('LOG4RPG09_Level_toInt')
   EXPORT SYMBOL('LOG4RPG09_Level_toString')
- 
+
   /*   Module: LOG4RPG10   */
   EXPORT SYMBOL('LOG4RPG10_LogLog_debug')
   EXPORT SYMBOL('LOG4RPG10_LogLog_debugMsg')
@@ -544,11 +544,11 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.7')
   EXPORT SYMBOL('LOG4RPG10_LogLog_warningMsg')
   EXPORT SYMBOL('LOG4RPG10_LogLog_verbose')
   EXPORT SYMBOL('LOG4RPG10_LogLog_verboseMsg')
- 
+
   /*   Module: LOG4RPG11   */
   EXPORT SYMBOL('LOG4RPG11_Layout_newLine')
   EXPORT SYMBOL('LOG4RPG11_Layout_knowsProperty')
- 
+
   /*   Module: LOG4RPG16   */
   EXPORT SYMBOL('LOG4RPG16_LogEvent_setText')
   EXPORT SYMBOL('LOG4RPG16_LogEvent_appendText')
@@ -563,42 +563,42 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.7')
   EXPORT SYMBOL('LOG4RPG16_LogEvent_getPriority')
   EXPORT SYMBOL('LOG4RPG16_LogEvent_getLoggerName')
   EXPORT SYMBOL('LOG4RPG16_LogEvent_getTime')
- 
+
   /*   Module: LOG4RPG17   */
   EXPORT SYMBOL('LOG4RPG17_Filter_knowsProperty')
- 
+
   /*   New with V1.3:      */
   /*   Module: LOG4RPG01   */
   EXPORT SYMBOL('LOG4RPG01_Logger_getInternalDebugMode')           /* V1.3      */
   EXPORT SYMBOL('LOG4RPG01_Logger_getInternalDebugOutput')         /* V1.3      */
- 
+
   /*   New with V1.5:      */
   /*   Module: LOG4RPG08   */
   EXPORT SYMBOL('LOG4RPG08_Configurator_loadAndWatchPropertiesConfiguration')
- 
+
   /*   Exported with V1.5: */
   /*   Module: LOG4RPG11   */
   EXPORT SYMBOL('LOG4RPG11_Layout_getFooter')
   EXPORT SYMBOL('LOG4RPG11_Layout_getHeader')
   EXPORT SYMBOL('LOG4RPG11_Layout_isNull')
- 
+
   /*   New with V1.5:      */
   /*   Module: LOG4RPG98   */
   EXPORT SYMBOL('LOG4RPG98_OptionConverter_toBoolean')
   EXPORT SYMBOL('LOG4RPG98_OptionConverter_toFileSize')
   EXPORT SYMBOL('LOG4RPG98_OptionConverter_toInt')
- 
+
   /*   New with V1.6:      */
   /*   Module: LOG4RPG01   */
   EXPORT SYMBOL('LOG4RPG01_setStubOfs Internal Use Only')
   /*   Module: LOG4RPG07   */
   EXPORT SYMBOL('LOG4RPG07_PropertyList_getUrl')
- 
+
   /* -------------------------------------------------------------- */
   /*   The following exports can be used to configure Log4rpg       */
   /*   without a property file.                                     */
   /* -------------------------------------------------------------- */
- 
+
   /*   New with V1.7:      */
   EXPORT SYMBOL('LOG4RPG11_Layout_new')
   EXPORT SYMBOL('LOG4RPG03_Appender_new')
@@ -607,11 +607,11 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.7')
   EXPORT SYMBOL('LOG4RPG01_Logger_addAppender')
   EXPORT SYMBOL('LOG4RPG17_Filter_new')
   EXPORT SYMBOL('LOG4RPG17_Filter_setNext')
- 
+
 ENDPGMEXP
- 
+
 STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.6')
- 
+
   /*   Module: LOG4RPG01   */
   EXPORT SYMBOL('LOG4RPG01_Logger_setLogging')
   EXPORT SYMBOL('LOG4RPG01_Logger_isLogging')
@@ -634,50 +634,50 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.6')
   EXPORT SYMBOL('LOG4RPG01_Logger_null')
   EXPORT SYMBOL('LOG4RPG01_Logger_setLevel')
   EXPORT SYMBOL('LOG4RPG01_Logger_setInternalDebugging')
- 
+
   /*   Module: LOG4RPG08   */
   EXPORT SYMBOL('LOG4RPG08_Configurator_loadDefaultConfiguration')
   EXPORT SYMBOL('LOG4RPG08_Configurator_loadPropertiesConfiguration')
   EXPORT SYMBOL('LOG4RPG08_Configurator_clearConfiguration')
- 
+
   /* -------------------------------------------------------------- */
   /*   These exports belong to the predefined layouts and           */
   /*   appenders.                                                   */
   /* -------------------------------------------------------------- */
- 
+
   /*   Module: LOG4RPG50   */
   EXPORT SYMBOL('DailyRollingFileAppender_new')
   EXPORT SYMBOL('DailyRollingFileAppender_requiresLayout')
   EXPORT SYMBOL('DailyRollingFileAppender_doAppend')
   EXPORT SYMBOL('DailyRollingFileAppender_setProperties')
   EXPORT SYMBOL('DailyRollingFileAppender_delete')
- 
+
   /*   Module: LOG4RPG51   */
   EXPORT SYMBOL('DailyRollingPrintAppender_new')
   EXPORT SYMBOL('DailyRollingPrintAppender_requiresLayout')
   EXPORT SYMBOL('DailyRollingPrintAppender_doAppend')
   EXPORT SYMBOL('DailyRollingPrintAppender_setProperties')
   EXPORT SYMBOL('DailyRollingPrintAppender_delete')
- 
+
   /*   Module: LOG4RPG51   */
   EXPORT SYMBOL('NullAppender_new')
   EXPORT SYMBOL('NullAppender_requiresLayout')
   EXPORT SYMBOL('NullAppender_doAppend')
   EXPORT SYMBOL('NullAppender_setProperties')
   EXPORT SYMBOL('NullAppender_delete')
- 
+
   /*   Module: LOG4RPG60   */
   EXPORT SYMBOL('PatternLayout_delete')
   EXPORT SYMBOL('PatternLayout_format')
   EXPORT SYMBOL('PatternLayout_new')
   EXPORT SYMBOL('PatternLayout_setProperties')
- 
+
   /*   Module: LOG4RPG61   */
   EXPORT SYMBOL('SimpleLayout_delete')
   EXPORT SYMBOL('SimpleLayout_format')
   EXPORT SYMBOL('SimpleLayout_new')
   EXPORT SYMBOL('SimpleLayout_setProperties')
- 
+
   /*   Module: LOG4RPG62   */
   EXPORT SYMBOL('XMLLayout_delete')
   EXPORT SYMBOL('XMLLayout_format')
@@ -685,16 +685,16 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.6')
   EXPORT SYMBOL('XMLLayout_setProperties')
   EXPORT SYMBOL('XMLLayout_getHeader')
   EXPORT SYMBOL('XMLLayout_getFooter')
- 
+
   /* -------------------------------------------------------------- */
   /*   The following exports should be used for developing          */
   /*   appenders and layouts, only.                                 */
   /* -------------------------------------------------------------- */
- 
+
   /*   Module: LOG4RPG03   */
   EXPORT SYMBOL('LOG4RPG03_Appender_getLayout')
   EXPORT SYMBOL('LOG4RPG03_Appender_knowsProperty')
- 
+
   /*   Module: LOG4RPG07   */
   EXPORT SYMBOL('LOG4RPG07_PropertyList_new')
   EXPORT SYMBOL('LOG4RPG07_PropertyList_put')
@@ -710,11 +710,11 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.6')
   EXPORT SYMBOL('LOG4RPG07_PropertyList_delete')
   EXPORT SYMBOL('LOG4RPG07_PropertyList_null')
   EXPORT SYMBOL('LOG4RPG07_PropertyList_isNull')
- 
+
   /*   Module: LOG4RPG09   */
   EXPORT SYMBOL('LOG4RPG09_Level_toInt')
   EXPORT SYMBOL('LOG4RPG09_Level_toString')
- 
+
   /*   Module: LOG4RPG10   */
   EXPORT SYMBOL('LOG4RPG10_LogLog_debug')
   EXPORT SYMBOL('LOG4RPG10_LogLog_debugMsg')
@@ -724,11 +724,11 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.6')
   EXPORT SYMBOL('LOG4RPG10_LogLog_warningMsg')
   EXPORT SYMBOL('LOG4RPG10_LogLog_verbose')
   EXPORT SYMBOL('LOG4RPG10_LogLog_verboseMsg')
- 
+
   /*   Module: LOG4RPG11   */
   EXPORT SYMBOL('LOG4RPG11_Layout_newLine')
   EXPORT SYMBOL('LOG4RPG11_Layout_knowsProperty')
- 
+
   /*   Module: LOG4RPG16   */
   EXPORT SYMBOL('LOG4RPG16_LogEvent_setText')
   EXPORT SYMBOL('LOG4RPG16_LogEvent_appendText')
@@ -743,41 +743,41 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.6')
   EXPORT SYMBOL('LOG4RPG16_LogEvent_getPriority')
   EXPORT SYMBOL('LOG4RPG16_LogEvent_getLoggerName')
   EXPORT SYMBOL('LOG4RPG16_LogEvent_getTime')
- 
+
   /*   Module: LOG4RPG17   */
   EXPORT SYMBOL('LOG4RPG17_Filter_knowsProperty')
- 
+
   /*   New with V1.3:      */
   /*   Module: LOG4RPG01   */
   EXPORT SYMBOL('LOG4RPG01_Logger_getInternalDebugMode')           /* V1.3      */
   EXPORT SYMBOL('LOG4RPG01_Logger_getInternalDebugOutput')         /* V1.3      */
- 
+
   /*   New with V1.5:      */
   /*   Module: LOG4RPG08   */
   EXPORT SYMBOL('LOG4RPG08_Configurator_loadAndWatchPropertiesConfiguration')
- 
+
   /*   Exported with V1.5: */
   /*   Module: LOG4RPG11   */
   EXPORT SYMBOL('LOG4RPG11_Layout_getFooter')
   EXPORT SYMBOL('LOG4RPG11_Layout_getHeader')
   EXPORT SYMBOL('LOG4RPG11_Layout_isNull')
- 
+
   /*   New with V1.5:      */
   /*   Module: LOG4RPG98   */
   EXPORT SYMBOL('LOG4RPG98_OptionConverter_toBoolean')
   EXPORT SYMBOL('LOG4RPG98_OptionConverter_toFileSize')
   EXPORT SYMBOL('LOG4RPG98_OptionConverter_toInt')
- 
+
   /*   New with V1.6:      */
   /*   Module: LOG4RPG01   */
   EXPORT SYMBOL('LOG4RPG01_setStubOfs Internal Use Only')
   /*   Module: LOG4RPG07   */
   EXPORT SYMBOL('LOG4RPG07_PropertyList_getUrl')
- 
+
 ENDPGMEXP
- 
+
 STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.5')
- 
+
   /*   Module: LOG4RPG01   */
   EXPORT SYMBOL('LOG4RPG01_Logger_setLogging')
   EXPORT SYMBOL('LOG4RPG01_Logger_isLogging')
@@ -800,50 +800,50 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.5')
   EXPORT SYMBOL('LOG4RPG01_Logger_null')
   EXPORT SYMBOL('LOG4RPG01_Logger_setLevel')
   EXPORT SYMBOL('LOG4RPG01_Logger_setInternalDebugging')
- 
+
   /*   Module: LOG4RPG08   */
   EXPORT SYMBOL('LOG4RPG08_Configurator_loadDefaultConfiguration')
   EXPORT SYMBOL('LOG4RPG08_Configurator_loadPropertiesConfiguration')
   EXPORT SYMBOL('LOG4RPG08_Configurator_clearConfiguration')
- 
+
   /* -------------------------------------------------------------- */
   /*   These exports belong to the predefined layouts and           */
   /*   appenders.                                                   */
   /* -------------------------------------------------------------- */
- 
+
   /*   Module: LOG4RPG50   */
   EXPORT SYMBOL('DailyRollingFileAppender_new')
   EXPORT SYMBOL('DailyRollingFileAppender_requiresLayout')
   EXPORT SYMBOL('DailyRollingFileAppender_doAppend')
   EXPORT SYMBOL('DailyRollingFileAppender_setProperties')
   EXPORT SYMBOL('DailyRollingFileAppender_delete')
- 
+
   /*   Module: LOG4RPG51   */
   EXPORT SYMBOL('DailyRollingPrintAppender_new')
   EXPORT SYMBOL('DailyRollingPrintAppender_requiresLayout')
   EXPORT SYMBOL('DailyRollingPrintAppender_doAppend')
   EXPORT SYMBOL('DailyRollingPrintAppender_setProperties')
   EXPORT SYMBOL('DailyRollingPrintAppender_delete')
- 
+
   /*   Module: LOG4RPG51   */
   EXPORT SYMBOL('NullAppender_new')
   EXPORT SYMBOL('NullAppender_requiresLayout')
   EXPORT SYMBOL('NullAppender_doAppend')
   EXPORT SYMBOL('NullAppender_setProperties')
   EXPORT SYMBOL('NullAppender_delete')
- 
+
   /*   Module: LOG4RPG60   */
   EXPORT SYMBOL('PatternLayout_delete')
   EXPORT SYMBOL('PatternLayout_format')
   EXPORT SYMBOL('PatternLayout_new')
   EXPORT SYMBOL('PatternLayout_setProperties')
- 
+
   /*   Module: LOG4RPG61   */
   EXPORT SYMBOL('SimpleLayout_delete')
   EXPORT SYMBOL('SimpleLayout_format')
   EXPORT SYMBOL('SimpleLayout_new')
   EXPORT SYMBOL('SimpleLayout_setProperties')
- 
+
   /*   Module: LOG4RPG62   */
   EXPORT SYMBOL('XMLLayout_delete')
   EXPORT SYMBOL('XMLLayout_format')
@@ -851,16 +851,16 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.5')
   EXPORT SYMBOL('XMLLayout_setProperties')
   EXPORT SYMBOL('XMLLayout_getHeader')
   EXPORT SYMBOL('XMLLayout_getFooter')
- 
+
   /* -------------------------------------------------------------- */
   /*   The following exports should be used for developing          */
   /*   appenders and layouts, only.                                 */
   /* -------------------------------------------------------------- */
- 
+
   /*   Module: LOG4RPG03   */
   EXPORT SYMBOL('LOG4RPG03_Appender_getLayout')
   EXPORT SYMBOL('LOG4RPG03_Appender_knowsProperty')
- 
+
   /*   Module: LOG4RPG07   */
   EXPORT SYMBOL('LOG4RPG07_PropertyList_new')
   EXPORT SYMBOL('LOG4RPG07_PropertyList_put')
@@ -876,11 +876,11 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.5')
   EXPORT SYMBOL('LOG4RPG07_PropertyList_delete')
   EXPORT SYMBOL('LOG4RPG07_PropertyList_null')
   EXPORT SYMBOL('LOG4RPG07_PropertyList_isNull')
- 
+
   /*   Module: LOG4RPG09   */
   EXPORT SYMBOL('LOG4RPG09_Level_toInt')
   EXPORT SYMBOL('LOG4RPG09_Level_toString')
- 
+
   /*   Module: LOG4RPG10   */
   EXPORT SYMBOL('LOG4RPG10_LogLog_debug')
   EXPORT SYMBOL('LOG4RPG10_LogLog_debugMsg')
@@ -890,11 +890,11 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.5')
   EXPORT SYMBOL('LOG4RPG10_LogLog_warningMsg')
   EXPORT SYMBOL('LOG4RPG10_LogLog_verbose')
   EXPORT SYMBOL('LOG4RPG10_LogLog_verboseMsg')
- 
+
   /*   Module: LOG4RPG11   */
   EXPORT SYMBOL('LOG4RPG11_Layout_newLine')
   EXPORT SYMBOL('LOG4RPG11_Layout_knowsProperty')
- 
+
   /*   Module: LOG4RPG16   */
   EXPORT SYMBOL('LOG4RPG16_LogEvent_setText')
   EXPORT SYMBOL('LOG4RPG16_LogEvent_appendText')
@@ -909,35 +909,35 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.5')
   EXPORT SYMBOL('LOG4RPG16_LogEvent_getPriority')
   EXPORT SYMBOL('LOG4RPG16_LogEvent_getLoggerName')
   EXPORT SYMBOL('LOG4RPG16_LogEvent_getTime')
- 
+
   /*   Module: LOG4RPG17   */
   EXPORT SYMBOL('LOG4RPG17_Filter_knowsProperty')
- 
+
   /*   New with V1.3:      */
   /*   Module: LOG4RPG01   */
   EXPORT SYMBOL('LOG4RPG01_Logger_getInternalDebugMode')           /* V1.3      */
   EXPORT SYMBOL('LOG4RPG01_Logger_getInternalDebugOutput')         /* V1.3      */
- 
+
   /*   New with V1.5:      */
   /*   Module: LOG4RPG08   */
   EXPORT SYMBOL('LOG4RPG08_Configurator_loadAndWatchPropertiesConfiguration')
- 
+
   /*   Exported with V1.5: */
   /*   Module: LOG4RPG11   */
   EXPORT SYMBOL('LOG4RPG11_Layout_getFooter')
   EXPORT SYMBOL('LOG4RPG11_Layout_getHeader')
   EXPORT SYMBOL('LOG4RPG11_Layout_isNull')
- 
+
   /*   New with V1.5:      */
   /*   Module: LOG4RPG98   */
   EXPORT SYMBOL('LOG4RPG98_OptionConverter_toBoolean')
   EXPORT SYMBOL('LOG4RPG98_OptionConverter_toFileSize')
   EXPORT SYMBOL('LOG4RPG98_OptionConverter_toInt')
- 
+
 ENDPGMEXP
- 
+
 STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.3')
- 
+
   /*   Module: LOG4RPG01   */
   EXPORT SYMBOL('LOG4RPG01_Logger_setLogging')
   EXPORT SYMBOL('LOG4RPG01_Logger_isLogging')
@@ -960,50 +960,50 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.3')
   EXPORT SYMBOL('LOG4RPG01_Logger_null')
   EXPORT SYMBOL('LOG4RPG01_Logger_setLevel')
   EXPORT SYMBOL('LOG4RPG01_Logger_setInternalDebugging')
- 
+
   /*   Module: LOG4RPG08   */
   EXPORT SYMBOL('LOG4RPG08_Configurator_loadDefaultConfiguration')
   EXPORT SYMBOL('LOG4RPG08_Configurator_loadPropertiesConfiguration')
   EXPORT SYMBOL('LOG4RPG08_Configurator_clearConfiguration')
- 
+
   /* -------------------------------------------------------------- */
   /*   These exports belong to the predefined layouts and           */
   /*   appenders.                                                   */
   /* -------------------------------------------------------------- */
- 
+
   /*   Module: LOG4RPG50   */
   EXPORT SYMBOL('DailyRollingFileAppender_new')
   EXPORT SYMBOL('DailyRollingFileAppender_requiresLayout')
   EXPORT SYMBOL('DailyRollingFileAppender_doAppend')
   EXPORT SYMBOL('DailyRollingFileAppender_setProperties')
   EXPORT SYMBOL('DailyRollingFileAppender_delete')
- 
+
   /*   Module: LOG4RPG51   */
   EXPORT SYMBOL('DailyRollingPrintAppender_new')
   EXPORT SYMBOL('DailyRollingPrintAppender_requiresLayout')
   EXPORT SYMBOL('DailyRollingPrintAppender_doAppend')
   EXPORT SYMBOL('DailyRollingPrintAppender_setProperties')
   EXPORT SYMBOL('DailyRollingPrintAppender_delete')
- 
+
   /*   Module: LOG4RPG51   */
   EXPORT SYMBOL('NullAppender_new')
   EXPORT SYMBOL('NullAppender_requiresLayout')
   EXPORT SYMBOL('NullAppender_doAppend')
   EXPORT SYMBOL('NullAppender_setProperties')
   EXPORT SYMBOL('NullAppender_delete')
- 
+
   /*   Module: LOG4RPG60   */
   EXPORT SYMBOL('PatternLayout_delete')
   EXPORT SYMBOL('PatternLayout_format')
   EXPORT SYMBOL('PatternLayout_new')
   EXPORT SYMBOL('PatternLayout_setProperties')
- 
+
   /*   Module: LOG4RPG61   */
   EXPORT SYMBOL('SimpleLayout_delete')
   EXPORT SYMBOL('SimpleLayout_format')
   EXPORT SYMBOL('SimpleLayout_new')
   EXPORT SYMBOL('SimpleLayout_setProperties')
- 
+
   /*   Module: LOG4RPG62   */
   EXPORT SYMBOL('XMLLayout_delete')
   EXPORT SYMBOL('XMLLayout_format')
@@ -1011,16 +1011,16 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.3')
   EXPORT SYMBOL('XMLLayout_setProperties')
   EXPORT SYMBOL('XMLLayout_getHeader')
   EXPORT SYMBOL('XMLLayout_getFooter')
- 
+
   /* -------------------------------------------------------------- */
   /*   The following exports should be used for developing          */
   /*   appenders and layouts, only.                                 */
   /* -------------------------------------------------------------- */
- 
+
   /*   Module: LOG4RPG03   */
   EXPORT SYMBOL('LOG4RPG03_Appender_getLayout')
   EXPORT SYMBOL('LOG4RPG03_Appender_knowsProperty')
- 
+
   /*   Module: LOG4RPG07   */
   EXPORT SYMBOL('LOG4RPG07_PropertyList_new')
   EXPORT SYMBOL('LOG4RPG07_PropertyList_put')
@@ -1036,11 +1036,11 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.3')
   EXPORT SYMBOL('LOG4RPG07_PropertyList_delete')
   EXPORT SYMBOL('LOG4RPG07_PropertyList_null')
   EXPORT SYMBOL('LOG4RPG07_PropertyList_isNull')
- 
+
   /*   Module: LOG4RPG09   */
   EXPORT SYMBOL('LOG4RPG09_Level_toInt')
   EXPORT SYMBOL('LOG4RPG09_Level_toString')
- 
+
   /*   Module: LOG4RPG10   */
   EXPORT SYMBOL('LOG4RPG10_LogLog_debug')
   EXPORT SYMBOL('LOG4RPG10_LogLog_debugMsg')
@@ -1050,11 +1050,11 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.3')
   EXPORT SYMBOL('LOG4RPG10_LogLog_warningMsg')
   EXPORT SYMBOL('LOG4RPG10_LogLog_verbose')
   EXPORT SYMBOL('LOG4RPG10_LogLog_verboseMsg')
- 
+
   /*   Module: LOG4RPG11   */
   EXPORT SYMBOL('LOG4RPG11_Layout_newLine')
   EXPORT SYMBOL('LOG4RPG11_Layout_knowsProperty')
- 
+
   /*   Module: LOG4RPG16   */
   EXPORT SYMBOL('LOG4RPG16_LogEvent_setText')
   EXPORT SYMBOL('LOG4RPG16_LogEvent_appendText')
@@ -1069,19 +1069,19 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.3')
   EXPORT SYMBOL('LOG4RPG16_LogEvent_getPriority')
   EXPORT SYMBOL('LOG4RPG16_LogEvent_getLoggerName')
   EXPORT SYMBOL('LOG4RPG16_LogEvent_getTime')
- 
+
   /*   Module: LOG4RPG17   */
   EXPORT SYMBOL('LOG4RPG17_Filter_knowsProperty')
- 
+
   /*   New with V1.3:      */
   /*   Module: LOG4RPG01   */
   EXPORT SYMBOL('LOG4RPG01_Logger_getInternalDebugMode')           /* V1.3      */
   EXPORT SYMBOL('LOG4RPG01_Logger_getInternalDebugOutput')         /* V1.3      */
- 
+
 ENDPGMEXP
- 
+
 STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.2')
- 
+
   /*   Module: LOG4RPG01   */
   EXPORT SYMBOL('LOG4RPG01_Logger_setLogging')
   EXPORT SYMBOL('LOG4RPG01_Logger_isLogging')
@@ -1104,50 +1104,50 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.2')
   EXPORT SYMBOL('LOG4RPG01_Logger_null')
   EXPORT SYMBOL('LOG4RPG01_Logger_setLevel')
   EXPORT SYMBOL('LOG4RPG01_Logger_setInternalDebugging')
- 
+
   /*   Module: LOG4RPG08   */
   EXPORT SYMBOL('LOG4RPG08_Configurator_loadDefaultConfiguration')
   EXPORT SYMBOL('LOG4RPG08_Configurator_loadPropertiesConfiguration')
   EXPORT SYMBOL('LOG4RPG08_Configurator_clearConfiguration')
- 
+
   /* -------------------------------------------------------------- */
   /*   These exports belong to the predefined layouts and           */
   /*   appenders.                                                   */
   /* -------------------------------------------------------------- */
- 
+
   /*   Module: LOG4RPG50   */
   EXPORT SYMBOL('DailyRollingFileAppender_new')
   EXPORT SYMBOL('DailyRollingFileAppender_requiresLayout')
   EXPORT SYMBOL('DailyRollingFileAppender_doAppend')
   EXPORT SYMBOL('DailyRollingFileAppender_setProperties')
   EXPORT SYMBOL('DailyRollingFileAppender_delete')
- 
+
   /*   Module: LOG4RPG51   */
   EXPORT SYMBOL('DailyRollingPrintAppender_new')
   EXPORT SYMBOL('DailyRollingPrintAppender_requiresLayout')
   EXPORT SYMBOL('DailyRollingPrintAppender_doAppend')
   EXPORT SYMBOL('DailyRollingPrintAppender_setProperties')
   EXPORT SYMBOL('DailyRollingPrintAppender_delete')
- 
+
   /*   Module: LOG4RPG51   */
   EXPORT SYMBOL('NullAppender_new')
   EXPORT SYMBOL('NullAppender_requiresLayout')
   EXPORT SYMBOL('NullAppender_doAppend')
   EXPORT SYMBOL('NullAppender_setProperties')
   EXPORT SYMBOL('NullAppender_delete')
- 
+
   /*   Module: LOG4RPG60   */
   EXPORT SYMBOL('PatternLayout_delete')
   EXPORT SYMBOL('PatternLayout_format')
   EXPORT SYMBOL('PatternLayout_new')
   EXPORT SYMBOL('PatternLayout_setProperties')
- 
+
   /*   Module: LOG4RPG61   */
   EXPORT SYMBOL('SimpleLayout_delete')
   EXPORT SYMBOL('SimpleLayout_format')
   EXPORT SYMBOL('SimpleLayout_new')
   EXPORT SYMBOL('SimpleLayout_setProperties')
- 
+
   /*   Module: LOG4RPG62   */
   EXPORT SYMBOL('XMLLayout_delete')
   EXPORT SYMBOL('XMLLayout_format')
@@ -1155,16 +1155,16 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.2')
   EXPORT SYMBOL('XMLLayout_setProperties')
   EXPORT SYMBOL('XMLLayout_getHeader')
   EXPORT SYMBOL('XMLLayout_getFooter')
- 
+
   /* -------------------------------------------------------------- */
   /*   The following exports should be used for developing          */
   /*   appenders and layouts, only.                                 */
   /* -------------------------------------------------------------- */
- 
+
   /*   Module: LOG4RPG03   */
   EXPORT SYMBOL('LOG4RPG03_Appender_getLayout')
   EXPORT SYMBOL('LOG4RPG03_Appender_knowsProperty')
- 
+
   /*   Module: LOG4RPG07   */
   EXPORT SYMBOL('LOG4RPG07_PropertyList_new')
   EXPORT SYMBOL('LOG4RPG07_PropertyList_put')
@@ -1180,11 +1180,11 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.2')
   EXPORT SYMBOL('LOG4RPG07_PropertyList_delete')
   EXPORT SYMBOL('LOG4RPG07_PropertyList_null')
   EXPORT SYMBOL('LOG4RPG07_PropertyList_isNull')
- 
+
   /*   Module: LOG4RPG09   */
   EXPORT SYMBOL('LOG4RPG09_Level_toInt')
   EXPORT SYMBOL('LOG4RPG09_Level_toString')
- 
+
   /*   Module: LOG4RPG10   */
   EXPORT SYMBOL('LOG4RPG10_LogLog_debug')
   EXPORT SYMBOL('LOG4RPG10_LogLog_debugMsg')
@@ -1194,11 +1194,11 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.2')
   EXPORT SYMBOL('LOG4RPG10_LogLog_warningMsg')
   EXPORT SYMBOL('LOG4RPG10_LogLog_verbose')
   EXPORT SYMBOL('LOG4RPG10_LogLog_verboseMsg')
- 
+
   /*   Module: LOG4RPG11   */
   EXPORT SYMBOL('LOG4RPG11_Layout_newLine')
   EXPORT SYMBOL('LOG4RPG11_Layout_knowsProperty')
- 
+
   /*   Module: LOG4RPG16   */
   EXPORT SYMBOL('LOG4RPG16_LogEvent_setText')
   EXPORT SYMBOL('LOG4RPG16_LogEvent_appendText')
@@ -1213,8 +1213,8 @@ STRPGMEXP PGMLVL(*PRV    ) SIGNATURE('Version 1.2')
   EXPORT SYMBOL('LOG4RPG16_LogEvent_getPriority')
   EXPORT SYMBOL('LOG4RPG16_LogEvent_getLoggerName')
   EXPORT SYMBOL('LOG4RPG16_LogEvent_getTime')
- 
+
   /*   Module: LOG4RPG17   */
   EXPORT SYMBOL('LOG4RPG17_Filter_knowsProperty')
- 
+
 ENDPGMEXP

@@ -1,62 +1,65 @@
-      /IF NOT DEFINED(PLOG4RPG97)
-      /DEFINE PLOG4RPG97
-      *
-      * -----------------------------------------
-      *  Type definitions
-      * -----------------------------------------
-      /COPY QLOG4RPG,PTYPES
-      /COPY QLOG4RPG,PLOG4RPG06                   Property
-      *
-     D LOG4RPG_syncTicket_t...
-     D                 DS                  qualified           based(pDummy)
-     D  jobName                      28A
-     D  alcTime                        Z
-      *
-      * -----------------------------------------
-      *  Constants
-      * -----------------------------------------
-      *
-      * -----------------------------------------
-      *  Prototypes
-      * -----------------------------------------
-      *
-      *  Enables or disables logging of sync lock holder.
-     D Synchronisation_setLogMode...
-     D                 PR
-     D                                     extproc('LOG4RPG97+
-     D                                     _Synchronisation_setLogMode+
-     D                                     ')
-     D  i_mode                         N   const
-      *
-      *  Sets the object description of the synchronisation object.
-     D Synchronisation_setObjectDesc...
-     D                 PR
-     D                                     extproc('LOG4RPG97+
-     D                                     _Synchronisation_setObjectDesc+
-     D                                     ')
-     D  i_text                       50A   const  varying
-      *
-      *  Start synchronisation by adding a lock on a given synchronisation
-      *  data area.
-     D Synchronisation_start...
-     D                 PR              N
-     D                                     extproc('LOG4RPG97+
-     D                                     _Synchronisation_start+
-     D                                     ')
-     D  i_dtaara                     10A   const
-     D  i_lib                        10A   const
-     D  o_ticket                                  likeds(LOG4RPG_syncTicket_t )
-     D  o_msg                                     likeds(msg_t )
-     D                                            options(*nopass: *omit)
-      *
-      *  End synchronisation and release lock.
-     D Synchronisation_end...
-     D                 PR
-     D                                     extproc('LOG4RPG97+
-     D                                     _Synchronisation_end+
-     D                                     ')
-     D  io_ticket                                 likeds(LOG4RPG_syncTicket_t )
-     D  o_msg                                     likeds(msg_t )
-     D                                            options(*nopass: *omit)
-      *
-      /ENDIF
+**FREE
+/IF NOT DEFINED(PLOG4RPG97)
+/DEFINE PLOG4RPG97
+//
+// -----------------------------------------
+//  Type definitions
+// -----------------------------------------
+/COPY QLOG4RPG,PTYPES
+/COPY QLOG4RPG,PLOG4RPG06                   Property
+//
+dcl-ds LOG4RPG_syncTicket_t
+       qualified           based(pDummy);
+  jobName         char(28);
+  alcTime         timestamp;
+end-ds;
+//
+// -----------------------------------------
+//  Constants
+// -----------------------------------------
+//
+// -----------------------------------------
+//  Prototypes
+// -----------------------------------------
+//
+//  Enables or disables logging of sync lock holder.
+dcl-pr Synchronisation_setLogMode
+       extproc('LOG4RPG97+
+       _Synchronisation_setLogMode+
+       ');
+  i_mode          ind const;
+end-pr;
+//
+//  Sets the object description of the synchronisation object.
+dcl-pr Synchronisation_setObjectDesc
+       extproc('LOG4RPG97+
+       _Synchronisation_setObjectDesc+
+       ');
+  i_text          varchar(50) const;
+end-pr;
+//
+//  Start synchronisation by adding a lock on a given synchronisation
+//  data area.
+dcl-pr Synchronisation_start
+       ind
+       extproc('LOG4RPG97+
+       _Synchronisation_start+
+       ');
+  i_dtaara        char(10) const;
+  i_lib           char(10) const;
+  o_ticket        likeds(LOG4RPG_syncTicket_t );
+o_msg           likeds(msg_t )
+     options(*nopass: *omit);
+end-pr;
+//
+//  End synchronisation and release lock.
+dcl-pr Synchronisation_end
+       extproc('LOG4RPG97+
+       _Synchronisation_end+
+       ');
+  io_ticket       likeds(LOG4RPG_syncTicket_t );
+o_msg           likeds(msg_t )
+     options(*nopass: *omit);
+end-pr;
+//
+/ENDIF

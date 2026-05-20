@@ -1,945 +1,966 @@
- DEF  /IF NOT DEFINED(CLIB)
- DEF  /DEFINE CLIB
-      *
-      *  Basic C data types
-     D uLong_t         S             10U 0 based(pDummy)
-     D uInt_t          S             10U 0 based(pDummy)
-      *
-      *  stdin, stdout and stderr
-     D stdin           S               *   import('_C_IFS_stdin')
-     D stdout          S               *   import('_C_IFS_stdout')
-     D stderr          S               *   import('_C_IFS_stderr')
-      *
-      *  system -- Execute a Command
-     D system          PR            10I 0 extproc('system')
-     D  i_clCommand                    *   value options(*string)
-      *
-     D EXCP_MSGID      S              7A   import('_EXCP_MSGID')
-      *
-      *  time -- Determine Current Time
-     D time...
-     D                 PR            10i 0 extproc('time')
-     D  timeptr                        *   value
-      *
-      *  strftime -- Convert to Formatted Time
-     D strftime...
-     D                 PR            10i 0 extproc('strftime')
-     D  dest                           *   value
-     D  maxsize                      10i 0 value
-     D  format                         *   value options(*string)
-     D  timeptr                            const  likeds(tm_t)
-      *
-     D tm_t            DS                  qualified  based(pDummy)
-     D  tm_sec                       10I 0
-     D  tm_min                       10I 0
-     D  tm_hour                      10I 0
-     D  tm_mday                      10I 0
-     D  tm_mon                       10I 0
-     D  tm_year                      10I 0
-     D  tm_wday                      10I 0
-     D  tm_yday                      10I 0
-     D  tm_isdst                     10I 0
-      *
-      *  localtime() -- Correct Local Time, returns tm_t*
-     D localtime...
-     D                 PR              *   extproc('localtime')
-     D  time                         10I 0 const
-      *
-      *  localtime_r() -- Correct Local Time
-     D localtime_r...
-     D                 PR              *   extproc('localtime_r')
-     D  time                         10I 0 const
-     D  tm                                 const  likeds(tm_t)
-      *
-      *  strtok -- Tokenize String
-     D strtok          PR              *          extproc('strtok')
-     D  i_string                       *   value  options(*string)
-     D  i_delimiters                   *   value  options(*string)
-      *
-      *  atoi -- Convert Character String to Integer
-     D atoi            PR            10I 0        extproc('atoi')
-     D  i_string                       *   value  options(*string)
-      *
-      *  memcpy -- Copy Bytes
-     D memcpy          PR              *          extproc('memcpy')
-     D  i_pDest                        *   value
-     D  i_pSrc                         *   value
-     D  i_count                      10U 0 value
-      *
-      *  memset -- Set Bytes to Value
-     D memset          PR              *          extproc('memset')
-     D  i_pDest                        *   value
-     D  i_char                       10I 0 value
-     D  i_count                      10U 0 value
-      *
-      *  memmove -- Copy Bytes
-      *     memmove allows copying between objects that may overlap
-      *     as if src is first copied into a temporary array.
-     D memmove         PR              *          extproc('memmove')
-     D  pMemDest                       *   value
-     D  pMemSrc                        *   value
-     D  memSize                            value like(size_t)
-      *
-      *  memcmp -- Compare Buffers
-     D memcmp          PR            10I 0        extproc('memcmp')
-     D  pBuf1                          *   value
-     D  pBuf2                          *   value
-     D  count                              value like(size_t)
-      *
-      *  memicmp -- Compare Bytes (ignore case)
-     D memicmp         PR            10I 0        extproc('__memicmp')
-     D  pBuf1                          *   value
-     D  pBuf2                          *   value
-     D  count                        10U 0 value
-      *
-      *  strcmp() -- Compare Strings
-      *  rc:   less than 0      -   string 1 less than string 2
-      *        0                -   string 1 equivalent to string 2
-      *        greater than 0   -   string 1 greater than string 2
-     D strcmp...
-     D                 PR            10I 0
-     D                                            extproc('strcmp')
-     D  string1                        *   value  options(*string)
-     D  string2                        *   value  options(*string)
-      *
-      *  strcasecmp() -- Compare Strings without Case Sensitivity
-      *  rc:   less than 0      -   string 1 less than string 2
-      *        0                -   string 1 equivalent to string 2
-      *        greater than 0   -   string 1 greater than string 2
-     D strcasecmp...
-     D                 PR            10I 0
-     D                                            extproc('strcasecmp')
-     D  string1                        *   value  options(*string)
-     D  string2                        *   value  options(*string)
-      /IF NOT DEFINED(TESTPTR)
-      /DEFINE TESTPTR
-      *
-      *  Test Pointer (TESTPTR)
-     D testptr         PR            10I 0 extproc('_TESTPTR')
-     D  i_ptr                          *   value
-     D  i_test_type                  10I 0 value
-      *
-     D cTESTPTR_TYPE_PROCPTR...
-     D                 C                   0
-     D cTESTPTR_NO_OPTIMIZED_PARAMETER_PASSING...
-     D                 C                   0
-     D cTESTPTR_OPTIMIZED_PARAMETER_PASSING...
-     D                 C                   1
-      *
-     D cTESTPTR_TYPE_MEMPTR...
-     D                 C                   1
-     D cTESTPTR_NON_TERASPACE...
-     D                 C                   0
-     D cTESTPTR_TERASPACE...
-     D                 C                   1
-      *
-     D cTESTPTR_ERROR_NOT_EXIST...
-     D                 C                   x'2401'
-     D cTESTPTR_ERROR_INVALID...
-     D                 C                   x'2402'
-     D cTESTPTR_ERROR_OBJECT_DESTROYED...
-     D                 C                   x'2202'
-      /ENDIF
-      *
-      *  malloc() - Reserve Storage Block
-     D TS_malloc...
-     D                 PR              *   extproc('_C_TS_malloc')
-     D  i_size                       10U 0 value
-      *
-      *  realloc() - Change Reserved Storage Block Size
-     D TS_realloc...
-     D                 PR              *   extproc('_C_TS_realloc')
-     D  i_pMem                         *   value
-     D  i_size                       10U 0 value
-      *
-      *  free() - Release Storage Blocks
-     D TS_free...
-     D                 PR                  extproc('_C_TS_free')
-     D  i_pMem                         *   value
-      *
-      *  _C_TS_malloc_info() - Determine amount of teraspace memory used
-     D TS_malloc_info...
-     D                 PR            10I 0 extproc('_C_TS_malloc_info')
-     D  o_c_mallinfo                       const  likeds(C_mallinfo_t)
-     D  i_size                       10U 0 value
-      *
-      *  _C_TS_malloc_debug() - Determine amount of teraspace memory
-      *                         used (with optional dumps and verification)
-     D TS_malloc_debug...
-     D                 PR            10I 0 extproc('_C_TS_malloc_debug')
-     D  i_dump_level                 10U 0 value
-     D  i_vrfy_level                 10U 0 value
-     D  o_c_mallinfo                       const  likeds(C_mallinfo_t)
-     D  i_size                       10U 0 value
-      *
-      * The following are possible values for the dump_level parameter
-     D C_NO_DUMPS      C                   0
-      *  Dumps the _C_mallinfo_t structure:
-     D C_DUMP_TOTALS   C                   1
-      *  Does a hex dump of all allocated chunks of teraspace storage,
-      *  this is the entire 512K chunk of storage:
-     D C_DUMP_CHUNKS   C                   2
-      *  Dumps each of the allocated nodes.
-      *  There is a node for each malloc performed with the header
-      *  associated with that malloc:
-     D C_DUMP_NODES    C                   3
-      *  Dumps the cartesian tree used to keep track of the freed nodes:
-     D C_DUMP_TREE     C                   4
-     D C_DUMP_ALL      C                   9999
-      *
-      *  The following are possible values for the verify_level parameter
-     D C_NO_CHECKS     C                   0
-     D C_CHECK_TOTALS  C                   1
-     D C_CHECK_CHUNKS  C                   2
-     D C_CHECK_NODES   C                   3
-     D C_CHECK_TREE    C                   4
-     D C_CHECK_ALL     C                   9998
-      *  Will call abort() if verification fails
-     D C_CHECK_ALL_AND_ABORT...
-     D                 C                   9999
-      *
-      * The following structure is used to return information
-      * from the _C_TS_malloc_info routine.  The fields are:
-      *   total_bytes        - bytes allocated from system
-      *                        (high water mark)
-      *   allocated_bytes    - number of allocated bytes
-      *   unallocated_bytes  - number of unallocated bytes
-      *   allocated_blocks   - number of allocated blocks
-      *   unallocated_blocks - number of unallocated blocks
-      *   requested_bytes    - bytes actually requested from malloc
-      *   pad_bytes          - bytes used to pad allocation length
-      *                        to a multiple of 16
-      *   overhead_bytes     - bytes used for malloc overhead
-     D C_mallinfo_t...
-     D                 DS                  qualified               based(pDummy)
-     D  total_bytes...
-     D                               20I 0
-     D  allocated_bytes...
-     D                               20I 0
-     D  unallocated_bytes...
-     D                               20I 0
-     D  allocated_blocks...
-     D                               20I 0
-     D  unallocated_blocks...
-     D                               20I 0
-     D  requested_bytes...
-     D                               20I 0
-     D  pad_bytes...
-     D                               20I 0
-     D  overhead_bytes...
-     D                               20I 0
-      *
-      *  malloc -- Reserve Storage Block
-     D malloc          PR              *          extproc('malloc')
-     D  i_size                       10U 0 value
-      *
-      *  realloc -- Change Reserved Storage Block Size
-     D realloc         PR              *          extproc('realloc')
-     D  i_pMem                         *   value
-     D  i_size                       10U 0 value
-      *
-      *  free -- Release Storage Blocks
-     D free            PR                         extproc('free')
-     D  i_pMem                         *   value
-      *
-      *  srand -- Set Seed for rand Function   e.g.:   srand(getSeed(*null))
-     D srand           PR                         extproc('srand')
-     D  i_seed                       10U 0 value
-      *
-      *  rand -- Generate Random Number                x = rand()
-     D rand            PR            10I 0        extproc('rand')
-      *
-     D RAND_MAX        C                   const(32767)
-      *
-      *  getSeed -- Get Seed for srand function
-     D getSeed         PR            10I 0        extproc('time')
-     D  i_timePtr                      *   value
-      *
-      *  strlen -- Determine String Length
-     D strlen...
-     D                 PR            10U 0 extproc('strlen')
-     D  i_string                       *   value
-      *
-      *  tmpnam -- Produce Temporary File Name
-     D tmpnam          PR              *          extproc('tmpnam')
-     D  pTmpNme                        *   value
-      *
-      *  _C_IFS_tmpnam -- Produce Temporary File Name for the IFS file system
-     D ifs_tmpnam      PR              *          extproc('_C_IFS_tmpnam')
-     D  fileName                       *   value
-      *
-     D L_tmpnam        C                   const(39)                            ! <stdio.h>
-      *
-     D TMP_MAX         C                   const(32767)                         ! <stdio.h>
-      *
-      *  qsort -- Sort Array
-     D qsort           PR              *                       extproc('qsort')
-     D  memPtr                         *   value
-     D  numElem                            value  like(size_t)
-     D  width                              value  like(size_t)
-     D  pSortFunc                      *   value  procptr
-      *
-      *  bsearch -- Search Arrays
-     D bsearch         PR              *          extproc('bsearch')
-     D  keyPtr                         *   value
-     D  memPtr                         *   value
-     D  numElem                            value  like(size_t)
-     D  width                              value  like(size_t)
-     D  pSearchFnc                     *   value  procptr
-      *
-      *  iconv_open()--Code Conversion Allocation API
-     D iconv_open...
-     D                 PR                  extproc('iconv_open')
-     D                                     like(iconv_t   )
-     D  i_toCode                       *   value
-     D  i_fromCode                     *   value
-      *
-     D iconv_t         DS                  qualified   based(pDummy)   align
-     D  return_value                 10I 0
-     D  cd                           10I 0 dim(12)
-      *
-     D iconv_fromcode_t...
-     D                 DS                  qualified   based(pDummy)
-     D  ibmccsid                      8A
-     D  ccsid                         5A
-     D  convAlt                       3A
-     D  substAlt                      1A
-     D  shiftStateAlt                 1A
-     D  inpLengthOpt                  1A
-     D  errOption                     1A
-     D  reserved                     12A
-      *
-     D iconv_tocode_t...
-     D                 DS                  qualified   based(pDummy)
-     D  ibmccsid                      8A
-     D  ccsid                         5A
-     D  reserved                     19A
-      *
-      *  QtqIconvOpen()--Code Conversion Allocation API
-     D QtqIconv_open...
-     D                 PR                  extproc('QtqIconvOpen')
-     D                                     likeds(iconv_t )
-     D  i_toCode                           const  likeds(QtqCode_t)
-     D  i_fromCode                         const  likeds(QtqCode_t)
-      *
-     D QtqCode_t...
-     D                 DS                  qualified   based(pDummy)
-     D  ccsid                        10I 0
-     D  conversionA                  10I 0
-     D  substitutionA                10I 0
-     D  shiftStateA                  10I 0
-     D  inpLenOpt                    10I 0
-     D  errOptMxdDta                 10I 0
-     D  reserved                     12A
-      *
-      *  iconv()--Code Conversion API
-     D iconv...
-     D                 PR            10U 0        extproc('iconv')
-     D  i_cd                               value likeds(iconv_t  )
-     D  i_pInBuf                       *
-     D  i_inBytLeft                  10U 0
-     D  i_pOutBuf                      *
-     D  i_outBytLeft                 10U 0
-      *
-     D cICONV_ERROR    C                   const(4294967295)
-      *
-      *  iconv_close()--Code Conversion Deallocation API
-     D iconv_close...
-     D                 PR            10I 0        extproc('iconv_close')
-     D  i_cd                               value likeds(iconv_t  )
-      *
-      *  0/-1 = stat()--Get File Information                include <sys/stat.h>
-     D stat...
-     D                 PR            10I 0        extproc('stat')               = int
-     D  i_pPath                        *   value options(*string)               = *path
-     D  i_pStat                        *   value                                = *buf
-      *
-      *  0/-1 = fstat()--Get File Information by Descriptor include <sys/stat.h>
-     D fstat...
-     D                 PR            10I 0        extproc('fstat')              = int
-     D  i_fd                         10I 0 value                                = int
-     D  i_stat                             const likeds(st_stat_t)              = *buf
-      *
-      *  0/-1 = lstat()--Get File or Link Information       include <sys/stat.h>
-     D lstat...
-     D                 PR            10I 0        extproc('lstat')              = int
-     D  i_pPath                        *   value options(*string)               = *path
-     D  i_pStat                        *   value                                = *buf
-      *
-     D st_stat_t       DS                  qualified   based(pDummy)   align
-     D  mode                         10U 0                                      mode_t =uint
-     D  ino                          10U 0                                      ino_t  =uint
-     D  nlink                         5U 0                                      nlink_t=ushort
-     D  reserved2                     2A
-     D  uid                          10U 0                                      uid_t  =uint
-     D  gid                          10U 0                                      gid_t  =uint
-     D  size                         10I 0                                      off_t  =int
-     D  atime                        10I 0                                      time_t =long
-     D  mtime                        10I 0                                      time_t =long
-     D  ctime                        10I 0                                      time_t =long
-     D  dev                          10U 0                                      dev_t  =uint
-     D  blksize                      10U 0                                      size_t =uint
-     D  allocsize                    10U 0                                      ulong
-     D  objtype                      11A                                        qp0l_objtype_t
-     D  reserved3                     1A
-     D  codepage                      5U 0                                      ushort
-     D  ccsid                         5U 0                                      ushort
-     D  rdev                         10U 0                                      dev_t  =uint
-     D  nlink32                      10U 0                                      nlink32_t=ulng
-     D  rdev64                       20U 0                                      dev64_t=ullng
-     D  dev64                        20U 0                                      dev64_t=ullng
-     D  reserved1                    36A
-     D  ino_gen_id                   10U 0                                      uint
-      *
-      *  Qp0lGetAttr()--Get Attributes
-     D Qp0lGetAttr...
-     D                 PR            10I 0 extproc('Qp0lGetAttr')
-     D  i_path                             const  likeds(Qlg_Path_Name_t)
-     D  i_attrArray                        const  like(Qlg_attrArray_t  )
-     D  i_pBuffer                      *   value
-     D  i_bytPrv                     10U 0 value
-     D  o_sizeNeeded                 10U 0
-     D  o_bytRet                     10U 0
-     D  i_followLnk                  10U 0 value
-      *
-     D Qlg_Path_Name_t...
-     D                 DS                  qualified align         based(pDummy)
-     D   CCSID                       10I 0
-     D   Country_ID                   2A
-     D   Language_ID                  3A
-     D   Reserved                     3A
-     D   Path_Type                   10U 0
-     D   Path_Length                 10I 0
-     D   Path_Name_Delimiter...
-     D                                2A
-     D   Reserved2                   10A
-     D   Path_Name                  256A
-      *
-     D QLG_PATH_JOB_CCSID...
-     D                 C                   const(0)
-     D QLG_PATH_JOB_COUNTRYID...
-     D                 C                   const(X'0000')
-     D QLG_PATH_JOB_LANGUAGEID...
-     D                 C                   const(X'000000')
-      *
-      *  The Path_Name is a character string and the delimiter is one byte long.
-     D QLG_CHAR_SINGLE...
-     D                 C                   const(0)
-      *
-      *  The Path_Name is a pointer and the delimiter is one byte long.
-     D QLG_PTR_SINGLE...
-     D                 C                   const(1)
-      *
-      *  The Path_Name is a character string and the delimiter is two bytes long.
-     D QLG_CHAR_DOUBLE...
-     D                 C                   const(2)
-      *
-      *  The Path_Name is a pointer and the delimiter is two bytes long.
-     D QLG_PTR_DOUBLE...
-     D                 C                   const(3)
-      *
-     D Qlg_attrArray_t...
-     D                 DS                  qualified               based(pDummy)
-     D  numE                         10I 0
-     D  attr                         10I 0 dim(64)
-      *
-     D Qlg_rtnAttr_t...
-     D                 DS                  qualified               based(pDummy)
-     D  ofsNextAttr                  10I 0
-     D  ID                           10I 0
-     D  size                         10I 0
-     D  reserved                      4A
-      *
-     D QP0L_ATTR_OBJTYPE...
-     D                 C                   const(0)                             CHAR(10)
-     D QP0L_ATTR_DATA_SIZE...
-     D                 C                   const(1)                             UINT(4)
-     D QP0L_ATTR_ALLOC_SIZE...
-     D                 C                   const(2)                             UINT(4)
-     D QP0L_ATTR_EXTENDED_ATTR_SIZE...
-     D                 C                   const(3)                             UINT(4)
-     D QP0L_ATTR_CREATE_TIME...
-     D                 C                   const(4)                             UINT(4)
-     D QP0L_ATTR_ACCESS_TIME...
-     D                 C                   const(5)                             UINT(4)
-     D QP0L_ATTR_CHANGE_TIME...
-     D                 C                   const(6)                             UINT(4)
-     D QP0L_ATTR_MODIFY_TIME...
-     D                 C                   const(7)                             UINT(4)
-     D QP0L_ATTR_STG_FREE...
-     D                 C                   const(8)                             CHAR(1)
-     D QP0L_ATTR_CHECKED_OUT...
-     D                 C                   const(9)                             chkOut Fmt
-     D QP0L_ATTR_LOCAL_REMOTE...
-     D                 C                   const(10)                            CHAR(1)
-      *
-     D QP0L_DONOT_FOLLOW_SYMLNK...
-     D                 C                   const(x'00')
-     D QP0L_FOLLOW_SYMLNK...
-     D                 C                   const(x'01')
-      *
-     D QP0L_NOT_CHECKED_OUT...
-     D                 C                   const(x'00')
-     D QP0L_CHECKED_OUT...
-     D                 C                   const(x'01')
-      *
-     D QP0L_LOCAL_OBJ...
-     D                 C                   const(x'01')
-     D QP0L_REMOTE_OBJ...
-     D                 C                   const(x'02')
-      *
-      *  QlgGetcwd()--Get Current Directory (using NLS-enabled path name)
-      *  Returns: Qlg_Path_Name_T
-     D QlgGetcwd...
-     D                 PR              *   extproc('QlgGetcwd')
-     D  o_path                             const  likeds(Qlg_Path_Name_t)
-     D  i_size                             value  like(size_t)
-      *
-      *  getcwd()--Get Current Directory
-     D getcwd...
-     D                 PR              *   extproc('getcwd')
-     D  o_path                    65535A   const  options(*varsize)
-     D  i_size                             value  like(size_t)
-      *
-      *  QlgChdir()--Change Current Directory (using NLS-enabled path name)
-      *  Returns: Qlg_Path_Name_T
-     D QlgChdir...
-     D                 PR            10I 0 extproc('QlgChdir')
-     D  i_path                             const  likeds(Qlg_Path_Name_t)
-      *
-      *  chdir()--Change Current Directory
-     D chdir...
-     D                 PR            10I 0 extproc('chdir')
-     D  i_path                         *   value  options(*string)
-      *
-      *  QSYSINC/SYS.TYPES
-     D off_t           S             10I 0 based(pDummy)
-     D size_t          S             10U 0 based(pDummy)
-     D ssize_t         S             10I 0 based(pDummy)
-     D time_t          S             10I 0 based(pDummy)
-      *
-      *  0/-1 = chmod()--Change File Authorizations         include <sys/stat.h>
-     D chmod...
-     D                 PR            10I 0        extproc('chmod')              = int
-     D  i_pPath                        *   value  options(*string)              = *path
-     D  i_mode                       10U 0 value                                = mode_t =uint
-      *
-      *  mkdir()--Make Directory                            include <sys/stat.h>
-     D mkdir...
-     D                 PR            10I 0        extproc('mkdir')              = rc
-     D  i_pPath                        *   value options(*string)               = *path
-     D  i_mode                       10U 0 value                                = mode_t =uint
-      *
-      *  rmdir()--Remove Directory                          include <sys/stat.h>
-     D rmdir...
-     D                 PR            10I 0        extproc('rmdir')              = rc
-     D  i_pPath                        *   value options(*string)               = *path
-      *
-      *  opendir()--Open Directory                          include <dirent.h>
-     D opendir...
-     D                 PR              *          extproc('opendir')            = *DIR
-     D  i_pDirName                     *   value options(*string)               = *dirname
-      *
-      *  readdir()--Read Directory Entry
-     D readdir...
-     D                 PR              *          extproc('readdir')            = *dirent
-     D  i_dirp                         *   value                                = *DIR
-      *
-     D dirent_t        DS                  qualified  based(pDummy)
-     D   d_reserv1                   16A
-     D   d_fileno_gen_id...
-     D                               10U 0
-     D   d_fileno                    10U 0
-     D   d_reclen                    10U 0
-     D   d_reserv3                   10I 0
-     D   d_reserv4                    8A
-      /if not defined(*V5R2M0)
-     D   d_nlsinfo                         like(qlg_nls_t)
-      /else
-     D   d_nlsinfo                         likeds(qlg_nls_t)
-      /endif
-     D   d_namelen                   10U 0
-     D   d_name                     640A
-      *
-     D qlg_nls_t       DS                  qualified  based(pDummy)    align
-     D  ccsid                        10I 0
-     D  country_id                    2A
-     D  language_id                   3A
-     D  nls_reserved                  3A
-      *
-      *  rewinddir()--Reset Directory Stream to Beginning
-     D rewinddir...
-     D                 PR                  extproc('rewinddir')
-     D  i_dirp                         *   value                                = *DIR
-      *
-      *  closedir()--Close Directory
-     D closedir...
-     D                 PR            10I 0        extproc('closedir')           = rc
-     D  i_dirp                         *   value                                = *DIR
-      *
-      *  fd/-1 = open()--Open File                          include <fcntl.h>
-     D open...
-     D                 PR            10I 0        extproc('open')               = int
-     D  i_pPath                        *   value  options(*string)              = *path
-     D  i_opnFLag                    10I 0 value                                = int
-     D  i_mode                       10U 0 value  options(*nopass)              = uint
-     D  i_codePage                   10U 0 value  options(*nopass)              = uint
-     D  i_crtCodePage                10U 0 value  options(*nopass)              = uint
-      *
-      *  <sys/stat.h>
-     D S_IRUSR         C                   const(         256)                  ! Read For Own
-     D S_IWUSR         C                   const(         128)                  ! Write For Ow
-     D S_IXUSR         C                   const(          64)                  ! Exc/Srch For
-     D S_IRWXU         C                   const(         448)                  ! Rd/Wrt/Exc O
-      *
-     D S_IRGRP         C                   const(          32)                  ! Read For Gro
-     D S_IWGRP         C                   const(          16)                  ! Write For Gr
-     D S_IXGRP         C                   const(           8)                  ! Exc/Srch For
-     D S_IRWXG         C                   const(          56)                  ! Rd/Wrt/Exc G
-      *
-     D S_IROTH         C                   const(           4)                  ! Read For Oth
-     D S_IWOTH         C                   const(           2)                  ! Write For Ot
-     D S_IXOTH         C                   const(           1)                  ! Exc/Srch For
-     D S_IRWXO         C                   const(           7)                  ! Rd/Wrt/Exc O
-      *
-     D S_ISUID         C                   const(        2048)
-     D S_ISGID         C                   const(        1024)
-     D S_ISVTX         C                   const(         512)
-      *
-      *  <h/fcntl.h>
-     D O_CREAT         C                   const( 8)                            ! Append Mode
-     D O_EXCL          C                   const(16)                            ! Exclusive Us
-     D O_TRUNC         C                   const(64)                            ! Truncate Fla
-      *
-     D O_APPEND        C                   const(256)                           ! Append Mode
-      *
-     D O_CODEPAGE      C                   const(  8388608)                     ! Codepage Fla
-     D O_TEXTDATA      C                   const( 16777216)                     ! Text Data Fl
-     D O_FORCE_SCAN    C                   const( 67108864)                     ! Force scan
-     D O_INHERITMODE   C                   const(134217728)                     ! Inherit Mode
-     D O_CCSID         C                   const(       32)                     ! CCSID
-     D O_TEXT_CREAT    C                   const( 33554432)                     !
-      *
-     D O_SHARE_RDONLY  C                   const( 65536)                        ! Shared Read
-     D O_SHARE_WRONLY  C                   const(131072)                        ! Shared Write
-     D O_SHARE_RDWR    C                   const(262144)                        ! Shared Rd/Wr
-     D O_SHARE_NONE    C                   const(524288)                        ! No Share
-      *
-     D O_RDONLY        C                   const(1)                             ! Read Only
-     D O_WRONLY        C                   const(2)                             ! Write Only
-     D O_RDWR          C                   const(4)                             ! Read/Write
-      *
-      *  value/-1 = read()--Write from Descriptor           include <unistd.h>
-     D read...
-     D                 PR                  extproc('read')   like(ssize_t   )   = ssize_t
-     D  i_fd                         10I 0 value                                = int
-     D  i_pBuffer                      *   value                                = *buf
-     D  i_buflen                           value like(size_t    )               = size_t
-      *
-      *  value/-1 = write()--Write to Descriptor            include <unistd.h>
-     D write...
-     D                 PR                  extproc('write')  like(ssize_t   )   = ssize_t
-     D  i_fd                         10I 0 value                                = int
-     D  i_pBuffer                      *   value                                = *buf
-     D  i_buflen                           value like(size_t    )               = size_t
-      *
-      *  0/-1 = ftruncate()--Truncate File                  include <unistd.h>
-     D ftruncate...
-     D                 PR            10I 0 extproc('ftruncate')                 = int
-     D  i_fd                         10I 0 value                                = int
-     D  i_length                           value like(off_t     )               = off_t
-      *
-      *  off_t = lseek()--Set File Read/Write Offset        include <unistd.h>
-     D lseek...
-     D                 PR                  extproc('lseek')  like(off_t     )   = off_t
-     D  i_fd                         10I 0 value                                = int
-     D  i_offset                           value like(off_t     )               = off_t
-     D  i_whence                     10I 0 value                                = int
-      *
-      *  <h/unistd.h>
-     D SEEK_SET        C                   const(0)                             ! seek start
-     D SEEK_CUR        C                   const(1)                             ! seek curPos
-     D SEEK_END        C                   const(2)                             ! seek end
-      *
-      *  0/-1 = unlink()--Remove Link to File               include <unistd.h>
-     D unlink...
-     D                 PR            10I 0 extproc('unlink')                    = int
-     D  i_pPath                        *   value options(*string)               = *path
-      *
-      *  0/-1 = Qp0lRenameKeep()--Rename File or Directory, Keep "new" If It Exists
-     D Qp0lRenameKeep...
-     D                 PR            10I 0 extproc('Qp0lRenameKeep')            = int
-     D  i_pOldPath                     *   value options(*string)               = *path
-     D  i_pNewPath                     *   value options(*string)               = *path
-      *
-      *  0/-1 = Qp0lRenameUnlink()--Rename File or Directory, Unlink "new" If It Exists
-     D Qp0lRenameUnlink...
-     D                 PR            10I 0 extproc('Qp0lRenameUnlink')          = int
-     D  i_pOldPath                     *   value options(*string)               = *path
-     D  i_pNewPath                     *   value options(*string)               = *path
-      *
-      *  0/-1 = close()--Close File or Socket Descriptor    include <unistd.h>
-      /IF NOT DEFINED(c_close_function)
-      /DEFINE c_close_function
-     D close...
-     D                 PR            10I 0 extproc('close')                     = int
-     D  i_fd                         10I 0 value                                = int
-      /ENDIF
-      *
-      *  erno--Set Pointer to Runtime Error Code
-     D errno           PR              *                     extproc('__errno')
-      *
-      *  strerror -- Set Pointer to Runtime Error Message
-     D strerror        PR              *                     extproc('strerror')
-     D  errno                        10I 0 value
-      *
-      *  <sys/errno.h>
-     D EDOM_C          C                   const(3001)                          domain error i
-     D ERANGE_C        C                   const(3002)                          range error in
-     D ETRUNC_C        C                   const(3003)                          truncation on
-     D ENOTOPEN_C      C                   const(3004)                          file has not b
-     D ENOTREAD_C      C                   const(3005)                          file not opene
-     D ERECIO_C        C                   const(3008)                          file opened fo
-     D ENOTWRITE_C     C                   const(3009)                          file not opene
-     D ESTDIN_C        C                   const(3010)                          stdin cannot b
-     D ESTDOUT_C       C                   const(3011)                          stdout cannot
-     D ESTDERR_C       C                   const(3012)                          stderr cannot
-     D EBADSEEK_C      C                   const(3013)                          bad offset to
-     D EBADNAME_C      C                   const(3014)                          invalid file n
-     D EBADMODE_C      C                   const(3015)                          invalid file m
-     D EBADPOS_C       C                   const(3017)                          invalid positi
-     D ENOPOS_C        C                   const(3018)                          no record at s
-     D ENUMMBRS_C      C                   const(3019)                          no ftell if mo
-     D ENUMRECS_C      C                   const(3020)                          no ftell if to
-     D EBADFUNC_C      C                   const(3022)                          invalid functi
-     D ENOREC_C        C                   const(3026)                          record not fou
-     D EBADDATA_C      C                   const(3028)                          message data i
-     D EBADOPT_C       C                   const(3040)                          bad option on
-     D ENOTUPD_C       C                   const(3041)                          file not opene
-     D ENOTDLT_C       C                   const(3042)                          file not opene
-     D EPAD_C          C                   const(3043)                          padding occurr
-     D EBADKEYLN_C     C                   const(3044)                          bad key length
-     D EPUTANDGET_C    C                   const(3080)                          illegal write
-     D EGETANDPUT_C    C                   const(3081)                          illegal read a
-     D EIOERROR_C      C                   const(3101)                          I/O exception
-     D EIORECERR_C     C                   const(3102)                          I/O exception
-      *
-      *  The following values are defined by POSIX ISO/IEC 9945-1:1990.
-     D EINVAL_C        C                   const(3021)                          invalid argume
-     D EIO_C           C                   const(3006)                          input/output e
-     D ENODEV_C        C                   const(3007)                          no such device
-     D EBUSY_C         C                   const(3029)                          resource busy
-     D ENOENT_C        C                   const(3025)                          no such file o
-     D EPERM_C         C                   const(3027)                          operation not
-      *
-      *  AS/400 specific error numbers
-     D EACCES_C        C                   const(3401)                          Permission den
-     D ENOTDIR_C       C                   const(3403)                          Not a director
-     D ENOSPC_C        C                   const(3404)                          No space avail
-     D EXDEV_C         C                   const(3405)                          Improper link.
-     D EWOULDBLOCK_C   C                   const(3406)                          Operation woul
-     D EAGAIN_C        C                   const(3406)                          Operation woul
-     D EINTR_C         C                   const(3407)                          Interrupted fu
-     D EFAULT_C        C                   const(3408)                          The address us
-     D ETIME_C         C                   const(3409)                          Operation time
-     D ENXIO_C         C                   const(3415)                          No such device
-     D ECLOSED_C       C                   const(3417)                          Socket closed
-     D EADDRINUSE_C    C                   const(3420)                          Address alread
-     D EADDRNOTAVAIL_C...
-     D                 C                   const(3421)                          Address not av
-     D EAFNOSUPPORT_C  C                   const(3422)                          The type of so
-     D EALREADY_C      C                   const(3423)                          Operation alre
-     D ECONNABORTED_C  C                   const(3424)                          Connection end
-     D ECONNREFUSED_C  C                   const(3425)                          A remote host
-     D ECONNRESET_C    C                   const(3426)                          A connection w
-     D EDESTADDRREQ_C  C                   const(3427)                          Operation requ
-     D EHOSTDOWN_C     C                   const(3428)                          A remote host
-     D EHOSTUNREACH_C  C                   const(3429)                          A route to the
-     D EINPROGRESS_C   C                   const(3430)                          Operation in p
-     D EISCONN_C       C                   const(3431)                          A connection h
-     D EMSGSIZE_C      C                   const(3432)                          Message size o
-     D ENETDOWN_C      C                   const(3433)                          The network is
-     D ENETRESET_C     C                   const(3434)                          A socket is co
-     D ENETUNREACH_C   C                   const(3435)                          Cannot reach t
-     D ENOBUFS_C       C                   const(3436)                          There is not e
-     D ENOPROTOOPT_C   C                   const(3437)                          The protocol d
-     D ENOTCONN_C      C                   const(3438)                          Requested oper
-     D ENOTSOCK_C      C                   const(3439)                          The specified
-     D ENOTSUP_C       C                   const(3440)                          Operation not
-     D EOPNOTSUPP_C    C                   const(3440)                          Operation not
-     D EPFNOSUPPORT_C  C                   const(3441)                          The socket pro
-     D EPROTONOSUPPORT_C...
-     D                 C                   const(3442)                          No protocol of
-     D EPROTOTYPE_C    C                   const(3443)                          The socket typ
-     D ERCVDERR_C      C                   const(3444)                          An error indic
-     D ESHUTDOWN_C     C                   const(3445)                          Cannot send da
-     D ESOCKTNOSUPPORT_C...
-     D                 C                   const(3446)                          The specified
-     D ETIMEDOUT_C     C                   const(3447)                          A remote host
-     D EUNATCH_C       C                   const(3448)                          The protocol r
-     D EBADF_C         C                   const(3450)                          Descriptor not
-     D EMFILE_C        C                   const(3452)                          Too many open
-     D ENFILE_C        C                   const(3453)                          Too many open
-     D EPIPE_C         C                   const(3455)                          Broken pipe.
-     D EEXIST_C        C                   const(3457)                          File exists.
-     D EDEADLK_C       C                   const(3459)                          Resource deadl
-     D ENOMEM_C        C                   const(3460)                          Storage alloca
-     D EOWNERTERM_C    C                   const(3462)                          The mutex no l
-     D EDESTROYED_C    C                   const(3463)                          he synchroniza
-     D ETERM_C         C                   const(3464)                          Operation term
-     D EMLINK_C        C                   const(3468)                          Maximum link c
-     D ESPIPE_C        C                   const(3469)                          Seek request n
-     D ENOSYS_C        C                   const(3470)                          Function not i
-     D EISDIR_C        C                   const(3471)                          Specified targ
-     D EROFS_C         C                   const(3472)                          Read-only file
-     D EUNKNOWN_C      C                   const(3474)                          Unknown system
-     D EITERBAD_C      C                   const(3475)                          Iterator is in
-     D EDAMAGE_C       C                   const(3484)                          A damaged obje
-     D ELOOP_C         C                   const(3485)                          A loop exists
-     D ENAMETOOLONG_C  C                   const(3486)                          A path name is
-     D ENOLCK_C        C                   const(3487)                          No locks avail
-     D ENOTEMPTY_C     C                   const(3488)                          Directory not
-     D ENOSYSRSC_C     C                   const(3489)                          System resourc
-     D ECONVERT_C      C                   const(3490)                          Conversion err
-     D E2BIG_C         C                   const(3491)                          Argument list
-     D EILSEQ_C        C                   const(3492)                          Conversion sto
-     D ESOFTDAMAGE_C   C                   const(3497)                          Object has sof
-     D ENOTENROLL_C    C                   const(3498)                          User not enrol
-     D EOFFLINE_C      C                   const(3499)                          Object is susp
-     D EROOBJ_C        C                   const(3500)                          Object is a re
-     D ELOCKED_C       C                   const(3506)                          Area being rea
-     D EFBIG_C         C                   const(3507)                          Object too lar
-     D EIDRM_C         C                   const(3509)                          The semaphore,
-     D ENOMSG_C        C                   const(3510)                          The queue does
-     D EFILECVT_C      C                   const(3511)                          File ID conver
-     D EBADFID_C       C                   const(3512)                          A File ID coul
-     D ESTALE_C        C                   const(3513)                          A File ID coul
-     D ESRCH_C         C                   const(3515)                          No such proces
-     D ENOTSIGINIT_C   C                   const(3516)                          Process not en
-     D ECHILD_C        C                   const(3517)                          No child proce
-     D EBADH_C         C                   const(3520)                          Handle is not
-     D ETOOMANYREFS_C  C                   const(3523)                          The operation
-     D ENOTSAFE_C      C                   const(3524)                          Function not a
-     D EOVERFLOW_C     C                   const(3525)                          Object is too
-     D EJRNDAMAGE_C    C                   CONST(3526)                          Journal damage
-     D EJRNINACTIVE_C  C                   CONST(3527)                          Journal inacti
-     D EJRNRCVSPC_C    C                   CONST(3528)                          Journal space
-     D EJRNRMT_C       C                   CONST(3529)                          Journal is rem
-     D ENEWJRNRCV_C    C                   CONST(3530)                          New journal re
-     D ENEWJRN_C       C                   CONST(3531)                          New journal is
-     D EJOURNALED_C    C                   CONST(3532)                          Object already
-     D EJRNENTTOOLONG_C...
-     D                 C                   CONST(3533)                          Entry too larg
-     D EDATALINK_C     C                   CONST(3534)                          Object is a Da
-     D ENOTAVAIL_C     C                   CONST(3535)                          Independent AS
-     D ENOTTY_C        C                   CONST(3536)                          Inappropriate
-     D EFBIG2_C        C                   CONST(3540)                          Write or trunc
-     D ETXTBSY_C       C                   CONST(3543)                          Text file busy
-     D EASPGRPNOTSET_C...
-     D                 C                   CONST(3544)                          ASP group not
-     D ERESTART_C      C                   CONST(3545)                          System call ca
-     D ESCANFAILURE_C  C                   CONST(3546)                          Object marked
-      *
-      *  Unix return codes
-     D RC_OK           C                   const(0)
-     D RC_ERROR        C                   const(-1)
-      *
-      *  Convert External Form to Numeric Value (CVTEFN)
-     D cvtefnd...
-     D                 PR             8F   extproc('cvtefnd')
-     D  i_source                       *   value
-     D  i_len                        10U 0 value
-     D  i_mask                         *   value
-      *
-      *  Test Bit in String (TSTBTS)
-     D tstbts...
-     D                 PR            10I 0 extproc('tstbts')
-     D  bit_string                     *   value
-     D  bit_offset                   10I 0 value
-      *
-      *  getenv()--Get Value of Environment Variable
-     D getenv...
-     D                 PR              *   extproc('getenv')
-     D  name                           *   value  options(*string)
-      *
-      *  putenv()--Change or Add Environment Variable
-     D putenv...
-     D                 PR            10I 0 extproc('putenv')
-     D  string                         *   value  options(*string)
-      *
-      *  Qp0zDltEnv()--Delete an Environment Variable
-     D Qp0zDltEnv...
-     D                 PR            10I 0 extproc('Qp0zDltEnv')
-     D  name                           *   value  options(*string)
-      *
-      *  Qp0zInitEnv()--Initialize Environment for Variables
-     D Qp0zInitEnv...
-     D                 PR            10I 0 extproc('Qp0zInitEnv')
-      *
-     D ENVIRON         S               *   import('environ')
-      *
-      *  Generate Universal Unique Identifier (GENUUID)
-     D genUUID...
-     D                 PR                  extproc('_GENUUID')
-     D  uuid_template                  *   value
-      *
-     D uuid_template_t...
-     D                 DS                  qualified  based(pDummy)
-     D  bytPrv                       10U 0
-     D  bytAvl                       10U 0
-     D  reserved                      8A
-     D  uuid                         16A
-      *
-      *  Convert Hex to Character (CVTHC)
-     D cvthc...
-     D                 PR                  extproc('cvthc')
-     D  pResult                        *   value
-     D  pSource                        *   value
-     D  sourceSize                   10I 0 value
-      *
-      *  Convert Eight Bit Character to Hex Nibbles (CVTCH)
-     D cvtch...
-     D                 PR                  extproc('cvtch')
-     D  pResult                        *   value
-     D  pSource                        *   value
-     D  sourceLen                    10I 0 value
-      *
-      *  Cipher (CIPHER)
-     D cipher...
-     D                 PR                  extproc('_CIPHER')
-     D                                 *   const
-     D                                 *   value
-     D                                 *   const
-      *
-     D cipherCtrls_t   DS                  qualified  based(pDummy)  align
-     D  function               1      2A
-     D  hashAlg                3      3A
-     D  sequence               4      4A
-     D  dataLength             5      8U 0
-     D  output                 9      9A
-     D  reserved_1            10     16A
-     D  hashContext           17     32*
-     D  HMACKey               33     48*
-     D  HMACKeyLength         49     52U 0
-     D  reserved_2            53     96A
-      *
-     D cCIPHER_MD5...
-     D                 C                   const(x'00')
-     D cCIPHER_SHA1...
-     D                 C                   const(x'01')
-      *
-     D cCIPHER_ONLY...
-     D                 C                   const(x'00')
-     D cCIPHER_FIRST...
-     D                 C                   const(x'01')
-     D cCIPHER_MIDDLE...
-     D                 C                   const(x'02')
-     D cCIPHER_FINAL...
-     D                 C                   const(x'03')
-      *
-     D cCIPHER_HASH...
-     D                 C                   const(x'00')
-     D cCIPHER_HMAC...
-     D                 C                   const(x'01')
-      *
- DEF  /ENDIF
+**free
+/if NOT DEFINED(CLIB)
+/define CLIB
+
+//  Basic C data types
+/if NOT DEFINED(C_DATA_TYPES)
+/define C_DATA_TYPES
+// C Data Types
+dcl-s char_t char(1) based(pDummy);
+dcl-s short_t int(5) based(pDummy);
+dcl-s ushort_t uns(5) based(pDummy);
+dcl-s int_t int(10) based(pDummy);
+dcl-s uint_t uns(10) based(pDummy);
+dcl-s long_t int(10) based(pDummy);
+dcl-s ulong_t uns(10) based(pDummy);
+dcl-s float_t float(4) based(pDummy);
+dcl-s double_t float(8) based(pDummy);
+/endif
+
+//  stdin, stdout and stderr
+dcl-s stdin pointer import('_C_IFS_stdin');
+dcl-s stdout pointer import('_C_IFS_stdout');
+dcl-s stderr pointer import('_C_IFS_stderr');
+
+//  system -- Execute a Command
+//     Return value       Meaning
+//     ----------------   --------------------------------------
+//     0                  the command is successful
+//     -1                 for a NULL pointer
+//     1                  the command fails
+dcl-pr system int(10) extproc('system');
+  i_clCommand pointer options(*string) value;
+end-pr;
+
+dcl-s EXCP_MSGID char(7) import('_EXCP_MSGID');
+
+//  time -- Determine Current Time
+//     The time() function returns the current calendar time.
+//     The return value is also stored in the location that
+//     is given by timeptr.
+dcl-pr time int(10) extproc('time');
+  timeptr pointer value;
+end-pr;
+
+//  strftime -- Convert to Formatted Time
+//     strftime() returns the number of bytes placed into the
+//     array pointed to by 'dest'.
+dcl-pr strftime int(10) extproc('strftime');
+  dest    pointer value;
+  maxsize int(10) value;
+  format  pointer options(*string) value;
+  timeptr likeds(tm_t) const;
+end-pr;
+
+dcl-ds tm_t qualified based(pDummy);
+  tm_sec   int(10);
+  tm_min   int(10);
+  tm_hour  int(10);
+  tm_mday  int(10);
+  tm_mon   int(10);
+  tm_year  int(10);
+  tm_wday  int(10);
+  tm_yday  int(10);
+  tm_isdst int(10);
+end-ds;
+
+//  localtime() -- Correct Local Time, returns tm_t*
+//     The localtime() function converts a time value, in
+//     seconds, to a structure of type tm.
+dcl-pr localtime pointer extproc('localtime');
+  time int(10) const;
+end-pr;
+
+//  localtime_r() -- Correct Local Time
+//     It is the same as localtime() except that it passes
+//     in the place to store the returned structure result.
+dcl-pr localtime_r pointer extproc('localtime_r');
+  time int(10) const;
+  tm   likeds(tm_t) const;
+end-pr;
+
+//  strtok -- Tokenize String
+//     The first time the strtok() function is called, it returns
+//     a pointer to the first token in i_string. In later calls
+//     it returns a pointer to the next token. A null pointer is
+//     returned when there are no more tokens.
+dcl-pr strtok pointer extproc('strtok');
+  i_string     pointer options(*string) value;
+  i_delimiters pointer options(*string) value;
+end-pr;
+
+//  atoi -- Convert Character String to Integer
+//     The atoi() function returns an int value of the
+//     interpreted input string.
+dcl-pr atoi int(10) extproc('atoi');
+  i_string pointer options(*string) value;
+end-pr;
+
+//  memcpy -- Copy Bytes
+//     The behavior is undefined if copying takes place
+//     between objects that overlap.
+//     The memcpy() function returns a pointer to dest.
+dcl-pr memcpy pointer extproc('memcpy');
+  i_pDest pointer value;
+  i_pSrc  pointer value;
+  i_count uns(10) value;
+end-pr;
+
+//  memset -- Set Bytes to Value
+//     The memset() function returns a pointer to dest.
+dcl-pr memset pointer extproc('memset');
+  i_pDest pointer value;
+  i_char  int(10) value;
+  i_count uns(10) value;
+end-pr;
+
+//  memmove -- Copy Bytes
+//     memmove allows copying between objects that may overlap
+//     as if src is first copied into a temporary array.
+//     The memmove() function returns a pointer to dest.
+dcl-pr memmove pointer extproc('memmove');
+  pMemDest pointer value;
+  pMemSrc  pointer value;
+  memSize  like(size_t) value;
+end-pr;
+
+//  memcmp -- Compare Buffers
+//     Return value       Meaning
+//     ----------------   --------------------------------------
+//     Less than 0        buf1 less than buf2
+//     0                  buf1 identical to buf2
+//     Greater than 0     buf1 greater than buf2
+dcl-pr memcmp int(10) extproc('memcmp');
+  pBuf1 pointer value;
+  pBuf2 pointer value;
+  count like(size_t) value;
+end-pr;
+
+//  memicmp -- Compare Bytes (ignore case)
+//     Return value       Meaning
+//     ----------------   --------------------------------------
+//     Less than 0        buf1 less than buf2
+//     0                  buf1 identical to buf2
+//     Greater than 0     buf1 greater than buf2
+dcl-pr memicmp int(10) extproc('__memicmp');
+  pBuf1 pointer value;
+  pBuf2 pointer value;
+  count uns(10) value;
+end-pr;
+
+//  strcmp() -- Compare Strings
+//     Return value       Meaning
+//     ----------------   --------------------------------------
+//     Less than 0        string 1 less than string 2
+//     0                  string 1 equivalent to string 2
+//     Greater than 0     string 1 greater than string 2
+dcl-pr strcmp int(10) extproc('strcmp');
+  string1 pointer options(*string) value;
+  string2 pointer options(*string) value;
+end-pr;
+
+//  strcasecmp() -- Compare Strings without Case Sensitivity
+//     Return value       Meaning
+//     ----------------   --------------------------------------
+//     Less than 0        string 1 less than string 2
+//     0                  string 1 equivalent to string 2
+//     Greater than 0     string 1 greater than string 2
+dcl-pr strcasecmp int(10) extproc('strcasecmp');
+  string1 pointer options(*string) value;
+  string2 pointer options(*string) value;
+end-pr;
+/if NOT DEFINED(TESTPTR)
+/define TESTPTR
+
+//  Test Pointer (TESTPTR)
+dcl-pr testptr int(10) extproc('_TESTPTR');
+  i_ptr       pointer value;
+  i_test_type int(10) value;
+end-pr;
+
+dcl-c cTESTPTR_TYPE_PROCPTR 0;
+dcl-c cTESTPTR_NO_OPTIMIZED_PARAMETER_PASSING 0;
+dcl-c cTESTPTR_OPTIMIZED_PARAMETER_PASSING 1;
+
+dcl-c cTESTPTR_TYPE_MEMPTR 1;
+dcl-c cTESTPTR_NON_TERASPACE 0;
+dcl-c cTESTPTR_TERASPACE 1;
+
+dcl-c cTESTPTR_ERROR_NOT_EXIST x'2401';
+dcl-c cTESTPTR_ERROR_INVALID x'2402';
+dcl-c cTESTPTR_ERROR_OBJECT_DESTROYED x'2202';
+/endif
+
+//  malloc() - Reserve Storage Block
+dcl-pr TS_malloc pointer extproc('_C_TS_malloc');
+  i_size uns(10) value;
+end-pr;
+
+//  realloc() - Change Reserved Storage Block Size
+dcl-pr TS_realloc pointer extproc('_C_TS_realloc');
+  i_pMem pointer value;
+  i_size uns(10) value;
+end-pr;
+
+//  free() - Release Storage Blocks
+dcl-pr TS_free extproc('_C_TS_free');
+  i_pMem pointer value;
+end-pr;
+
+//  _C_TS_malloc_info() - Determine amount of teraspace memory used
+dcl-pr TS_malloc_info int(10) extproc('_C_TS_malloc_info');
+  o_c_mallinfo likeds(C_mallinfo_t) const;
+  i_size       uns(10) value;
+end-pr;
+
+//  _C_TS_malloc_debug() - Determine amount of teraspace memory
+//                         used (with optional dumps and verification)
+dcl-pr TS_malloc_debug int(10) extproc('_C_TS_malloc_debug');
+  i_dump_level uns(10) value;
+  i_vrfy_level uns(10) value;
+  o_c_mallinfo likeds(C_mallinfo_t) const;
+  i_size       uns(10) value;
+end-pr;
+
+// The following are possible values for the dump_level parameter
+dcl-c C_NO_DUMPS 0;
+//  Dumps the _C_mallinfo_t structure:
+dcl-c C_DUMP_TOTALS 1;
+//  Does a hex dump of all allocated chunks of teraspace storage,
+//  this is the entire 512K chunk of storage:
+dcl-c C_DUMP_CHUNKS 2;
+//  Dumps each of the allocated nodes.
+//  There is a node for each malloc performed with the header
+//  associated with that malloc:
+dcl-c C_DUMP_NODES 3;
+//  Dumps the cartesian tree used to keep track of the freed nodes:
+dcl-c C_DUMP_TREE 4;
+dcl-c C_DUMP_ALL 9999;
+
+//  The following are possible values for the verify_level parameter
+dcl-c C_NO_CHECKS 0;
+dcl-c C_CHECK_TOTALS 1;
+dcl-c C_CHECK_CHUNKS 2;
+dcl-c C_CHECK_NODES 3;
+dcl-c C_CHECK_TREE 4;
+dcl-c C_CHECK_ALL 9998;
+//  Will call abort() if verification fails
+dcl-c C_CHECK_ALL_AND_ABORT 9999;
+
+// The following structure is used to return information
+// from the _C_TS_malloc_info routine.  The fields are:
+//   total_bytes        - bytes allocated from system
+//                        (high water mark)
+//   allocated_bytes    - number of allocated bytes
+//   unallocated_bytes  - number of unallocated bytes
+//   allocated_blocks   - number of allocated blocks
+//   unallocated_blocks - number of unallocated blocks
+//   requested_bytes    - bytes actually requested from malloc
+//   pad_bytes          - bytes used to pad allocation length
+//                        to a multiple of 16
+//   overhead_bytes     - bytes used for malloc overhead
+dcl-ds C_mallinfo_t qualified based(pDummy);
+  total_bytes        int(20);
+  allocated_bytes    int(20);
+  unallocated_bytes  int(20);
+  allocated_blocks   int(20);
+  unallocated_blocks int(20);
+  requested_bytes    int(20);
+  pad_bytes          int(20);
+  overhead_bytes     int(20);
+end-ds;
+
+//  malloc -- Reserve Storage Block
+dcl-pr malloc pointer extproc('malloc');
+  i_size uns(10) value;
+end-pr;
+
+//  realloc -- Change Reserved Storage Block Size
+dcl-pr realloc pointer extproc('realloc');
+  i_pMem pointer value;
+  i_size uns(10) value;
+end-pr;
+
+//  free -- Release Storage Blocks
+dcl-pr free extproc('free');
+  i_pMem pointer value;
+end-pr;
+
+//  srand -- Set Seed for rand Function   e.g.:   srand(getSeed(*null))
+dcl-pr srand extproc('srand');
+  i_seed uns(10) value;
+end-pr;
+
+//  rand -- Generate Random Number                x = rand()
+dcl-pr rand int(10) extproc('rand');
+end-pr;
+
+dcl-c RAND_MAX 32767;
+
+//  getSeed -- Get Seed for srand function
+dcl-pr getSeed int(10) extproc('time');
+  i_timePtr pointer value;
+end-pr;
+
+//  strlen -- Determine String Length
+dcl-pr strlen uns(10) extproc('strlen');
+  i_string pointer value;
+end-pr;
+
+//  tmpnam -- Produce Temporary File Name
+dcl-pr tmpnam pointer extproc('tmpnam');
+  pTmpNme pointer value;
+end-pr;
+
+//  _C_IFS_tmpnam -- Produce Temporary File Name for the IFS file system
+dcl-pr ifs_tmpnam pointer extproc('_C_IFS_tmpnam');
+  fileName pointer value;
+end-pr;
+
+dcl-c L_tmpnam 39; // ! <stdio.h>
+
+dcl-c TMP_MAX 32767; // ! <stdio.h>
+
+//  qsort -- Sort Array
+dcl-pr qsort pointer extproc('qsort');
+  memPtr    pointer value;
+  numElem   like(size_t) value;
+  width     like(size_t) value;
+  pSortFunc pointer(*proc) value;
+end-pr;
+
+//  bsearch -- Search Arrays
+dcl-pr bsearch pointer extproc('bsearch');
+  keyPtr     pointer value;
+  memPtr     pointer value;
+  numElem    like(size_t) value;
+  width      like(size_t) value;
+  pSearchFnc pointer(*proc) value;
+end-pr;
+
+//  iconv_open()--Code Conversion Allocation API
+dcl-pr iconv_open extproc('iconv_open') like(iconv_t);
+  i_toCode   pointer value;
+  i_fromCode pointer value;
+end-pr;
+
+dcl-ds iconv_t qualified based(pDummy) align;
+  return_value int(10);
+  cd           int(10) dim(12);
+end-ds;
+
+dcl-ds iconv_fromcode_t qualified based(pDummy);
+  ibmccsid      char(8);
+  ccsid         char(5);
+  convAlt       char(3);
+  substAlt      char(1);
+  shiftStateAlt char(1);
+  inpLengthOpt  char(1);
+  errOption     char(1);
+  reserved      char(12);
+end-ds;
+
+dcl-ds iconv_tocode_t qualified based(pDummy);
+  ibmccsid char(8);
+  ccsid    char(5);
+  reserved char(19);
+end-ds;
+
+//  QtqIconvOpen()--Code Conversion Allocation API
+dcl-pr QtqIconv_open extproc('QtqIconvOpen') likeds(iconv_t);
+  i_toCode   likeds(QtqCode_t) const;
+  i_fromCode likeds(QtqCode_t) const;
+end-pr;
+
+dcl-ds QtqCode_t qualified based(pDummy);
+  ccsid         int(10);
+  conversionA   int(10);
+  substitutionA int(10);
+  shiftStateA   int(10);
+  inpLenOpt     int(10);
+  errOptMxdDta  int(10);
+  reserved      char(12);
+end-ds;
+
+//  iconv()--Code Conversion API
+dcl-pr iconv uns(10) extproc('iconv');
+  i_cd         likeds(iconv_t) value;
+  i_pInBuf     pointer;
+  i_inBytLeft  uns(10);
+  i_pOutBuf    pointer;
+  i_outBytLeft uns(10);
+end-pr;
+
+dcl-c cICONV_ERROR 4294967295;
+
+//  iconv_close()--Code Conversion Deallocation API
+dcl-pr iconv_close int(10) extproc('iconv_close');
+  i_cd likeds(iconv_t) value;
+end-pr;
+
+//  0/-1 = stat()--Get File Information                include <sys/stat.h>
+dcl-pr stat int(10) extproc('stat'); // = int
+  i_pPath pointer options(*string) value; // = *path
+  i_pStat pointer value; // = *buf
+end-pr;
+
+//  0/-1 = fstat()--Get File Information by Descriptor include <sys/stat.h>
+dcl-pr fstat int(10) extproc('fstat'); // = int
+  i_fd   int(10) value; // = int
+  i_stat likeds(st_stat_t) const; // = *buf
+end-pr;
+
+//  0/-1 = lstat()--Get File or Link Information       include <sys/stat.h>
+dcl-pr lstat int(10) extproc('lstat'); // = int
+  i_pPath pointer options(*string) value; // = *path
+  i_pStat pointer value; // = *buf
+end-pr;
+
+dcl-ds st_stat_t qualified based(pDummy) align;
+  mode       uns(10); // mode_t =uint
+  ino        uns(10); // ino_t  =uint
+  nlink      uns(5); // nlink_t=ushort
+  reserved2  char(2);
+  uid        uns(10); // uid_t  =uint
+  gid        uns(10); // gid_t  =uint
+  size       int(10); // off_t  =int
+  atime      int(10); // time_t =long
+  mtime      int(10); // time_t =long
+  ctime      int(10); // time_t =long
+  dev        uns(10); // dev_t  =uint
+  blksize    uns(10); // size_t =uint
+  allocsize  uns(10); // ulong
+  objtype    char(11); // qp0l_objtype_t
+  reserved3  char(1);
+  codepage   uns(5); // ushort
+  ccsid      uns(5); // ushort
+  rdev       uns(10); // dev_t  =uint
+  nlink32    uns(10); // nlink32_t=ulng
+  rdev64     uns(20); // dev64_t=ullng
+  dev64      uns(20); // dev64_t=ullng
+  reserved1  char(36);
+  ino_gen_id uns(10); // uint
+end-ds;
+
+//  Qp0lGetAttr()--Get Attributes
+dcl-pr Qp0lGetAttr int(10) extproc('Qp0lGetAttr');
+  i_path       likeds(Qlg_Path_Name_t) const;
+  i_attrArray  like(Qlg_attrArray_t) const;
+  i_pBuffer    pointer value;
+  i_bytPrv     uns(10) value;
+  o_sizeNeeded uns(10);
+  o_bytRet     uns(10);
+  i_followLnk  uns(10) value;
+end-pr;
+
+/if not defined(Qlg_Path_Name)
+/define Qlg_Path_Name
+dcl-ds Qlg_Path_Name_t qualified align based(pDummy);
+  CCSID               int(10);
+  Country_ID          char(2);
+  Language_ID         char(3);
+  Reserved            char(3);
+  Path_Type           uns(10);
+  Path_Length         int(10);
+  Path_Name_Delimiter char(2);
+  Reserved2           char(10);
+  Path_Name           char(256);
+end-ds;
+
+dcl-c QLG_PATH_JOB_CCSID 0;
+dcl-c QLG_PATH_JOB_COUNTRYID X'0000';
+dcl-c QLG_PATH_JOB_LANGUAGEID X'000000';
+
+//  The Path_Name is a character string and the delimiter is one byte long.
+dcl-c QLG_CHAR_SINGLE 0;
+
+//  The Path_Name is a pointer and the delimiter is one byte long.
+dcl-c QLG_PTR_SINGLE 1;
+
+//  The Path_Name is a character string and the delimiter is two bytes long.
+dcl-c QLG_CHAR_DOUBLE 2;
+
+//  The Path_Name is a pointer and the delimiter is two bytes long.
+dcl-c QLG_PTR_DOUBLE 3;
+
+/endif
+
+dcl-ds Qlg_attrArray_t qualified based(pDummy);
+  numE int(10);
+  attr int(10) dim(64);
+end-ds;
+
+dcl-ds Qlg_rtnAttr_t qualified based(pDummy);
+  ofsNextAttr int(10);
+  ID          int(10);
+  size        int(10);
+  reserved    char(4);
+end-ds;
+
+dcl-c QP0L_ATTR_OBJTYPE 0; // CHAR(10)
+dcl-c QP0L_ATTR_DATA_SIZE 1; // UINT(4)
+dcl-c QP0L_ATTR_ALLOC_SIZE 2; // UINT(4)
+dcl-c QP0L_ATTR_EXTENDED_ATTR_SIZE 3; // UINT(4)
+dcl-c QP0L_ATTR_CREATE_TIME 4; // UINT(4)
+dcl-c QP0L_ATTR_ACCESS_TIME 5; // UINT(4)
+dcl-c QP0L_ATTR_CHANGE_TIME 6; // UINT(4)
+dcl-c QP0L_ATTR_MODIFY_TIME 7; // UINT(4)
+dcl-c QP0L_ATTR_STG_FREE 8; // CHAR(1)
+dcl-c QP0L_ATTR_CHECKED_OUT 9; // chkOut Fmt
+dcl-c QP0L_ATTR_LOCAL_REMOTE 10; // CHAR(1)
+
+dcl-c QP0L_DONOT_FOLLOW_SYMLNK x'00';
+dcl-c QP0L_FOLLOW_SYMLNK x'01';
+
+dcl-c QP0L_NOT_CHECKED_OUT x'00';
+dcl-c QP0L_CHECKED_OUT x'01';
+
+dcl-c QP0L_LOCAL_OBJ x'01';
+dcl-c QP0L_REMOTE_OBJ x'02';
+
+//  QlgGetcwd()--Get Current Directory (using NLS-enabled path name)
+//  Returns: Qlg_Path_Name_T
+dcl-pr QlgGetcwd pointer extproc('QlgGetcwd');
+  o_path likeds(Qlg_Path_Name_t) const;
+  i_size like(size_t) value;
+end-pr;
+
+//  getcwd()--Get Current Directory
+dcl-pr getcwd pointer extproc('getcwd');
+  o_path char(65535) options(*varsize) const;
+  i_size like(size_t) value;
+end-pr;
+
+//  QlgChdir()--Change Current Directory (using NLS-enabled path name)
+//  Returns: Qlg_Path_Name_T
+dcl-pr QlgChdir int(10) extproc('QlgChdir');
+  i_path likeds(Qlg_Path_Name_t) const;
+end-pr;
+
+//  chdir()--Change Current Directory
+dcl-pr chdir int(10) extproc('chdir');
+  i_path pointer options(*string) value;
+end-pr;
+
+//  QSYSINC/SYS.TYPES
+dcl-s off_t int(10) based(pDummy);
+dcl-s size_t uns(10) based(pDummy);
+dcl-s ssize_t int(10) based(pDummy);
+dcl-s time_t int(10) based(pDummy);
+
+//  0/-1 = chmod()--Change File Authorizations         include <sys/stat.h>
+dcl-pr chmod int(10) extproc('chmod'); // = int
+  i_pPath pointer options(*string) value; // = *path
+  i_mode  uns(10) value; // = mode_t =uint
+end-pr;
+
+//  mkdir()--Make Directory                            include <sys/stat.h>
+dcl-pr mkdir int(10) extproc('mkdir'); // = rc
+  i_pPath pointer options(*string) value; // = *path
+  i_mode  uns(10) value; // = mode_t =uint
+end-pr;
+
+//  rmdir()--Remove Directory                          include <sys/stat.h>
+dcl-pr rmdir int(10) extproc('rmdir'); // = rc
+  i_pPath pointer options(*string) value; // = *path
+end-pr;
+
+//  opendir()--Open Directory                          include <dirent.h>
+dcl-pr opendir pointer extproc('opendir'); // = *DIR
+  i_pDirName pointer options(*string) value; // = *dirname
+end-pr;
+
+//  readdir()--Read Directory Entry
+dcl-pr readdir pointer extproc('readdir'); // = *dirent
+  i_dirp pointer value; // = *DIR
+end-pr;
+
+dcl-ds dirent_t qualified based(pDummy);
+  d_reserv1       char(16);
+  d_fileno_gen_id uns(10);
+  d_fileno        uns(10);
+  d_reclen        uns(10);
+  d_reserv3       int(10);
+  d_reserv4       char(8);
+/if not defined(*V5R2M0)
+  d_nlsinfo       like(qlg_nls_t);
+/else
+  d_nlsinfo       likeds(qlg_nls_t);
+/endif
+  d_namelen       uns(10);
+  d_name          char(640);
+end-ds;
+
+dcl-ds qlg_nls_t qualified based(pDummy) align;
+  ccsid        int(10);
+  country_id   char(2);
+  language_id  char(3);
+  nls_reserved char(3);
+end-ds;
+
+//  rewinddir()--Reset Directory Stream to Beginning
+dcl-pr rewinddir extproc('rewinddir');
+  i_dirp pointer value; // = *DIR
+end-pr;
+
+//  closedir()--Close Directory
+dcl-pr closedir int(10) extproc('closedir'); // = rc
+  i_dirp pointer value; // = *DIR
+end-pr;
+
+//  fd/-1 = open()--Open File                          include <fcntl.h>
+dcl-pr open int(10) extproc('open'); // = int
+  i_pPath       pointer options(*string) value; // = *path
+  i_opnFLag     int(10) value; // = int
+  i_mode        uns(10) options(*nopass) value; // = uint
+  i_codePage    uns(10) options(*nopass) value; // = uint
+  i_crtCodePage uns(10) options(*nopass) value; // = uint
+end-pr;
+
+//  <sys/stat.h>
+dcl-c S_IRUSR 256; // ! Read For Own
+dcl-c S_IWUSR 128; // ! Write For Ow
+dcl-c S_IXUSR 64; // ! Exc/Srch For
+dcl-c S_IRWXU 448; // ! Rd/Wrt/Exc O
+
+dcl-c S_IRGRP 32; // ! Read For Gro
+dcl-c S_IWGRP 16; // ! Write For Gr
+dcl-c S_IXGRP 8; // ! Exc/Srch For
+dcl-c S_IRWXG 56; // ! Rd/Wrt/Exc G
+
+dcl-c S_IROTH 4; // ! Read For Oth
+dcl-c S_IWOTH 2; // ! Write For Ot
+dcl-c S_IXOTH 1; // ! Exc/Srch For
+dcl-c S_IRWXO 7; // ! Rd/Wrt/Exc O
+
+dcl-c S_ISUID 2048;
+dcl-c S_ISGID 1024;
+dcl-c S_ISVTX 512;
+
+//  <h/fcntl.h>
+dcl-c O_CREAT 8; // ! Append Mode
+dcl-c O_EXCL 16; // ! Exclusive Us
+dcl-c O_TRUNC 64; // ! Truncate Fla
+
+dcl-c O_APPEND 256; // ! Append Mode
+
+dcl-c O_CODEPAGE 8388608; // ! Codepage Fla
+dcl-c O_TEXTDATA 16777216; // ! Text Data Fl
+dcl-c O_FORCE_SCAN 67108864; // ! Force scan
+dcl-c O_INHERITMODE 134217728; // ! Inherit Mode
+dcl-c O_CCSID 32; // ! CCSID
+dcl-c O_TEXT_CREAT 33554432; // !
+
+dcl-c O_SHARE_RDONLY 65536; // ! Shared Read
+dcl-c O_SHARE_WRONLY 131072; // ! Shared Write
+dcl-c O_SHARE_RDWR 262144; // ! Shared Rd/Wr
+dcl-c O_SHARE_NONE 524288; // ! No Share
+
+dcl-c O_RDONLY 1; // ! Read Only
+dcl-c O_WRONLY 2; // ! Write Only
+dcl-c O_RDWR 4; // ! Read/Write
+
+//  value/-1 = read()--Write from Descriptor           include <unistd.h>
+dcl-pr read extproc('read') like(ssize_t); // = ssize_t
+  i_fd      int(10) value; // = int
+  i_pBuffer pointer value; // = *buf
+  i_buflen  like(size_t) value; // = size_t
+end-pr;
+
+//  value/-1 = write()--Write to Descriptor            include <unistd.h>
+dcl-pr write extproc('write') like(ssize_t); // = ssize_t
+  i_fd      int(10) value; // = int
+  i_pBuffer pointer value; // = *buf
+  i_buflen  like(size_t) value; // = size_t
+end-pr;
+
+//  0/-1 = ftruncate()--Truncate File                  include <unistd.h>
+dcl-pr ftruncate int(10) extproc('ftruncate'); // = int
+  i_fd     int(10) value; // = int
+  i_length like(off_t) value; // = off_t
+end-pr;
+
+//  off_t = lseek()--Set File Read/Write Offset        include <unistd.h>
+dcl-pr lseek extproc('lseek') like(off_t); // = off_t
+  i_fd     int(10) value; // = int
+  i_offset like(off_t) value; // = off_t
+  i_whence int(10) value; // = int
+end-pr;
+
+//  <h/unistd.h>
+dcl-c SEEK_SET 0; // ! seek start
+dcl-c SEEK_CUR 1; // ! seek curPos
+dcl-c SEEK_END 2; // ! seek end
+
+//  0/-1 = unlink()--Remove Link to File               include <unistd.h>
+dcl-pr unlink int(10) extproc('unlink'); // = int
+  i_pPath pointer options(*string) value; // = *path
+end-pr;
+
+//  0/-1 = Qp0lRenameKeep()--Rename File or Directory, Keep "new" If It Exists
+dcl-pr Qp0lRenameKeep int(10) extproc('Qp0lRenameKeep'); // = int
+  i_pOldPath pointer options(*string) value; // = *path
+  i_pNewPath pointer options(*string) value; // = *path
+end-pr;
+
+//  0/-1 = Qp0lRenameUnlink()--Rename File or Directory, Unlink "new" If It Exists
+dcl-pr Qp0lRenameUnlink int(10) extproc('Qp0lRenameUnlink'); // = int
+  i_pOldPath pointer options(*string) value; // = *path
+  i_pNewPath pointer options(*string) value; // = *path
+end-pr;
+
+//  0/-1 = close()--Close File or Socket Descriptor    include <unistd.h>
+/if NOT DEFINED(c_close_function)
+/define c_close_function
+dcl-pr close int(10) extproc('close'); // = int
+  i_fd int(10) value; // = int
+end-pr;
+/endif
+
+//  erno--Set Pointer to Runtime Error Code
+dcl-pr errno pointer extproc('__errno');
+end-pr;
+
+//  strerror -- Set Pointer to Runtime Error Message
+dcl-pr strerror pointer extproc('strerror');
+  errno int(10) value;
+end-pr;
+
+//  <sys/errno.h>
+dcl-c EDOM_C 3001; // domain error i
+dcl-c ERANGE_C 3002; // range error in
+dcl-c ETRUNC_C 3003; // truncation on
+dcl-c ENOTOPEN_C 3004; // file has not b
+dcl-c ENOTREAD_C 3005; // file not opene
+dcl-c ERECIO_C 3008; // file opened fo
+dcl-c ENOTWRITE_C 3009; // file not opene
+dcl-c ESTDIN_C 3010; // stdin cannot b
+dcl-c ESTDOUT_C 3011; // stdout cannot
+dcl-c ESTDERR_C 3012; // stderr cannot
+dcl-c EBADSEEK_C 3013; // bad offset to
+dcl-c EBADNAME_C 3014; // invalid file n
+dcl-c EBADMODE_C 3015; // invalid file m
+dcl-c EBADPOS_C 3017; // invalid positi
+dcl-c ENOPOS_C 3018; // no record at s
+dcl-c ENUMMBRS_C 3019; // no ftell if mo
+dcl-c ENUMRECS_C 3020; // no ftell if to
+dcl-c EBADFUNC_C 3022; // invalid functi
+dcl-c ENOREC_C 3026; // record not fou
+dcl-c EBADDATA_C 3028; // message data i
+dcl-c EBADOPT_C 3040; // bad option on
+dcl-c ENOTUPD_C 3041; // file not opene
+dcl-c ENOTDLT_C 3042; // file not opene
+dcl-c EPAD_C 3043; // padding occurr
+dcl-c EBADKEYLN_C 3044; // bad key length
+dcl-c EPUTANDGET_C 3080; // illegal write
+dcl-c EGETANDPUT_C 3081; // illegal read a
+dcl-c EIOERROR_C 3101; // I/O exception
+dcl-c EIORECERR_C 3102; // I/O exception
+
+//  The following values are defined by POSIX ISO/IEC 9945-1:1990.
+dcl-c EINVAL_C 3021; // invalid argume
+dcl-c EIO_C 3006; // input/output e
+dcl-c ENODEV_C 3007; // no such device
+dcl-c EBUSY_C 3029; // resource busy
+dcl-c ENOENT_C 3025; // no such file o
+dcl-c EPERM_C 3027; // operation not
+
+//  AS/400 specific error numbers
+dcl-c EACCES_C 3401; // Permission den
+dcl-c ENOTDIR_C 3403; // Not a director
+dcl-c ENOSPC_C 3404; // No space avail
+dcl-c EXDEV_C 3405; // Improper link.
+dcl-c EWOULDBLOCK_C 3406; // Operation woul
+dcl-c EAGAIN_C 3406; // Operation woul
+dcl-c EINTR_C 3407; // Interrupted fu
+dcl-c EFAULT_C 3408; // The address us
+dcl-c ETIME_C 3409; // Operation time
+dcl-c ENXIO_C 3415; // No such device
+dcl-c ECLOSED_C 3417; // Socket closed
+dcl-c EADDRINUSE_C 3420; // Address alread
+dcl-c EADDRNOTAVAIL_C 3421; // Address not av
+dcl-c EAFNOSUPPORT_C 3422; // The type of so
+dcl-c EALREADY_C 3423; // Operation alre
+dcl-c ECONNABORTED_C 3424; // Connection end
+dcl-c ECONNREFUSED_C 3425; // A remote host
+dcl-c ECONNRESET_C 3426; // A connection w
+dcl-c EDESTADDRREQ_C 3427; // Operation requ
+dcl-c EHOSTDOWN_C 3428; // A remote host
+dcl-c EHOSTUNREACH_C 3429; // A route to the
+dcl-c EINPROGRESS_C 3430; // Operation in p
+dcl-c EISCONN_C 3431; // A connection h
+dcl-c EMSGSIZE_C 3432; // Message size o
+dcl-c ENETDOWN_C 3433; // The network is
+dcl-c ENETRESET_C 3434; // A socket is co
+dcl-c ENETUNREACH_C 3435; // Cannot reach t
+dcl-c ENOBUFS_C 3436; // There is not e
+dcl-c ENOPROTOOPT_C 3437; // The protocol d
+dcl-c ENOTCONN_C 3438; // Requested oper
+dcl-c ENOTSOCK_C 3439; // The specified
+dcl-c ENOTSUP_C 3440; // Operation not
+dcl-c EOPNOTSUPP_C 3440; // Operation not
+dcl-c EPFNOSUPPORT_C 3441; // The socket pro
+dcl-c EPROTONOSUPPORT_C 3442; // No protocol of
+dcl-c EPROTOTYPE_C 3443; // The socket typ
+dcl-c ERCVDERR_C 3444; // An error indic
+dcl-c ESHUTDOWN_C 3445; // Cannot send da
+dcl-c ESOCKTNOSUPPORT_C 3446; // The specified
+dcl-c ETIMEDOUT_C 3447; // A remote host
+dcl-c EUNATCH_C 3448; // The protocol r
+dcl-c EBADF_C 3450; // Descriptor not
+dcl-c EMFILE_C 3452; // Too many open
+dcl-c ENFILE_C 3453; // Too many open
+dcl-c EPIPE_C 3455; // Broken pipe.
+dcl-c EEXIST_C 3457; // File exists.
+dcl-c EDEADLK_C 3459; // Resource deadl
+dcl-c ENOMEM_C 3460; // Storage alloca
+dcl-c EOWNERTERM_C 3462; // The mutex no l
+dcl-c EDESTROYED_C 3463; // he synchroniza
+dcl-c ETERM_C 3464; // Operation term
+dcl-c EMLINK_C 3468; // Maximum link c
+dcl-c ESPIPE_C 3469; // Seek request n
+dcl-c ENOSYS_C 3470; // Function not i
+dcl-c EISDIR_C 3471; // Specified targ
+dcl-c EROFS_C 3472; // Read-only file
+dcl-c EUNKNOWN_C 3474; // Unknown system
+dcl-c EITERBAD_C 3475; // Iterator is in
+dcl-c EDAMAGE_C 3484; // A damaged obje
+dcl-c ELOOP_C 3485; // A loop exists
+dcl-c ENAMETOOLONG_C 3486; // A path name is
+dcl-c ENOLCK_C 3487; // No locks avail
+dcl-c ENOTEMPTY_C 3488; // Directory not
+dcl-c ENOSYSRSC_C 3489; // System resourc
+dcl-c ECONVERT_C 3490; // Conversion err
+dcl-c E2BIG_C 3491; // Argument list
+dcl-c EILSEQ_C 3492; // Conversion sto
+dcl-c ESOFTDAMAGE_C 3497; // Object has sof
+dcl-c ENOTENROLL_C 3498; // User not enrol
+dcl-c EOFFLINE_C 3499; // Object is susp
+dcl-c EROOBJ_C 3500; // Object is a re
+dcl-c ELOCKED_C 3506; // Area being rea
+dcl-c EFBIG_C 3507; // Object too lar
+dcl-c EIDRM_C 3509; // The semaphore,
+dcl-c ENOMSG_C 3510; // The queue does
+dcl-c EFILECVT_C 3511; // File ID conver
+dcl-c EBADFID_C 3512; // A File ID coul
+dcl-c ESTALE_C 3513; // A File ID coul
+dcl-c ESRCH_C 3515; // No such proces
+dcl-c ENOTSIGINIT_C 3516; // Process not en
+dcl-c ECHILD_C 3517; // No child proce
+dcl-c EBADH_C 3520; // Handle is not
+dcl-c ETOOMANYREFS_C 3523; // The operation
+dcl-c ENOTSAFE_C 3524; // Function not a
+dcl-c EOVERFLOW_C 3525; // Object is too
+dcl-c EJRNDAMAGE_C 3526; // Journal damage
+dcl-c EJRNINACTIVE_C 3527; // Journal inacti
+dcl-c EJRNRCVSPC_C 3528; // Journal space
+dcl-c EJRNRMT_C 3529; // Journal is rem
+dcl-c ENEWJRNRCV_C 3530; // New journal re
+dcl-c ENEWJRN_C 3531; // New journal is
+dcl-c EJOURNALED_C 3532; // Object already
+dcl-c EJRNENTTOOLONG_C 3533; // Entry too larg
+dcl-c EDATALINK_C 3534; // Object is a Da
+dcl-c ENOTAVAIL_C 3535; // Independent AS
+dcl-c ENOTTY_C 3536; // Inappropriate
+dcl-c EFBIG2_C 3540; // Write or trunc
+dcl-c ETXTBSY_C 3543; // Text file busy
+dcl-c EASPGRPNOTSET_C 3544; // ASP group not
+dcl-c ERESTART_C 3545; // System call ca
+dcl-c ESCANFAILURE_C 3546; // Object marked
+
+//  Unix return codes
+dcl-c RC_OK 0;
+dcl-c RC_ERROR -1;
+
+//  Convert External Form to Numeric Value (CVTEFN)
+dcl-pr cvtefnd float(8) extproc('cvtefnd');
+  i_source pointer value;
+  i_len    uns(10) value;
+  i_mask   pointer value;
+end-pr;
+
+//  Test Bit in String (TSTBTS)
+dcl-pr tstbts int(10) extproc('tstbts');
+  bit_string pointer value;
+  bit_offset int(10) value;
+end-pr;
+
+//  getenv()--Get Value of Environment Variable
+dcl-pr getenv pointer extproc('getenv');
+  name pointer options(*string) value;
+end-pr;
+
+//  putenv()--Change or Add Environment Variable
+dcl-pr putenv int(10) extproc('putenv');
+  string pointer options(*string) value;
+end-pr;
+
+//  Qp0zDltEnv()--Delete an Environment Variable
+dcl-pr Qp0zDltEnv int(10) extproc('Qp0zDltEnv');
+  name pointer options(*string) value;
+end-pr;
+
+//  Qp0zInitEnv()--Initialize Environment for Variables
+dcl-pr Qp0zInitEnv int(10) extproc('Qp0zInitEnv');
+end-pr;
+
+dcl-s ENVIRON pointer import('environ');
+
+//  Generate Universal Unique Identifier (GENUUID)
+dcl-pr genUUID extproc('_GENUUID');
+  uuid_template pointer value;
+end-pr;
+
+dcl-ds uuid_template_t qualified based(pDummy);
+  bytPrv   uns(10);
+  bytAvl   uns(10);
+  reserved char(8);
+  uuid     char(16);
+end-ds;
+
+//  Convert Hex to Character (CVTHC)
+dcl-pr cvthc extproc('cvthc');
+  pResult    pointer value;
+  pSource    pointer value;
+  sourceSize int(10) value;
+end-pr;
+
+//  Convert Eight Bit Character to Hex Nibbles (CVTCH)
+dcl-pr cvtch extproc('cvtch');
+  pResult   pointer value;
+  pSource   pointer value;
+  sourceLen int(10) value;
+end-pr;
+
+//  Cipher (CIPHER)
+dcl-pr cipher extproc('_CIPHER');
+  *n pointer const;
+  *n pointer value;
+  *n pointer const;
+end-pr;
+
+dcl-ds cipherCtrls_t qualified based(pDummy) align;
+  function      char(2) pos(1);
+  hashAlg       char(1) pos(3);
+  sequence      char(1) pos(4);
+  dataLength    uns(10) pos(5);
+  output        char(1) pos(9);
+  reserved_1    char(7) pos(10);
+  hashContext   pointer pos(17);
+  HMACKey       pointer pos(33);
+  HMACKeyLength uns(10) pos(49);
+  reserved_2    char(44) pos(53);
+end-ds;
+
+dcl-c cCIPHER_MD5 x'00';
+dcl-c cCIPHER_SHA1 x'01';
+
+dcl-c cCIPHER_ONLY x'00';
+dcl-c cCIPHER_FIRST x'01';
+dcl-c cCIPHER_MIDDLE x'02';
+dcl-c cCIPHER_FINAL x'03';
+
+dcl-c cCIPHER_HASH x'00';
+dcl-c cCIPHER_HMAC x'01';
+
+/endif

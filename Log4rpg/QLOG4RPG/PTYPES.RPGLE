@@ -1,67 +1,62 @@
-      /IF NOT DEFINED(PTYPES)
-      /DEFINE PTYPES
-      *
-      * =========================================
-      *  Defines internal used type templates
-      * =========================================
-      *
-      * -----------------------------------------
-      *  Type definitions
-      * -----------------------------------------
-      /DEFINE TYPES_ONLY
-      /COPY QLOG4RPG,PLOG4RPG                      Public API Specification
-      /COPY QLOG4RPG,PLOG4RPG04                    AppenderList
-      *
-      * -----------------------------------------
-      *  Constants
-      * -----------------------------------------
-     D cROOT_LOGGER...
-     D                 C                   'root'
-      *
-      * @deprecated, use *on instead
-      /IF NOT DEFINED(cTrue)
-      /DEFINE cTrue
-     D cTrue           C                   *on
-      /ENDIF
-      *
-      * @deprecated, use *off instead
-      /IF NOT DEFINED(cFalse)
-      /DEFINE cFalse
-     D cFalse          C                   *off
-      /ENDIF
-      *
-      * -----------------------------------------
-      *  Internal type definitions
-      * -----------------------------------------
-      *
-     D LOG4RPG_formattedText_t...
-     D                 S           4096A   varying template
-      *
-     D LOG4RPG_footer_t...
-     D                 S                   like(LOG4RPG_header_t)
-     D                                     template
-      *
-     D LOG4RPG_header_t...
-     D                 S           4096A   varying template
-      *
-     D LOG4RPG_logger_t...
-     D                 DS                  qualified template
-     D  node                         10I 0
-     D  pParent                        *
-     D  name                               like(LOG4RPG_loggerName_t    )
-     D  priority                           like(LOG4RPG_priority_t      )
-     D  pAppenderList                      like(LOG4RPG_pAppenderList_t )
-     D  pChildren                          like(BasicList_handle_t      )
-      *
-     D LOG4RPG_priority_t...
-     D                 S             10I 0 template
-      *
-     D LOG4RPG_procedure_t...
-     D                 S            128A   varying template
-      *
-     D LOG4RPG_qJob_t  DS                  qualified template
-     D  name                         10A
-     D  user                         10A
-     D  nbr                           6A                                          *
-      *
-      /ENDIF
+**free
+/if NOT DEFINED(PTYPES)
+/define PTYPES
+
+// =========================================
+//  Defines internal used type templates
+// =========================================
+//
+// -----------------------------------------
+//  Type definitions
+// -----------------------------------------
+/define TYPES_ONLY
+/copy QLOG4RPG,PLOG4RPG                      Public API Specification
+/copy QLOG4RPG,PLOG4RPG04                    AppenderList
+
+// -----------------------------------------
+//  Constants
+// -----------------------------------------
+dcl-c cROOT_LOGGER 'root';
+
+// @deprecated, use *on instead
+/if NOT DEFINED(cTrue)
+/define cTrue
+dcl-c cTrue *on;
+/endif
+
+// @deprecated, use *off instead
+/if NOT DEFINED(cFalse)
+/define cFalse
+dcl-c cFalse *off;
+/endif
+
+// -----------------------------------------
+//  Internal type definitions
+// -----------------------------------------
+
+dcl-s LOG4RPG_formattedText_t varchar(4096) template;
+
+dcl-s LOG4RPG_footer_t like(LOG4RPG_header_t) template;
+
+dcl-s LOG4RPG_header_t varchar(4096) template;
+
+dcl-ds LOG4RPG_logger_t qualified template;
+  node          int(10);
+  pParent       pointer;
+  name          like(LOG4RPG_loggerName_t);
+  priority      like(LOG4RPG_priority_t);
+  pAppenderList like(LOG4RPG_pAppenderList_t);
+  pChildren     like(BasicList_handle_t);
+end-ds;
+
+dcl-s LOG4RPG_priority_t int(10) template;
+
+dcl-s LOG4RPG_procedure_t varchar(128) template;
+
+dcl-ds LOG4RPG_qJob_t qualified template;
+  name char(10);
+  user char(10);
+  nbr  char(6); //   *
+end-ds;
+
+/endif

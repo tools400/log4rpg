@@ -48,9 +48,9 @@ ctl-opt expropts(*resdecpos) extbinint(*yes);
 // ------------------------------------
 //  External Prototypes
 // ------------------------------------
-/COPY QBASICS1,PBASICS1                      SrvPgm: Basics 1
-/COPY QLOG4RPG,PLOG4RPG                      Log4rpg
-//
+/copy QBASICS1,PBASICS1                      SrvPgm: Basics 1
+/copy QLOG4RPG,PLOG4RPG                      Log4rpg
+
 // ------------------------------------
 //  Global Fields
 // ------------------------------------
@@ -62,7 +62,7 @@ ctl-opt expropts(*resdecpos) extbinint(*yes);
 // ------------------------------------
 //  Prototypes
 // ------------------------------------
-//
+
 dcl-pr PGM_ENTRY_POINT extpgm('LOG4_EXP4');
   gi_config char(64) options(*nopass) const;
 end-pr;
@@ -75,11 +75,11 @@ dcl-proc PGM_ENTRY_POINT;
     gi_config char(64) options(*nopass) const;
   end-pi;
 
-   if (%parms() >= %parmnum(gi_config));
-     main(%subst(gi_config: 1: %scan(' ': gi_config)));
-   else;
-     main('mbr:QLOG4RPG.LOG4_X1P1');
-   endif;
+  if (%parms() >= %parmnum(gi_config));
+    main(%subst(gi_config: 1: %scan(' ': gi_config)));
+  else;
+    main('mbr:QLOG4RPG.LOG4_X1P1');
+  endif;
 
 end-proc;
 

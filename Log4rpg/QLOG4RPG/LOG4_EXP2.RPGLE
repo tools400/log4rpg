@@ -90,9 +90,9 @@ dcl-proc main;
   Logger_debug(hSubLogger2: 'Debug message, now logged (de.tools400.sub2)');
   Logger_info(hSubLogger2: 'Info message (de.tools400.sub2)');
 
-  // The log level can be changed at any time.
-  // The log level of logger 'de.tools400.sub2' could also be set
-  // in the configuration file like this:
-  //   log4rpg.logger.de.tools400.sub2=DEBUG
+// The log level can be changed at any time.
+// The log level of logger 'de.tools400.sub2' could also be set
+// in the configuration file like this:
+//   log4rpg.logger.de.tools400.sub2=DEBUG
 
 end-proc;

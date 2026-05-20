@@ -1,643 +1,568 @@
-      *=====================================================================*
-      *  SrvPgm: LOG4RPG - Object: LogLog                                   *
-      *=====================================================================*
-      *  Author  :  Thomas Raddatz                                          *
-      *  Date    :  13.06.2006                                              *
-      *  E-mail  :  thomas.raddatz@tools400.de                              *
-      *  Homepage:  www.tools400.de                                         *
-      *=====================================================================*
-      *                                                                     *
-      *  This software is free software, you can redistribute it and/or     *
-      *  modify it under the terms of the GNU General Public License (GPL)  *
-      *  as published by the Free Software Foundation.                      *
-      *                                                                     *
-      *  See GNU General Public License for details.                        *
-      *          http://www.opensource.org                                  *
-      *          http://www.opensource.org/licenses/gpl-license.html        *
-      *                                                                     *
-      *=====================================================================*
-      *  History:                                                           *
-      *                                                                     *
-      *  Datum       Name          Änderung                                 *
-      *  ----------  ------------  ---------------------------------------  *
-      *  27.10.2006  Th.Raddatz    Added feature to completely enable/      *
-      *                            disable Log4rpg. Logger_isLogging().     *
-      *                                                                     *
-      *  15.11.2006  Th.Raddatz    Added procedures:                        *
-      *                            LogLog_getInternalDebugMode()            *
-      *                            LogLog_getInternalDebugOutput()          *
-      *                                                                     *
-      *=====================================================================*
-      *   >>PRE-COMPILER<<                                                  *
-      *                                                                     *
-      *     >>CRTCMD<<  CRTRPGMOD    MODULE(&LI/&OB) +                      *
-      *                              SRCFILE(&SL/&SF) +                     *
-      *                              SRCMBR(&SM);                           *
-      *                                                                     *
-      *     >>COMPILE<<                                                     *
-      *       >>PARM<< TRUNCNBR(*NO);                                       *
-      *       >>PARM<< DBGVIEW(*LIST);                                      *
-      *       >>PARM<< OPTION(*EVENTF);                                     *
-      *       >>PARM<< TGTRLS(V7R3M0  );                                    *
-      *     >>END-COMPILE<<                                                 *
-      *                                                                     *
-      *     >>EXECUTE<<                                                     *
-      *                                                                     *
-      *   >>END-PRE-COMPILER<<                                              *
-      *=====================================================================*
-      /COPY QLOG4RPG,H_SPEC
-      *=====================================================================*
-     FLOG4RPG   O    F  132        PRINTER usropn
-      *
-      * -----------------------------------------
-      *  Imported functions
-      * -----------------------------------------
-      /COPY QLOG4RPG,PLOG4RPG                      Public API Specification
-      *
-      * -----------------------------------------
-      *  Exported functions
-      * -----------------------------------------
-      /COPY QLOG4RPG,PLOG4RPG10
-      *
-      * -----------------------------------------
-      *  Type definitions
-      * -----------------------------------------
-      /COPY QLOG4RPG,PLOG4RPG                      Public interface & type definitions
-      *
-      * -----------------------------------------
-      *  Prototypes
-      * -----------------------------------------
-      /COPY QLOG4RPG,CLIB                          C-Library
-      /COPY QBASICS1,PBASICS1                      Basic RPG Extensions
-      /COPY QLOG4RPG,PLOG4RPG14                    DebugMode
-      /COPY QLOG4RPG,PLOG4RPG15                    DebugOutput
-      *
-      * -----------------------------------------
-      *  Private prototypes
-      * -----------------------------------------
-      *
-      *  This method is used to output log4rpg internal
-      *  statements.
-     D streamOut...
-     D                 PR
-     D  i_text                             const  like(LOG4RPG_formattedText_t)
-      *
-      *  This method is used to output log4rpg internal
-      *  statements. Output goes to stdout.
-     D writeToStdout...
-     D                 PR
-     D  i_text                             const  like(LOG4RPG_formattedText_t)
-      *
-      *  This method is used to output log4rpg internal
-      *  statements. Output goes to the printer.
-     D writeToPrinter...
-     D                 PR
-     D  i_text                             const  like(LOG4RPG_formattedText_t)
-      *
-      * -----------------------------------------
-      *  Global constants
-      * -----------------------------------------
-     D cPREFIX...
-     D                 C                   const('log4rpg: ')
-     D cERR_PREFIX...
-     D                 C                   const('log4rpg:ERROR ')
-     D cWARN_PREFIX...
-     D                 C                   const('log4rpg:WARN ')
-      *
-      * Constants for printf()
-     D cESC_NEW_LINE   C                   const(x'15')
-     D cESC_TAB        C                   const(x'05')
-     D cESC_BACKSLASH  C                   const(x'EC')
-      *
-      * -----------------------------------------
-      *  Global fields
-      * -----------------------------------------
-     D g_debugMode     S              5U 0 inz(
-     D                                        cLOG4RPG_INT_DEBUG_OFF)
-     D g_output        S              5U 0 inz(
-     D                                        cLOG4RPG_INT_DEBUG_OUTPUT_PRINTER)
-      *
-     D g_printText     S            117A
-      *
-      * -----------------------------------------
-      *  Output to printer
-      * -----------------------------------------
+**free
+//=====================================================================*
+//  SrvPgm: LOG4RPG - Object: LogLog                                   *
+//=====================================================================*
+//  Author  :  Thomas Raddatz                                          *
+//  Date    :  13.06.2006                                              *
+//  E-mail  :  thomas.raddatz@tools400.de                              *
+//  Homepage:  www.tools400.de                                         *
+//=====================================================================*
+//                                                                     *
+//  This software is free software, you can redistribute it and/or     *
+//  modify it under the terms of the GNU General Public License (GPL)  *
+//  as published by the Free Software Foundation.                      *
+//                                                                     *
+//  See GNU General Public License for details.                        *
+//          http://www.opensource.org                                  *
+//          http://www.opensource.org/licenses/gpl-license.html        *
+//                                                                     *
+//=====================================================================*
+//  History:                                                           *
+//                                                                     *
+//  Datum       Name          Änderung                                 *
+//  ----------  ------------  ---------------------------------------  *
+//  27.10.2006  Th.Raddatz    Added feature to completely enable/      *
+//                            disable Log4rpg. Logger_isLogging().     *
+//                                                                     *
+//  15.11.2006  Th.Raddatz    Added procedures:                        *
+//                            LogLog_getInternalDebugMode()            *
+//                            LogLog_getInternalDebugOutput()          *
+//                                                                     *
+//=====================================================================*
+//   >>PRE-COMPILER<<                                                  *
+//                                                                     *
+//     >>CRTCMD<<  CRTRPGMOD    MODULE(&LI/&OB) +                      *
+//                              SRCFILE(&SL/&SF) +                     *
+//                              SRCMBR(&SM);                           *
+//                                                                     *
+//     >>COMPILE<<                                                     *
+//       >>PARM<< TRUNCNBR(*NO);                                       *
+//       >>PARM<< DBGVIEW(*LIST);                                      *
+//       >>PARM<< OPTION(*EVENTF);                                     *
+//       >>PARM<< TGTRLS(V7R3M0  );                                    *
+//     >>END-COMPILE<<                                                 *
+//                                                                     *
+//     >>EXECUTE<<                                                     *
+//                                                                     *
+//   >>END-PRE-COMPILER<<                                              *
+//=====================================================================*
+/copy QLOG4RPG,H_SPEC
+//=====================================================================*
+dcl-f LOG4RPG printer(132) usage(*output) usropn;
+
+// -----------------------------------------
+//  Imported functions
+// -----------------------------------------
+/copy QLOG4RPG,PLOG4RPG                      Public API Specification
+
+// -----------------------------------------
+//  Exported functions
+// -----------------------------------------
+/copy QLOG4RPG,PLOG4RPG10
+
+// -----------------------------------------
+//  Type definitions
+// -----------------------------------------
+/copy QLOG4RPG,PLOG4RPG                      Public interface & type definitions
+
+// -----------------------------------------
+//  Prototypes
+// -----------------------------------------
+/copy QLOG4RPG,CLIB                          C-Library
+/copy QBASICS1,PBASICS1                      Basic RPG Extensions
+/copy QLOG4RPG,PLOG4RPG14                    DebugMode
+/copy QLOG4RPG,PLOG4RPG15                    DebugOutput
+
+// -----------------------------------------
+//  Private prototypes
+// -----------------------------------------
+
+//  This method is used to output log4rpg internal
+//  statements.
+dcl-pr streamOut;
+  i_text like(LOG4RPG_formattedText_t) const;
+end-pr;
+
+//  This method is used to output log4rpg internal
+//  statements. Output goes to stdout.
+dcl-pr writeToStdout;
+  i_text like(LOG4RPG_formattedText_t) const;
+end-pr;
+
+//  This method is used to output log4rpg internal
+//  statements. Output goes to the printer.
+dcl-pr writeToPrinter;
+  i_text like(LOG4RPG_formattedText_t) const;
+end-pr;
+
+// -----------------------------------------
+//  Global constants
+// -----------------------------------------
+dcl-c cPREFIX 'log4rpg: ';
+dcl-c cERR_PREFIX 'log4rpg:ERROR ';
+dcl-c cWARN_PREFIX 'log4rpg:WARN ';
+
+// Constants for printf()
+dcl-c cESC_NEW_LINE x'15';
+dcl-c cESC_TAB x'05';
+dcl-c cESC_BACKSLASH x'EC';
+
+// -----------------------------------------
+//  Global fields
+// -----------------------------------------
+dcl-s g_debugMode uns(5) inz(cLOG4RPG_INT_DEBUG_OFF);
+dcl-s g_output uns(5) inz(cLOG4RPG_INT_DEBUG_OUTPUT_PRINTER);
+
+dcl-s g_printText char(117);
+
+// -----------------------------------------
+//  Output to printer
+// -----------------------------------------
      OLOG4RPG   E            printLine
      O                       g_printText        127
-      *
-      *=========================================================================
-      *  Allows to enable/disable log4rpg internal logging.
-      *=========================================================================
-      *  Parameters:
-      *   i_debugMode   - Specifies the debug mode for the log4rpg
-      *                   internal logging.
-      *
-      *  Returns:
-      *   void
-      *=========================================================================
-     P LogLog_setInternalDebugging...
-     P                 B                   export
-      *
-     D LogLog_setInternalDebugging...
-     D                 PI
-     D  i_debugMode                        const  like(LOG4RPG_debugMode_t  )
-     D  i_output                           const  like(LOG4RPG_debugOutput_t)
-     D                                            options(*nopass)
-      *
-      *  Parameter positions
-     D p_output        C                   const(2)
-      *
-      *  Fields for optional parameters
-     D output          S                   like(i_output ) inz
-      *
-      *  Helper fields
-     D mode            S                   like(i_debugMode ) inz
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+//
+//=========================================================================
+//  Allows to enable/disable log4rpg internal logging.
+//=========================================================================
+//  Parameters:
+//   i_debugMode   - Specifies the debug mode for the log4rpg
+//                   internal logging.
+//
+//  Returns:
+//   void
+//=========================================================================
+dcl-proc LogLog_setInternalDebugging export;
+dcl-pi LogLog_setInternalDebugging;
+  i_debugMode like(LOG4RPG_debugMode_t) const;
+  i_output    like(LOG4RPG_debugOutput_t) options(*nopass) const;
+end-pi;
 
-         if %parms() >= p_output;
-            output = f_lcase(i_output);
-         else;
-            output = cLOG4RPG_DEBUG_OUTPUT_PRINTER;
-         endif;
+//  Parameter positions
+dcl-c p_output 2;
 
-         mode = f_lcase(i_debugMode);
+//  Fields for optional parameters
+dcl-s output like(i_output) inz;
 
-         if DebugMode_isValid(mode);
-            g_debugMode = DebugMode_toInt(mode);
-         else;
-            g_debugMode = DebugMode_toInt(cLOG4RPG_DEBUG_ON);
-            LogLog_error('Unexpected value [' + mode +
-                          '] passed for parameter ''debug mode'' to +
-                          procedure [' + f_this + ']');
-         endif;
+//  Helper fields
+dcl-s mode like(i_debugMode) inz;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-         if DebugOutput_isValid(output);
-            g_output = DebugOutput_toInt(output);
-         else;
-            g_output = cLOG4RPG_INT_DEBUG_OUTPUT_PRINTER;
-            LogLog_error('Unexpected value [' + output +
-                          '] passed for parameter ''output'' to +
-                          procedure [' + f_this + ']');
-         endif;
+if %parms() >= p_output;
+   output = f_lcase(i_output);
+else;
+   output = cLOG4RPG_DEBUG_OUTPUT_PRINTER;
+endif;
 
-         if (g_output <> cLOG4RPG_INT_DEBUG_OUTPUT_PRINTER) and %open(LOG4RPG);
-            close LOG4RPG;
-         endif;
+mode = f_lcase(i_debugMode);
 
-         return;
+if DebugMode_isValid(mode);
+   g_debugMode = DebugMode_toInt(mode);
+else;
+   g_debugMode = DebugMode_toInt(cLOG4RPG_DEBUG_ON);
+   LogLog_error('Unexpected value [' + mode +
+                 '] passed for parameter ''debug mode'' to +
+                 procedure [' + f_this + ']');
+endif;
 
-      /END-FREE
-      *
-     P LogLog_setInternalDebugging...
-     P                 E
-      *
-      *=========================================================================
-      *  Returns the internal debug mode.
-      *=========================================================================
-      *  Parameters:
-      *   void
-      *
-      *  Returns:
-      *   debugMode     - Mode of the internal logging.
-      *=========================================================================
-     P LogLog_getInternalDebugMode...
-     P                 B                   export
-      *
-     D LogLog_getInternalDebugMode...
-     D                 PI                         like(LOG4RPG_debugMode_t  )
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+if DebugOutput_isValid(output);
+   g_output = DebugOutput_toInt(output);
+else;
+   g_output = cLOG4RPG_INT_DEBUG_OUTPUT_PRINTER;
+   LogLog_error('Unexpected value [' + output +
+                 '] passed for parameter ''output'' to +
+                 procedure [' + f_this + ']');
+endif;
 
-         return DebugMode_toString(g_debugMode);
+if (g_output <> cLOG4RPG_INT_DEBUG_OUTPUT_PRINTER) and %open(LOG4RPG);
+   close LOG4RPG;
+endif;
 
-      /END-FREE
-      *
-     P LogLog_getInternalDebugMode...
-     P                 E
-      *
-      *=========================================================================
-      *  Returns the target for internal log events.
-      *=========================================================================
-      *  Parameters:
-      *   void
-      *
-      *  Returns:
-      *   output        - Output target for internal log events.
-      *=========================================================================
-     P LogLog_getInternalDebugOutput...
-     P                 B                   export
-      *
-     D LogLog_getInternalDebugOutput...
-     D                 PI                         like(LOG4RPG_debugOutput_t)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+return;
 
-         return DebugOutput_toString(g_output);
 
-      /END-FREE
-      *
-     P LogLog_getInternalDebugOutput...
-     P                 E
-      *
-      *=========================================================================
-      *  This method is used to output log4rpg internal debug statements.
-      *=========================================================================
-      *  Parameters:
-      *   i_text        - The debug statement.
-      *
-      *  Returns:
-      *   void
-      *=========================================================================
-     P LogLog_debug...
-     P                 B                   export
-      *
-     D LogLog_debug...
-     D                 PI
-     D  i_text                             const  like(LOG4RPG_text_t    )
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+end-proc;
 
-         if not Logger_isLogging();
-            return;
-         endif;
+//=========================================================================
+//  Returns the internal debug mode.
+//=========================================================================
+//  Parameters:
+//   void
+//
+//  Returns:
+//   debugMode     - Mode of the internal logging.
+//=========================================================================
+dcl-proc LogLog_getInternalDebugMode export;
+  dcl-pi *n like(LOG4RPG_debugMode_t);
+  end-pi;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-         if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
-            return;
-         endif;
+return DebugMode_toString(g_debugMode);
 
-         if g_debugMode <> cLOG4RPG_INT_DEBUG_OFF;
-            streamOut(cPREFIX + i_text);
-         endif;
 
-         return;
+end-proc;
 
-      /END-FREE
-      *
-     P LogLog_debug...
-     P                 E
-      *
-      *=========================================================================
-      *  This method is used to output log4rpg internal debug messages.
-      *=========================================================================
-      *  Parameters:
-      *   i_msg         - The debug message.
-      *
-      *  Returns:
-      *   void
-      *=========================================================================
-     P LogLog_debugMsg...
-     P                 B                   export
-      *
-     D LogLog_debugMsg...
-     D                 PI
-     D  i_msg                              const  likeds(msg_t           )
-      *
-      *  Helper fields
-     D text            S                   like(LOG4RPG_text_t    ) inz
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+//=========================================================================
+//  Returns the target for internal log events.
+//=========================================================================
+//  Parameters:
+//   void
+//
+//  Returns:
+//   output        - Output target for internal log events.
+//=========================================================================
+dcl-proc LogLog_getInternalDebugOutput export;
+  dcl-pi *n like(LOG4RPG_debugOutput_t);
+  end-pi;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-         if not Logger_isLogging();
-            return;
-         endif;
+return DebugOutput_toString(g_output);
 
-         if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
-            return;
-         endif;
 
-         if g_debugMode <> cLOG4RPG_INT_DEBUG_OFF;
-            text = %trimR(f_rtvMsgText(i_msg: *omit));
-            LogLog_debug(text);
-         endif;
+end-proc;
 
-         return;
+//=========================================================================
+//  This method is used to output log4rpg internal debug statements.
+//=========================================================================
+//  Parameters:
+//   i_text        - The debug statement.
+//
+//  Returns:
+//   void
+//=========================================================================
+dcl-proc LogLog_debug export;
+  dcl-pi *n;
+    i_text like(LOG4RPG_text_t) const;
+  end-pi;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-      /END-FREE
-      *
-     P LogLog_debugMsg...
-     P                 E
-      *
-      *=========================================================================
-      *  This method is used to output log4rpg internal error statements.
-      *=========================================================================
-      *  Parameters:
-      *   i_text        - The error statement.
-      *
-      *  Returns:
-      *   void
-      *=========================================================================
-     P LogLog_error...
-     P                 B                   export
-      *
-     D LogLog_error...
-     D                 PI
-     D  i_text                             const  like(LOG4RPG_text_t    )
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+if not Logger_isLogging();
+   return;
+endif;
 
-         if not Logger_isLogging();
-            return;
-         endif;
+if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
+   return;
+endif;
 
-         if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
-            return;
-         endif;
+if g_debugMode <> cLOG4RPG_INT_DEBUG_OFF;
+   streamOut(cPREFIX + i_text);
+endif;
 
-         streamOut(cERR_PREFIX + i_text);
+return;
 
-         return;
 
-      /END-FREE
-      *
-     P LogLog_error...
-     P                 E
-      *
-      *=========================================================================
-      *  This method is used to output log4rpg internal error messages.
-      *=========================================================================
-      *  Parameters:
-      *   i_msg         - The error message.
-      *
-      *  Returns:
-      *   void
-      *=========================================================================
-     P LogLog_errorMsg...
-     P                 B                   export
-      *
-     D LogLog_errorMsg...
-     D                 PI
-     D  i_msg                              const  likeds(msg_t           )
-      *
-      *  Helper fields
-     D text            S                   like(LOG4RPG_text_t    ) inz
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+end-proc;
 
-         if not Logger_isLogging();
-            return;
-         endif;
+//=========================================================================
+//  This method is used to output log4rpg internal debug messages.
+//=========================================================================
+//  Parameters:
+//   i_msg         - The debug message.
+//
+//  Returns:
+//   void
+//=========================================================================
+dcl-proc LogLog_debugMsg export;
+  dcl-pi *n;
+    i_msg likeds(msg_t) const;
+  end-pi;
 
-         if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
-            return;
-         endif;
+//  Helper fields
+  dcl-s text like(LOG4RPG_text_t) inz;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-         text = %trimR(f_rtvMsgText(i_msg: *omit));
-         LogLog_error(text);
+if not Logger_isLogging();
+   return;
+endif;
 
-         return;
+if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
+   return;
+endif;
 
-      /END-FREE
-      *
-     P LogLog_errorMsg...
-     P                 E
-      *
-      *=========================================================================
-      *  This method is used to output log4rpg internal warning statements.
-      *=========================================================================
-      *  Parameters:
-      *   i_text        - The warning statement.
-      *
-      *  Returns:
-      *   void
-      *=========================================================================
-     P LogLog_warning...
-     P                 B                   export
-      *
-     D LogLog_warning...
-     D                 PI
-     D  i_text                             const  like(LOG4RPG_text_t    )
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+if g_debugMode <> cLOG4RPG_INT_DEBUG_OFF;
+   text = %trimR(f_rtvMsgText(i_msg: *omit));
+   LogLog_debug(text);
+endif;
 
-         if not Logger_isLogging();
-            return;
-         endif;
+return;
 
-         if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
-            return;
-         endif;
 
-         streamOut(cWARN_PREFIX + i_text);
+end-proc;
 
-         return;
+//=========================================================================
+//  This method is used to output log4rpg internal error statements.
+//=========================================================================
+//  Parameters:
+//   i_text        - The error statement.
+//
+//  Returns:
+//   void
+//=========================================================================
+dcl-proc LogLog_error export;
+  dcl-pi *n;
+    i_text like(LOG4RPG_text_t) const;
+  end-pi;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-      /END-FREE
-      *
-     P LogLog_warning...
-     P                 E
-      *
-      *=========================================================================
-      *  This method is used to output log4rpg internal warning message.
-      *=========================================================================
-      *  Parameters:
-      *   i_msg         - The warning message.
-      *
-      *  Returns:
-      *   void
-      *=========================================================================
-     P LogLog_warningMsg...
-     P                 B                   export
-      *
-     D LogLog_warningMsg...
-     D                 PI
-     D  i_msg                              const  likeds(msg_t           )
-      *
-      *  Helper fields
-     D text            S                   like(LOG4RPG_text_t    ) inz
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+if not Logger_isLogging();
+   return;
+endif;
 
-         if not Logger_isLogging();
-            return;
-         endif;
+if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
+   return;
+endif;
 
-         if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
-            return;
-         endif;
+streamOut(cERR_PREFIX + i_text);
 
-         text = %trimR(f_rtvMsgText(i_msg: *omit));
-         LogLog_warning(text);
+return;
 
-         return;
 
-      /END-FREE
-      *
-     P LogLog_warningMsg...
-     P                 E
-      *
-      *=========================================================================
-      *  This method is used to output log4rpg internal verbose statements.
-      *=========================================================================
-      *  Parameters:
-      *   i_text        - The verbose statement.
-      *
-      *  Returns:
-      *   void
-      *=========================================================================
-     P LogLog_verbose...
-     P                 B                   export
-      *
-     D LogLog_verbose...
-     D                 PI
-     D  i_text                             const  like(LOG4RPG_text_t    )
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+end-proc;
 
-         if not Logger_isLogging();
-            return;
-         endif;
+//=========================================================================
+//  This method is used to output log4rpg internal error messages.
+//=========================================================================
+//  Parameters:
+//   i_msg         - The error message.
+//
+//  Returns:
+//   void
+//=========================================================================
+dcl-proc LogLog_errorMsg export;
+  dcl-pi *n;
+    i_msg likeds(msg_t) const;
+  end-pi;
 
-         if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
-            return;
-         endif;
+//  Helper fields
+  dcl-s text like(LOG4RPG_text_t) inz;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-         if g_debugMode = cLOG4RPG_INT_DEBUG_VERBOSE;
-            streamOut(cPREFIX + i_text);
-         endif;
+if not Logger_isLogging();
+   return;
+endif;
 
-         return;
+if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
+   return;
+endif;
 
-      /END-FREE
-      *
-     P LogLog_verbose...
-     P                 E
-      *
-      *=========================================================================
-      *  This method is used to output log4rpg internal verbose message.
-      *=========================================================================
-      *  Parameters:
-      *   i_msg         - The verbose message.
-      *
-      *  Returns:
-      *   void
-      *=========================================================================
-     P LogLog_verboseMsg...
-     P                 B                   export
-      *
-     D LogLog_verboseMsg...
-     D                 PI
-     D  i_msg                              const  likeds(msg_t           )
-      *
-      *  Helper fields
-     D text            S                   like(LOG4RPG_text_t    ) inz
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+text = %trimR(f_rtvMsgText(i_msg: *omit));
+LogLog_error(text);
 
-         if not Logger_isLogging();
-            return;
-         endif;
+return;
 
-         if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
-            return;
-         endif;
 
-         if g_debugMode = cLOG4RPG_INT_DEBUG_VERBOSE;
-            text = %trimR(f_rtvMsgText(i_msg: *omit));
-            LogLog_verbose(text);
-         endif;
+end-proc;
 
-         return;
+//=========================================================================
+//  This method is used to output log4rpg internal warning statements.
+//=========================================================================
+//  Parameters:
+//   i_text        - The warning statement.
+//
+//  Returns:
+//   void
+//=========================================================================
+dcl-proc LogLog_warning export;
+  dcl-pi *n;
+    i_text like(LOG4RPG_text_t) const;
+  end-pi;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-      /END-FREE
-      *
-     P LogLog_verboseMsg...
-     P                 E
-      *
-      *=========================================================================
-    R *  *** Private ***
-      *  This method is used write log4rpg internal statements to the output.
-      *=========================================================================
-     P streamOut...
-     P                 B
-      *
-     D streamOut...
-     D                 PI
-     D  i_text                             const  like(LOG4RPG_formattedText_t)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+if not Logger_isLogging();
+   return;
+endif;
 
-         select;
-         when g_output = cLOG4RPG_INT_DEBUG_OUTPUT_PRINTER;
-            writeToPrinter(i_text);
-         when g_output = cLOG4RPG_INT_DEBUG_OUTPUT_STDOUT;
-            writeToStdout(i_text);
-         endsl;
+if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
+   return;
+endif;
 
-         return;
+streamOut(cWARN_PREFIX + i_text);
 
-      /END-FREE
-      *
-     P streamOut...
-     P                 E
-      *
-      *=========================================================================
-    R *  *** Private ***
-      *  This method is used to output log4rpg internal statements.
-      *  Output goes to printer.
-      *=========================================================================
-     P writeToPrinter...
-     P                 B
-      *
-     D writeToPrinter...
-     D                 PI
-     D  i_text                             const  like(LOG4RPG_formattedText_t)
-      *
-      *  Helper fields
-     D startPos        S             10U 0 inz(1)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+return;
 
-         if i_text = '';
-            return;
-         endif;
 
-         if not %open(LOG4RPG);
-            system('OVRPRTF FILE(LOG4RPG) +
-                    TOFILE(QSYS/QSYSPRT) OVRSCOPE(*CALLLVL)');
-            open LOG4RPG;
-         endif;
+end-proc;
 
-         dow   startPos > 0;
-            g_printText = f_wordWrap(i_text
-                                     : %len(g_printText)
-                                     : startPos
-                                     : cWORDWRAP_PARAGRAPH_TEXT);
-            except printLine;
-         enddo;
+//=========================================================================
+//  This method is used to output log4rpg internal warning message.
+//=========================================================================
+//  Parameters:
+//   i_msg         - The warning message.
+//
+//  Returns:
+//   void
+//=========================================================================
+dcl-proc LogLog_warningMsg export;
+  dcl-pi *n;
+    i_msg likeds(msg_t) const;
+  end-pi;
 
-         return;
+//  Helper fields
+  dcl-s text like(LOG4RPG_text_t) inz;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-      /END-FREE
-      *
-     P writeToPrinter...
-     P                 E
-      *
-      *=========================================================================
-    R *  *** Private ***
-      *  This method is used to output log4rpg internal statements.
-      *  Output goes to stdout.
-      *=========================================================================
-     P writeToStdout...
-     P                 B
-      *
-     D writeToStdout...
-     D                 PI
-     D  i_text                             const  like(LOG4RPG_formattedText_t)
-      *
-      *  printf -- Print Formatted Characters
-     D printf...
-     D                 PR            10I 0 extproc('printf')
-     D  i_fmtString                    *   value  options(*string)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+if not Logger_isLogging();
+   return;
+endif;
 
-         printf(i_text + cESC_NEW_LINE);
+if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
+   return;
+endif;
 
-         return;
+text = %trimR(f_rtvMsgText(i_msg: *omit));
+LogLog_warning(text);
 
-      /END-FREE
-      *
-     P writeToStdout...
-     P                 E
-      *
+return;
+
+
+end-proc;
+
+//=========================================================================
+//  This method is used to output log4rpg internal verbose statements.
+//=========================================================================
+//  Parameters:
+//   i_text        - The verbose statement.
+//
+//  Returns:
+//   void
+//=========================================================================
+dcl-proc LogLog_verbose export;
+  dcl-pi *n;
+    i_text like(LOG4RPG_text_t) const;
+  end-pi;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+if not Logger_isLogging();
+   return;
+endif;
+
+if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
+   return;
+endif;
+
+if g_debugMode = cLOG4RPG_INT_DEBUG_VERBOSE;
+   streamOut(cPREFIX + i_text);
+endif;
+
+return;
+
+
+end-proc;
+
+//=========================================================================
+//  This method is used to output log4rpg internal verbose message.
+//=========================================================================
+//  Parameters:
+//   i_msg         - The verbose message.
+//
+//  Returns:
+//   void
+//=========================================================================
+dcl-proc LogLog_verboseMsg export;
+  dcl-pi *n;
+    i_msg likeds(msg_t) const;
+  end-pi;
+
+//  Helper fields
+  dcl-s text like(LOG4RPG_text_t) inz;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+if not Logger_isLogging();
+   return;
+endif;
+
+if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
+   return;
+endif;
+
+if g_debugMode = cLOG4RPG_INT_DEBUG_VERBOSE;
+   text = %trimR(f_rtvMsgText(i_msg: *omit));
+   LogLog_verbose(text);
+endif;
+
+return;
+
+
+end-proc;
+
+//=========================================================================
+//  *** Private ***
+//  This method is used write log4rpg internal statements to the output.
+//=========================================================================
+dcl-proc streamOut;
+  dcl-pi *n;
+    i_text like(LOG4RPG_formattedText_t) const;
+  end-pi;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+select;
+when g_output = cLOG4RPG_INT_DEBUG_OUTPUT_PRINTER;
+   writeToPrinter(i_text);
+when g_output = cLOG4RPG_INT_DEBUG_OUTPUT_STDOUT;
+   writeToStdout(i_text);
+endsl;
+
+return;
+
+
+end-proc;
+
+//=========================================================================
+//  *** Private ***
+//  This method is used to output log4rpg internal statements.
+//  Output goes to printer.
+//=========================================================================
+dcl-proc writeToPrinter;
+  dcl-pi *n;
+    i_text like(LOG4RPG_formattedText_t) const;
+  end-pi;
+
+//  Helper fields
+  dcl-s startPos uns(10) inz(1);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+if i_text = '';
+   return;
+endif;
+
+if not %open(LOG4RPG);
+   system('OVRPRTF FILE(LOG4RPG) +
+           TOFILE(QSYS/QSYSPRT) OVRSCOPE(*CALLLVL)');
+   open LOG4RPG;
+endif;
+
+dow   startPos > 0;
+   g_printText = f_wordWrap(i_text
+                            : %len(g_printText)
+                            : startPos
+                            : cWORDWRAP_PARAGRAPH_TEXT);
+   except printLine;
+enddo;
+
+return;
+
+
+end-proc;
+
+//=========================================================================
+//  *** Private ***
+//  This method is used to output log4rpg internal statements.
+//  Output goes to stdout.
+//=========================================================================
+dcl-proc writeToStdout;
+  dcl-pi *n;
+    i_text like(LOG4RPG_formattedText_t) const;
+  end-pi;
+
+//  printf -- Print Formatted Characters
+  dcl-pr printf int(10) extproc('printf');
+    i_fmtString pointer options(*string) value;
+  end-pr;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+printf(i_text + cESC_NEW_LINE);
+
+return;
+
+
+end-proc;
+

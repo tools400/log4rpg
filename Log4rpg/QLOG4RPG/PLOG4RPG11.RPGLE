@@ -1,90 +1,97 @@
-      /IF NOT DEFINED(PLOG4RPG11)
-      /DEFINE PLOG4RPG11
-      *
-      * -----------------------------------------
-      *  Type definitions
-      * -----------------------------------------
-      /COPY QLOG4RPG,PSHARE                        Type defs appenders, layouts, filters
-      *
-      * -----------------------------------------
-      *  Constants
-      * -----------------------------------------
-      *
-      * -----------------------------------------
-      *  Prototypes
-      * -----------------------------------------
-      *
-      *  Creates a new layout.
-      *  ==> PLOG4RPG
-      *
-      *  Formats the given string according to the layout.
-     D Layout_format...
-     D                 PR
-     D                                     extproc('LOG4RPG11+
-     D                                     _Layout_format+
-     D                                     ')
-     D  i_pLayout                          const  like(LOG4RPG_pLayout_t   )
-     D  i_pLogEvent                        const  like(LOG4RPG_pLogEvent_t )
-      *
-      *  Returns the header of the layout.
-     D Layout_getHeader...
-     D                 PR                         like(LOG4RPG_header_t    )
-     D                                     extproc('LOG4RPG11+
-     D                                     _Layout_getHeader+
-     D                                     ')
-     D  i_pLayout                          const  like(LOG4RPG_pLayout_t   )
-      *
-      *  Returns the footer of the layout.
-     D Layout_getFooter...
-     D                 PR                         like(LOG4RPG_footer_t    )
-     D                                     extproc('LOG4RPG11+
-     D                                     _Layout_getFooter+
-     D                                     ')
-     D  i_pLayout                          const  like(LOG4RPG_pLayout_t   )
-      *
-      *  Sets the properties of the specified layout.
-     D Layout_setProperties...
-     D                 PR
-     D                                     extproc('LOG4RPG11+
-     D                                     _Layout_setProperties+
-     D                                     ')
-     D  i_pLayout                          const  like(LOG4RPG_pLayout_t       )
-     D  i_pPropList                        const  like(LOG4RPG_pPropertyList_t )
-     D  i_prefix                           const  like(LOG4RPG_prefix_t        )
-      *
-      *  Returns the new-line character.
-     D Layout_newLine...
-     D                 PR             2A          varying
-     D                                     extproc('LOG4RPG11+
-     D                                     _Layout_newLine+
-     D                                     ')
-      *
-      *  Deletes the specified layout.
-     D Layout_delete...
-     D                 PR              N
-     D                                     extproc('LOG4RPG11+
-     D                                     _Layout_delete+
-     D                                     ')
-     D  io_pLayout                                like(LOG4RPG_pLayout_t       )
-      *
-      *  Tests, whether the specified property is known by the
-      *  super Layout.
-     D Layout_knowsProperty...
-     D                 PR              N
-     D                                     extproc('LOG4RPG11+
-     D                                     _Layout_knowsProperty+
-     D                                     ')
-     D  i_parameter                        const  like(LOG4RPG_Property_key_t  )
-      *
-      *  Tests a given layout for a NULL value.
-     D Layout_isNull...
-     D                 PR              N
-     D                                     extproc('LOG4RPG11+
-     D                                     _Layout_isNull+
-     D                                     ')
-     D  i_pLayout                          const  like(LOG4RPG_pLayout_t       )
-      *
-      *  Returns a NULL layout.
-      *  ==> PLOG4RPG
-      *
-      /ENDIF
+**FREE
+/IF NOT DEFINED(PLOG4RPG11)
+/DEFINE PLOG4RPG11
+//
+// -----------------------------------------
+//  Type definitions
+// -----------------------------------------
+/COPY QLOG4RPG,PSHARE                        Type defs appenders, layouts, filters
+//
+// -----------------------------------------
+//  Constants
+// -----------------------------------------
+//
+// -----------------------------------------
+//  Prototypes
+// -----------------------------------------
+//
+//  Creates a new layout.
+//  ==> PLOG4RPG
+//
+//  Formats the given string according to the layout.
+dcl-pr Layout_format
+       extproc('LOG4RPG11+
+       _Layout_format+
+       ');
+  i_pLayout       const  like(LOG4RPG_pLayout_t   );
+  i_pLogEvent     const  like(LOG4RPG_pLogEvent_t );
+end-pr;
+//
+//  Returns the header of the layout.
+dcl-pr Layout_getHeader
+       like(LOG4RPG_header_t    )
+       extproc('LOG4RPG11+
+       _Layout_getHeader+
+       ');
+  i_pLayout       const  like(LOG4RPG_pLayout_t   );
+end-pr;
+//
+//  Returns the footer of the layout.
+dcl-pr Layout_getFooter
+       like(LOG4RPG_footer_t    )
+       extproc('LOG4RPG11+
+       _Layout_getFooter+
+       ');
+  i_pLayout       const  like(LOG4RPG_pLayout_t   );
+end-pr;
+//
+//  Sets the properties of the specified layout.
+dcl-pr Layout_setProperties
+       extproc('LOG4RPG11+
+       _Layout_setProperties+
+       ');
+  i_pLayout       const  like(LOG4RPG_pLayout_t       );
+  i_pPropList     const  like(LOG4RPG_pPropertyList_t );
+  i_prefix        const  like(LOG4RPG_prefix_t        );
+end-pr;
+//
+//  Returns the new-line character.
+dcl-pr Layout_newLine
+       varchar(2)
+       extproc('LOG4RPG11+
+       _Layout_newLine+
+       ');
+end-pr;
+//
+//  Deletes the specified layout.
+dcl-pr Layout_delete
+       ind
+       extproc('LOG4RPG11+
+       _Layout_delete+
+       ');
+  io_pLayout      like(LOG4RPG_pLayout_t       );
+end-pr;
+//
+//  Tests, whether the specified property is known by the
+//  super Layout.
+dcl-pr Layout_knowsProperty
+       ind
+       extproc('LOG4RPG11+
+       _Layout_knowsProperty+
+       ');
+  i_parameter     const  like(LOG4RPG_Property_key_t  );
+end-pr;
+//
+//  Tests a given layout for a NULL value.
+dcl-pr Layout_isNull
+       ind
+       extproc('LOG4RPG11+
+       _Layout_isNull+
+       ');
+  i_pLayout       const  like(LOG4RPG_pLayout_t       );
+end-pr;
+//
+//  Returns a NULL layout.
+//  ==> PLOG4RPG
+//
+/ENDIF

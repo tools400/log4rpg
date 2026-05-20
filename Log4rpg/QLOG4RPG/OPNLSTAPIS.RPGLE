@@ -1,100 +1,112 @@
-      *
-     D qgy_opnListInf_t...
-     D                 DS                  qualified               based(pDummy)
-     D  totalRcds                    10I 0
-     D  rcdsRet                      10I 0
-     D  hRequest                      4A
-     D  rcdLen                       10I 0
-     D  infComplInd                   1A
-     D  dateTimeCrt                  13A
-     D  listStatInd                   1A
-     D  reserved_01                   1A
-     D  lenInfRet                    10I 0
-     D  firstRcdInRcv                10I 0
-     D  reserved_02                  40A
-      *
-      *  Get List Entries (QGYGTLE) API
-     D QGYGTLE...
-     D                 PR                  extpgm('QGYGTLE')
-     D  o_rcvVar                  65535A          options(*varsize)
-     D  i_rcvVarLen                  10I 0 const
-     D  i_hRequest                    4A   const
-     D  o_opnListInf                 80A
-     D  i_numRcdRtn                  10I 0 const
-     D  i_startRcd                   10I 0 const
-     D  io_errCode                65535A          options(*varsize)
-      *
-      *  Close List (QGYCLST) API
-     D QGYCLST...
-     D                 PR                  extpgm('QGYCLST')
-     D  i_hRequest                    4A   const
-     D  io_errCode                65535A          options(*varsize)
-      *
-      *  Open List of Objects (QGYOLOBJ) API
-     D QGYOLOBJ...
-     D                 PR                         extpgm('QGYOLOBJ')
-     D  o_rcvVar                  32767A          options(*varsize )
-     D  i_lenRcvVar                  10I 0 const
-     D  o_listInf                    80A
-     D  i_numRcdRet                  10I 0 const
-     D  i_sortInf                 32767A   const  options(*varsize )
-     D  i_qObj                       20A   const
-     D  i_objType                    10A   const
-     D  i_authCtrl                32767A   const  options(*varsize )
-     D  i_selectCtrl              32767A   const  options(*varsize )
-     D  i_numFldRet                  10I 0 const
-     D  i_keyOfFldRet             32767A   const  options(*varsize )
-     D  io_ErrCode                32767A          options(*varsize )
-      *
-     D qgy_selectCtrl_t...
-     D                 DS                  qualified               based(pDummy)
-     D  length                       10I 0
-     D  value                        10I 0
-     D  ofsStat                      10I 0
-     D  numStat                      10I 0
-     D  reserved_1                   10I 0
-     D  statList                           likeds(qgy_statList_t   )
-      *
-     D qgy_statList_t...
-     D                 DS                  qualified   based(pDummy)
-     D  stat                          1A   dim(16)
-      *
-     D qgy_authCtrl_t...
-     D                 DS                  qualified               based(pDummy)
-     D  length                       10I 0
-     D  callLvl                      10I 0
-     D  ofsObjAuth                   10I 0
-     D  numObjAuth                   10I 0
-     D  ofsLibAuth                   10I 0
-     D  numLibAuth                   10I 0
-     D  reserved_1                    4A
-     D  objAuthList                        likeds(qgy_authList_t   )
-     D  libAuthList                        likeds(qgy_authList_t   )
-      *
-     D qgy_authList_t...
-     D                 DS                  qualified               based(pDummy)
-     D  auth                         10A   dim(16)
-      *
-     D qgy_sortInf_t...
-     D                 DS                  qualified               based(pDummy)
-     D  numE                         10I 0
-     D  sortInfE                           likeds(qgy_sortInfE_t   )
-     D                                     dim(16)
-      *
-     D qgy_sortInfE_t...
-     D                 DS                  qualified               based(pDummy)
-     D  startPos                     10I 0
-     D  length                       10I 0
-     D  dataType                      5I 0
-     D  order                         1A
-     D  reserved_1                    1A
-      *
-     D qgy_objInf_t...
-     D                 DS                  qualified               based(pDummy)
-     D  name                         10A
-     D  lib                          10A
-     D  type                         10A
-     D  infStat                       1A
-     D  reserved_1                    1A
-     D  numFldRet                    10I 0
-      *
+**FREE
+//
+dcl-ds qgy_opnListInf_t
+       qualified               based(pDummy);
+  totalRcds       int(10);
+  rcdsRet         int(10);
+  hRequest        char(4);
+  rcdLen          int(10);
+  infComplInd     char(1);
+  dateTimeCrt     char(13);
+  listStatInd     char(1);
+  reserved_01     char(1);
+  lenInfRet       int(10);
+  firstRcdInRcv   int(10);
+  reserved_02     char(40);
+end-ds;
+//
+//  Get List Entries (QGYGTLE) API
+dcl-pr QGYGTLE
+       extpgm('QGYGTLE');
+  o_rcvVar        char(65535) options(*varsize);
+  i_rcvVarLen     int(10) const;
+  i_hRequest      char(4) const;
+  o_opnListInf    char(80);
+  i_numRcdRtn     int(10) const;
+  i_startRcd      int(10) const;
+  io_errCode      char(65535) options(*varsize);
+end-pr;
+//
+//  Close List (QGYCLST) API
+dcl-pr QGYCLST
+       extpgm('QGYCLST');
+  i_hRequest      char(4) const;
+  io_errCode      char(65535) options(*varsize);
+end-pr;
+//
+//  Open List of Objects (QGYOLOBJ) API
+dcl-pr QGYOLOBJ
+       extpgm('QGYOLOBJ');
+  o_rcvVar        char(32767) options(*varsize );
+  i_lenRcvVar     int(10) const;
+  o_listInf       char(80);
+  i_numRcdRet     int(10) const;
+  i_sortInf       char(32767) const  options(*varsize );
+  i_qObj          char(20) const;
+  i_objType       char(10) const;
+  i_authCtrl      char(32767) const  options(*varsize );
+  i_selectCtrl    char(32767) const  options(*varsize );
+  i_numFldRet     int(10) const;
+  i_keyOfFldRet   char(32767) const  options(*varsize );
+  io_ErrCode      char(32767) options(*varsize );
+end-pr;
+//
+dcl-ds qgy_selectCtrl_t
+       qualified               based(pDummy);
+  length          int(10);
+  value           int(10);
+  ofsStat         int(10);
+  numStat         int(10);
+  reserved_1      int(10);
+  statList        likeds(qgy_statList_t   );
+end-ds;
+//
+dcl-ds qgy_statList_t
+       qualified   based(pDummy);
+  stat            char(1) dim(16);
+end-ds;
+//
+dcl-ds qgy_authCtrl_t
+       qualified               based(pDummy);
+  length          int(10);
+  callLvl         int(10);
+  ofsObjAuth      int(10);
+  numObjAuth      int(10);
+  ofsLibAuth      int(10);
+  numLibAuth      int(10);
+  reserved_1      char(4);
+  objAuthList     likeds(qgy_authList_t   );
+libAuthList     likeds(qgy_authList_t   );
+end-ds;
+//
+dcl-ds qgy_authList_t
+       qualified               based(pDummy);
+  auth            char(10) dim(16);
+end-ds;
+//
+dcl-ds qgy_sortInf_t
+       qualified               based(pDummy);
+  numE            int(10);
+  sortInfE        likeds(qgy_sortInfE_t   )
+dim(16);
+end-ds;
+//
+dcl-ds qgy_sortInfE_t
+       qualified               based(pDummy);
+  startPos        int(10);
+  length          int(10);
+  dataType        int(5);
+  order           char(1);
+  reserved_1      char(1);
+end-ds;
+//
+dcl-ds qgy_objInf_t
+       qualified               based(pDummy);
+  name            char(10);
+  lib             char(10);
+  type            char(10);
+  infStat         char(1);
+  reserved_1      char(1);
+  numFldRet       int(10);
+end-ds;
+//

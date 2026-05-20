@@ -1,553 +1,482 @@
-      *=====================================================================*
-      *  SrvPgm: LOG4RPG - Object: AppenderList                             *
-      *=====================================================================*
-      *  Author  :  Thomas Raddatz                                          *
-      *  Date    :  13.06.2006                                              *
-      *  E-mail  :  thomas.raddatz@tools400.de                              *
-      *  Homepage:  www.tools400.de                                         *
-      *=====================================================================*
-      *                                                                     *
-      *  This software is free software, you can redistribute it and/or     *
-      *  modify it under the terms of the GNU General Public License (GPL)  *
-      *  as published by the Free Software Foundation.                      *
-      *                                                                     *
-      *  See GNU General Public License for details.                        *
-      *          http://www.opensource.org                                  *
-      *          http://www.opensource.org/licenses/gpl-license.html        *
-      *                                                                     *
-      *=====================================================================*
-      *  History:                                                           *
-      *                                                                     *
-      *  Datum       Name          Änderung                                 *
-      *  ----------  ------------  ---------------------------------------  *
-      *                                                                     *
-      *=====================================================================*
-      *   >>PRE-COMPILER<<                                                  *
-      *                                                                     *
-      *     >>CRTCMD<<  CRTRPGMOD    MODULE(&LI/&OB) +                      *
-      *                              SRCFILE(&SL/&SF) +                     *
-      *                              SRCMBR(&SM);                           *
-      *                                                                     *
-      *     >>COMPILE<<                                                     *
-      *       >>PARM<< TRUNCNBR(*NO);                                       *
-      *       >>PARM<< DBGVIEW(*LIST);                                      *
-      *       >>PARM<< OPTION(*EVENTF);                                     *
-      *       >>PARM<< TGTRLS(V7R3M0  );                                    *
-      *     >>END-COMPILE<<                                                 *
-      *                                                                     *
-      *     >>EXECUTE<<                                                     *
-      *                                                                     *
-      *   >>END-PRE-COMPILER<<                                              *
-      *=====================================================================*
-      /COPY QLOG4RPG,H_SPEC
-      *=====================================================================*
-      *
-      * -----------------------------------------
-      *  Exported functions
-      * -----------------------------------------
-      /COPY QLOG4RPG,PLOG4RPG04
-      *
-      * -----------------------------------------
-      *  Type definitions
-      * -----------------------------------------
-      /COPY QLOG4RPG,PTYPES                        Private type definitions
-      *
-     D handle_t...
-     D                 DS                  qualified               based(pDummy)
-     D  pMap                               like(BasicMap_handle_t )
-      *
-      * -----------------------------------------
-      *  Prototypes
-      * -----------------------------------------
-      /COPY QBASICS1,PBASICS1                      Basic RPG Extensions
-      /COPY QIFS,PIFS                              IFS Stream file support
-      *
-      /COPY QLOG4RPG,PLOG4RPG10                    LogLog
-      /COPY QLOG4RPG,PLOG4RPG99                    Helpers
-      *
-      * -----------------------------------------
-      *  Private prototypes
-      * -----------------------------------------
-      *
-      * -----------------------------------------
-      *  Global constants
-      * -----------------------------------------
-      *
-      * -----------------------------------------
-      *  Global fields
-      * -----------------------------------------
-      *
-      *=========================================================================
-      *  Creates a new appender list.
-      *=========================================================================
-      *  Parameters:
-      *   void
-      *
-      *  Returns:
-      *   pAppList      - Returns a handle to the appender list on success, else
-      *                   a NULL handle.
-      *=========================================================================
-     P AppenderList_new...
-     P                 B                   export
-      *
-     D AppenderList_new...
-     D                 PI                         like(LOG4RPG_pAppenderList_t )
-      *
-      *  Return value
-     D appList         DS                  likeds(handle_t       )
-     D                                     based(pAppList)
-      *
-      *  Helper fields
-     D tempAppList     DS                  likeds(handle_t       ) inz
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+**free
+//=====================================================================*
+//  SrvPgm: LOG4RPG - Object: AppenderList                             *
+//=====================================================================*
+//  Author  :  Thomas Raddatz                                          *
+//  Date    :  13.06.2006                                              *
+//  E-mail  :  thomas.raddatz@tools400.de                              *
+//  Homepage:  www.tools400.de                                         *
+//=====================================================================*
+//                                                                     *
+//  This software is free software, you can redistribute it and/or     *
+//  modify it under the terms of the GNU General Public License (GPL)  *
+//  as published by the Free Software Foundation.                      *
+//                                                                     *
+//  See GNU General Public License for details.                        *
+//          http://www.opensource.org                                  *
+//          http://www.opensource.org/licenses/gpl-license.html        *
+//                                                                     *
+//=====================================================================*
+//  History:                                                           *
+//                                                                     *
+//  Datum       Name          Änderung                                 *
+//  ----------  ------------  ---------------------------------------  *
+//                                                                     *
+//=====================================================================*
+//   >>PRE-COMPILER<<                                                  *
+//                                                                     *
+//     >>CRTCMD<<  CRTRPGMOD    MODULE(&LI/&OB) +                      *
+//                              SRCFILE(&SL/&SF) +                     *
+//                              SRCMBR(&SM);                           *
+//                                                                     *
+//     >>COMPILE<<                                                     *
+//       >>PARM<< TRUNCNBR(*NO);                                       *
+//       >>PARM<< DBGVIEW(*LIST);                                      *
+//       >>PARM<< OPTION(*EVENTF);                                     *
+//       >>PARM<< TGTRLS(V7R3M0  );                                    *
+//     >>END-COMPILE<<                                                 *
+//                                                                     *
+//     >>EXECUTE<<                                                     *
+//                                                                     *
+//   >>END-PRE-COMPILER<<                                              *
+//=====================================================================*
+/copy QLOG4RPG,H_SPEC
+//=====================================================================*
+//
+// -----------------------------------------
+//  Exported functions
+// -----------------------------------------
+/copy QLOG4RPG,PLOG4RPG04
 
-         LogLog_verbose('Creating appender list ...');
+// -----------------------------------------
+//  Type definitions
+// -----------------------------------------
+/copy QLOG4RPG,PTYPES                        Private type definitions
 
-         pAppList = AppenderList_null();
+dcl-ds handle_t qualified based(pDummy);
+  pMap like(BasicMap_handle_t);
+end-ds;
 
-         // Initialize appender list handle
-         clear tempAppList;
-         tempAppList.pMap = BasicMap_new();
+// -----------------------------------------
+//  Prototypes
+// -----------------------------------------
+/copy QBASICS1,PBASICS1                      Basic RPG Extensions
+/copy QIFS,PIFS                              IFS Stream file support
 
-         // Return properties list to caller
-         pAppList = %alloc(%size(handle_t));
-         appList = tempAppList;
+/copy QLOG4RPG,PLOG4RPG10                    LogLog
+/copy QLOG4RPG,PLOG4RPG99                    Helpers
 
-         LogLog_verbose('+ Allocated memory for appender list.');
+// -----------------------------------------
+//  Private prototypes
+// -----------------------------------------
+//
+// -----------------------------------------
+//  Global constants
+// -----------------------------------------
+//
+// -----------------------------------------
+//  Global fields
+// -----------------------------------------
+//
+//=========================================================================
+//  Creates a new appender list.
+//=========================================================================
+//  Parameters:
+//   void
+//
+//  Returns:
+//   pAppList      - Returns a handle to the appender list on success, else
+//                   a NULL handle.
+//=========================================================================
+dcl-proc AppenderList_new export;
+  dcl-pi *n like(LOG4RPG_pAppenderList_t);
+  end-pi;
 
-         return pAppList;
+//  Return value
+  dcl-ds appList likeds(handle_t) based(pAppList);
 
-      /END-FREE
-      *
-     P AppenderList_new...
-     P                 E
-      *
-      *=========================================================================
-      *  Returns the number of entries in the specified appender list.
-      *=========================================================================
-      *  Parameters:
-      *   i_pAppList    - Appender list returned by AppenderList_new().
-      *
-      *  Returns:
-      *   numE          - Returns the number of appenders in this
-      *                   appender list on success, else -1.
-      *=========================================================================
-     P AppenderList_getNumE...
-     P                 B                   export
-      *
-     D AppenderList_getNumE...
-     D                 PI            10I 0
-     D  i_pAppList                         const  like(LOG4RPG_pAppenderList_t )
-      *
-      *  Appender list handle
-     D appList         DS                  likeds(handle_t    )
-     D                                     based(i_pAppList)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+//  Helper fields
+  dcl-ds tempAppList likeds(handle_t) inz;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-         return BasicMap_getNumE(appList.pMap);
+LogLog_verbose('Creating appender list ...');
 
-      /END-FREE
-      *
-     P AppenderList_getNumE...
-     P                 E
-      *
-      *=========================================================================
-      *  Adds an appender to the specified appender list.
-      *=========================================================================
-      *  Parameters:
-      *   i_pAppList    - Appender list returned by AppenderList_new().
-      *   i_pAppender   - Appender that is added to this appender list.
-      *
-      *  Returns:
-      *   index         - Returns 0 on success, else -1.
-      *=========================================================================
-     P AppenderList_put...
-     P                 B                   export
-      *
-     D AppenderList_put...
-     D                 PI            10I 0
-     D  i_pAppList                         const  like(LOG4RPG_pAppenderList_t )
-     D  i_pAppender                        const  like(LOG4RPG_pAppender_t     )
-      *
-      *  Helper fields
-     D pAppender       S                   like(i_pAppender            )
-      *
-      *  Appender list handle
-     D appList         DS                  likeds(handle_t    )
-     D                                     based(i_pAppList)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+pAppList = AppenderList_null();
 
-         pAppender = i_pAppender;
+// Initialize appender list handle
+clear tempAppList;
+tempAppList.pMap = BasicMap_new();
 
-         return BasicMap_put(appList.pMap: Appender_getName(pAppender)
-                                         : %addr(pAppender)
-                                         : %len(pAppender ));
+// Return properties list to caller
+pAppList = %alloc(%size(handle_t));
+appList = tempAppList;
 
-      /END-FREE
-      *
-     P AppenderList_put...
-     P                 E
-      *
-      *=========================================================================
-      *  Removes the specified appender from the given appender list.
-      *=========================================================================
-      *  Parameters:
-      *   i_pAppList    - Appender list returned by AppenderList_new().
-      *   i_appName     - Name of the appender that is removed from
-      *                   this appender list.
-      *
-      *  Returns:
-      *   rc            - Returns 0 on success, else -1.
-      *=========================================================================
-     P AppenderList_remove...
-     P                 B                   export
-      *
-     D AppenderList_remove...
-     D                 PI            10I 0
-     D  i_pAppList                         const  like(LOG4RPG_pAppenderList_t )
-     D  i_appName                          const  like(LOG4RPG_appenderName_t  )
-      *
-      *  Appender list handle
-     D appList         DS                  likeds(handle_t    )
-     D                                     based(i_pAppList)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+LogLog_verbose('+ Allocated memory for appender list.');
 
-         return BasicMap_remove(appList.pMap: i_appName);
+return pAppList;
 
-      /END-FREE
-      *
-     P AppenderList_remove...
-     P                 E
-      *
-      *=========================================================================
-      *  Returns the appender assigned to the specified key.
-      *=========================================================================
-      *  Parameters:
-      *   i_pAppList    - Appender list returned by AppenderList_new().
-      *   i_appName     - Name of the appender that is returned.
-      *
-      *  Returns:
-      *   pAppender     - Returns the associated appender on ssuccess, else NULL.
-      *=========================================================================
-     P AppenderList_get...
-     P                 B                   export
-      *
-     D AppenderList_get...
-     D                 PI                         like(LOG4RPG_pAppender_t     )
-     D  i_pAppList                         const  like(LOG4RPG_pAppenderList_t )
-     D  i_appName                          const  like(LOG4RPG_appenderName_t  )
-      *
-      *  Return value
-     D pAppender       S                   like(LOG4RPG_pAppender_t     ) inz
-      *
-      *  Appender list handle
-     D appList         DS                  likeds(handle_t    )
-     D                                     based(i_pAppList)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
 
-         BasicMap_get(appList.pMap: i_appName: %addr(pAppender)
-                                             : %size(pAppender));
+end-proc;
 
-         return pAppender;
+//=========================================================================
+//  Returns the number of entries in the specified appender list.
+//=========================================================================
+//  Parameters:
+//   i_pAppList    - Appender list returned by AppenderList_new().
+//
+//  Returns:
+//   numE          - Returns the number of appenders in this
+//                   appender list on success, else -1.
+//=========================================================================
+dcl-proc AppenderList_getNumE export;
+  dcl-pi *n int(10);
+    i_pAppList like(LOG4RPG_pAppenderList_t) const;
+  end-pi;
 
-      /END-FREE
-      *
-     P AppenderList_get...
-     P                 E
-      *
-      *=========================================================================
-      *  Tests, if the appender list contains the specified appender.
-      *=========================================================================
-      *  Parameters:
-      *   i_pAppList    - Appender list returned by AppenderList_new().
-      *   i_appName     - Name of the appender.
-      *
-      *  Returns:
-      *   exist         - Returns TRUE if the appender exists, else FALSE.
-      *=========================================================================
-     P AppenderList_exist...
-     P                 B                   export
-      *
-     D AppenderList_exist...
-     D                 PI              N
-     D  i_pAppList                         const  like(LOG4RPG_pAppenderList_t )
-     D  i_appName                          const  like(LOG4RPG_appenderName_t  )
-      *
-      *  Appender list handle
-     D appList         DS                  likeds(handle_t    )
-     D                                     based(i_pAppList)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+//  Appender list handle
+  dcl-ds appList likeds(handle_t) based(i_pAppList);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-         return BasicMap_containsKey(appList.pMap: i_appName);
+return BasicMap_getNumE(appList.pMap);
 
-      /END-FREE
-      *
-     P AppenderList_exist...
-     P                 E
-      *
-      *=========================================================================
-      *  Returns an iterator for the specified appender list.
-      *=========================================================================
-      *  Parameters:
-      *   i_pAppList    - Appender list returned by AppenderList_new().
-      *
-      *  Returns:
-      *   appIter       - Iterator for the appender list.
-      *=========================================================================
-     P AppenderList_getIterator...
-     P                 B                   export
-      *
-     D AppenderList_getIterator...
-     D                 PI                        likeds(LOG4RPG_Appender...
-     D                                                          ListIterator_t )
-     D  i_pAppList                         const  like(LOG4RPG_pAppenderList_t )
-      *
-      *  Return value
-     D appIter         DS                  likeds(LOG4RPG_Appender...
-     D                                                    ListIterator_t) inz
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
 
-         clear appIter;
-         appIter.pAppList = i_pAppList;
-         appIter.lastApp  = 0;
+end-proc;
 
-         return appIter;
+//=========================================================================
+//  Adds an appender to the specified appender list.
+//=========================================================================
+//  Parameters:
+//   i_pAppList    - Appender list returned by AppenderList_new().
+//   i_pAppender   - Appender that is added to this appender list.
+//
+//  Returns:
+//   index         - Returns 0 on success, else -1.
+//=========================================================================
+dcl-proc AppenderList_put export;
+  dcl-pi *n int(10);
+    i_pAppList  like(LOG4RPG_pAppenderList_t) const;
+    i_pAppender like(LOG4RPG_pAppender_t) const;
+  end-pi;
 
-      /END-FREE
-      *
-     P AppenderList_getIterator...
-     P                 E
-      *
-      *=========================================================================
-      *  Returns the first appender of the specified appender list.
-      *=========================================================================
-      *  Parameters:
-      *   io_appIter    - Iteratur returned by AppenderList_getIterator().
-      *
-      *  Returns:
-      *   pAppender     - Returns the first appender in the specified
-      *                   appender list on success, else a NULL handle.
-      *=========================================================================
-     P AppenderList_getFirst...
-     P                 B                   export
-      *
-     D AppenderList_getFirst...
-     D                 PI                         like(LOG4RPG_pAppender_t     )
-     D  io_appIter                                likeds(LOG4RPG_Appender...
-     D                                                           ListIterator_t)
-      *
-      *  Return value
-     D pAppender       S                   like(LOG4RPG_pAppender_t     ) inz
-      *
-      *  Helper fields
-     D appName         S                   like(LOG4RPG_appenderName_t ) inz
-      *
-      *  Appender list handle
-     D appList         DS                  likeds(handle_t    )
-     D                                     based(io_appIter.pAppList)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+//  Helper fields
+  dcl-s pAppender like(i_pAppender);
 
-         pAppender = Appender_null();
+//  Appender list handle
+  dcl-ds appList likeds(handle_t) based(i_pAppList);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-         if AppenderList_getNumE(io_appIter.pAppList) = 0;
-            return pAppender;
-         endif;
+pAppender = i_pAppender;
 
-         io_appIter.lastApp = 1;
+return BasicMap_put(appList.pMap: Appender_getName(pAppender)
+                                : %addr(pAppender)
+                                : %len(pAppender ));
 
-         appName = BasicMap_getKeyByIndex(appList.pMap
-                                          : io_appIter.lastApp);
-         pAppender = AppenderList_get(io_appIter.pAppList: appName);
 
-         return pAppender;
+end-proc;
 
-      /END-FREE
-      *
-     P AppenderList_getFirst...
-     P                 E
-      *
-      *=========================================================================
-      *  Returns the next appender of the specified appender list.
-      *=========================================================================
-      *  Parameters:
-      *   io_appIter    - Iteratur returned by AppenderList_getIterator().
-      *
-      *  Returns:
-      *   pAppender     - Returns the next appender in the specified
-      *                   appender list on success, else a NULL handle.
-      *=========================================================================
-     P AppenderList_getNext...
-     P                 B                   export
-      *
-     D AppenderList_getNext...
-     D                 PI                         like(LOG4RPG_pAppender_t     )
-     D  io_appIter                                likeds(LOG4RPG_Appender...
-     D                                                           ListIterator_t)
-      *
-      *  Return value
-     D pAppender       S                   like(LOG4RPG_pAppender_t     ) inz
-      *
-      *  Helper fields
-     D appName         S                   like(LOG4RPG_appenderName_t ) inz
-      *
-      *  Appender list handle
-     D appList         DS                  likeds(handle_t    )
-     D                                     based(io_appIter.pAppList)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+//=========================================================================
+//  Removes the specified appender from the given appender list.
+//=========================================================================
+//  Parameters:
+//   i_pAppList    - Appender list returned by AppenderList_new().
+//   i_appName     - Name of the appender that is removed from
+//                   this appender list.
+//
+//  Returns:
+//   rc            - Returns 0 on success, else -1.
+//=========================================================================
+dcl-proc AppenderList_remove export;
+  dcl-pi *n int(10);
+    i_pAppList like(LOG4RPG_pAppenderList_t) const;
+    i_appName  like(LOG4RPG_appenderName_t) const;
+  end-pi;
 
-         pAppender = Appender_null();
+//  Appender list handle
+  dcl-ds appList likeds(handle_t) based(i_pAppList);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-         if AppenderList_getNumE(io_appIter.pAppList) <= io_appIter.lastApp;
-            return pAppender;
-         endif;
+return BasicMap_remove(appList.pMap: i_appName);
 
-         io_appIter.lastApp = io_appIter.lastApp + 1;
 
-         appName = BasicMap_getKeyByIndex(appList.pMap
-                                          : io_appIter.lastApp);
-         pAppender = AppenderList_get(io_appIter.pAppList: appName);
+end-proc;
 
-         return pAppender;
+//=========================================================================
+//  Returns the appender assigned to the specified key.
+//=========================================================================
+//  Parameters:
+//   i_pAppList    - Appender list returned by AppenderList_new().
+//   i_appName     - Name of the appender that is returned.
+//
+//  Returns:
+//   pAppender     - Returns the associated appender on ssuccess, else NULL.
+//=========================================================================
+dcl-proc AppenderList_get export;
+  dcl-pi *n like(LOG4RPG_pAppender_t);
+    i_pAppList like(LOG4RPG_pAppenderList_t) const;
+    i_appName  like(LOG4RPG_appenderName_t) const;
+  end-pi;
 
-      /END-FREE
-      *
-     P AppenderList_getNext...
-     P                 E
-      *
-      *=========================================================================
-      *  Deletes the specified appender list.
-      *=========================================================================
-      *  Parameters:
-      *   io_pAppList   - Appender list returned by AppenderList_new().
-      *
-      *  Returns:
-      *   isDeleted     - Returns TRUE on success, else FALSE.
-      *=========================================================================
-     P AppenderList_delete...
-     P                 B                   export
-      *
-     D AppenderList_delete...
-     D                 PI              N
-     D  io_pAppList                               like(LOG4RPG_pAppenderList_t )
-      *
-      *  Return value
-     D isDeleted       S               N   inz(*off)
-      *
-      *  Helper fields
-     D name            S                   like(LOG4RPG_appenderName_t  ) inz
-     D appIter         DS                  likeds(LOG4RPG_Appender...
-     D                                            ListIterator_t        ) inz
-     D pAppender       S                   like(LOG4RPG_pAppender_t     ) inz
-      *
-      *  Appender list handle
-     D appList         DS                  likeds(handle_t    )
-     D                                     based(io_pAppList)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+//  Return value
+  dcl-s pAppender like(LOG4RPG_pAppender_t) inz;
 
-         if BasicMap_isNull(appList.pMap);
-            return *on;
-         endif;
+//  Appender list handle
+  dcl-ds appList likeds(handle_t) based(i_pAppList);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-         LogLog_verbose('Deleting appender list ...');
+BasicMap_get(appList.pMap: i_appName: %addr(pAppender)
+                                    : %size(pAppender));
 
-         p_assert(AppenderList_getNumE(io_pAppList) = 0
-                  : 'All appender should have been removed from this +
-                     appender list by the logger or the repository.');
+return pAppender;
 
-         appIter = AppenderList_getIterator(io_pAppList);
 
-         dow AppenderList_getNumE(io_pAppList) > 0;
-            pAppender = AppenderList_getFirst(appIter);
-            name = Appender_getName(pAppender);
-            AppenderList_remove(io_pAppList: name);
-            Appender_delete(pAppender);
-         enddo;
+end-proc;
 
-         if BasicMap_delete(appList.pMap) = 0;
-            isDeleted = *on;
-         else;
-            isDeleted = *off;
-         endif;
+//=========================================================================
+//  Tests, if the appender list contains the specified appender.
+//=========================================================================
+//  Parameters:
+//   i_pAppList    - Appender list returned by AppenderList_new().
+//   i_appName     - Name of the appender.
+//
+//  Returns:
+//   exist         - Returns TRUE if the appender exists, else FALSE.
+//=========================================================================
+dcl-proc AppenderList_exist export;
+  dcl-pi *n ind;
+    i_pAppList like(LOG4RPG_pAppenderList_t) const;
+    i_appName  like(LOG4RPG_appenderName_t) const;
+  end-pi;
 
-         clear appList;
-         dealloc(N) io_pAppList;
+//  Appender list handle
+  dcl-ds appList likeds(handle_t) based(i_pAppList);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-         io_pAppList = AppenderList_null();
+return BasicMap_containsKey(appList.pMap: i_appName);
 
-         LogLog_verbose('- Freed memory of appender list.');
 
-         return isDeleted;
+end-proc;
 
-      /END-FREE
-      *
-     P AppenderList_delete...
-     P                 E
-      *
-      *=========================================================================
-      *  Test the specified appender list for a NULL value.
-      *=========================================================================
-      *  Parameters:
-      *   i_appList     - Appender list returned by AppenderList_new().
-      *
-      *  Returns:
-      *   isNull        - Returns TRUE if the handle of the appender list is a
-      *                   NULL handle.
-      *=========================================================================
-     P AppenderList_isNull...
-     P                 B                   export
-      *
-     D AppenderList_isNull...
-     D                 PI              N
-     D  i_pAppList                         const  like(LOG4RPG_pAppenderList_t )
-      *
-      *  Appender list handle
-     D appList         DS                  likeds(handle_t    )
-     D                                     based(i_pAppList)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+//=========================================================================
+//  Returns an iterator for the specified appender list.
+//=========================================================================
+//  Parameters:
+//   i_pAppList    - Appender list returned by AppenderList_new().
+//
+//  Returns:
+//   appIter       - Iterator for the appender list.
+//=========================================================================
+dcl-proc AppenderList_getIterator export;
 
-         if i_pAppList = AppenderList_null();
-            return *on;
-         else;
-            return BasicMap_isNull(appList.pMap);
-         endif;
+  dcl-ds AppenderList_getIteratorPI likeds(LOG4RPG_Appender: ListIterator_t);
+i_pAppList      const  like(LOG4RPG_pAppenderList_t );
+  end-ds;
 
-      /END-FREE
-      *
-     P AppenderList_isNull...
-     P                 E
-      *
-      *=========================================================================
-      *  Returns a NULL appender list.
-      *=========================================================================
-      *  Parameters:
-      *   void
-      *
-      *  Returns:
-      *   pAppList      - Appender list NULL handle.
-      *=========================================================================
-     P AppenderList_null...
-     P                 B                   export
-      *
-     D AppenderList_null...
-     D                 PI                         like(LOG4RPG_pAppenderList_t )
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+//  Return value
+  dcl-ds appIter DS likeds(LOG4RPG_Appender: ListIterator_t) inz;
+  end-ds;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-         return BasicMap_null();
+clear appIter;
+appIter.pAppList = i_pAppList;
+appIter.lastApp  = 0;
 
-      /END-FREE
-      *
-     P AppenderList_null...
-     P                 E
-      *
+return appIter;
+
+
+end-proc;
+
+//=========================================================================
+//  Returns the first appender of the specified appender list.
+//=========================================================================
+//  Parameters:
+//   io_appIter    - Iteratur returned by AppenderList_getIterator().
+//
+//  Returns:
+//   pAppender     - Returns the first appender in the specified
+//                   appender list on success, else a NULL handle.
+//=========================================================================
+dcl-proc AppenderList_getFirst export;
+  dcl-pi *n like(LOG4RPG_pAppender_t);
+    io_appIter likeds(LOG4RPG_AppenderListIterator_t);
+  end-pi;
+
+//  Return value
+  dcl-s pAppender like(LOG4RPG_pAppender_t) inz;
+
+//  Helper fields
+  dcl-s appName like(LOG4RPG_appenderName_t) inz;
+
+//  Appender list handle
+  dcl-ds appList likeds(handle_t) based(io_appIter.pAppList);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+pAppender = Appender_null();
+
+if AppenderList_getNumE(io_appIter.pAppList) = 0;
+   return pAppender;
+endif;
+
+io_appIter.lastApp = 1;
+
+appName = BasicMap_getKeyByIndex(appList.pMap
+                                 : io_appIter.lastApp);
+pAppender = AppenderList_get(io_appIter.pAppList: appName);
+
+return pAppender;
+
+
+end-proc;
+
+//=========================================================================
+//  Returns the next appender of the specified appender list.
+//=========================================================================
+//  Parameters:
+//   io_appIter    - Iteratur returned by AppenderList_getIterator().
+//
+//  Returns:
+//   pAppender     - Returns the next appender in the specified
+//                   appender list on success, else a NULL handle.
+//=========================================================================
+dcl-proc AppenderList_getNext export;
+  dcl-pi *n like(LOG4RPG_pAppender_t);
+    io_appIter likeds(LOG4RPG_AppenderListIterator_t);
+  end-pi;
+
+//  Return value
+  dcl-s pAppender like(LOG4RPG_pAppender_t) inz;
+
+//  Helper fields
+  dcl-s appName like(LOG4RPG_appenderName_t) inz;
+
+//  Appender list handle
+  dcl-ds appList likeds(handle_t) based(io_appIter.pAppList);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+pAppender = Appender_null();
+
+if AppenderList_getNumE(io_appIter.pAppList) <= io_appIter.lastApp;
+   return pAppender;
+endif;
+
+io_appIter.lastApp = io_appIter.lastApp + 1;
+
+appName = BasicMap_getKeyByIndex(appList.pMap
+                                 : io_appIter.lastApp);
+pAppender = AppenderList_get(io_appIter.pAppList: appName);
+
+return pAppender;
+
+
+end-proc;
+
+//=========================================================================
+//  Deletes the specified appender list.
+//=========================================================================
+//  Parameters:
+//   io_pAppList   - Appender list returned by AppenderList_new().
+//
+//  Returns:
+//   isDeleted     - Returns TRUE on success, else FALSE.
+//=========================================================================
+dcl-proc AppenderList_delete export;
+  dcl-pi *n ind;
+    io_pAppList like(LOG4RPG_pAppenderList_t);
+  end-pi;
+
+//  Return value
+  dcl-s isDeleted ind inz(*off);
+
+//  Helper fields
+  dcl-s name like(LOG4RPG_appenderName_t) inz;
+  dcl-ds appIter DS likeds(LOG4RPG_Appender: ListIterator_t) inz;
+  end-ds;
+  dcl-s pAppender like(LOG4RPG_pAppender_t) inz;
+
+//  Appender list handle
+  dcl-ds appList likeds(handle_t) based(io_pAppList);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+if BasicMap_isNull(appList.pMap);
+   return *on;
+endif;
+
+LogLog_verbose('Deleting appender list ...');
+
+p_assert(AppenderList_getNumE(io_pAppList) = 0
+         : 'All appender should have been removed from this +
+            appender list by the logger or the repository.');
+
+appIter = AppenderList_getIterator(io_pAppList);
+
+dow AppenderList_getNumE(io_pAppList) > 0;
+   pAppender = AppenderList_getFirst(appIter);
+   name = Appender_getName(pAppender);
+   AppenderList_remove(io_pAppList: name);
+   Appender_delete(pAppender);
+enddo;
+
+if BasicMap_delete(appList.pMap) = 0;
+   isDeleted = *on;
+else;
+   isDeleted = *off;
+endif;
+
+clear appList;
+dealloc(N) io_pAppList;
+
+io_pAppList = AppenderList_null();
+
+LogLog_verbose('- Freed memory of appender list.');
+
+return isDeleted;
+
+
+end-proc;
+
+//=========================================================================
+//  Test the specified appender list for a NULL value.
+//=========================================================================
+//  Parameters:
+//   i_appList     - Appender list returned by AppenderList_new().
+//
+//  Returns:
+//   isNull        - Returns TRUE if the handle of the appender list is a
+//                   NULL handle.
+//=========================================================================
+dcl-proc AppenderList_isNull export;
+  dcl-pi *n ind;
+    i_pAppList like(LOG4RPG_pAppenderList_t) const;
+  end-pi;
+
+//  Appender list handle
+  dcl-ds appList likeds(handle_t) based(i_pAppList);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+if i_pAppList = AppenderList_null();
+   return *on;
+else;
+   return BasicMap_isNull(appList.pMap);
+endif;
+
+
+end-proc;
+
+//=========================================================================
+//  Returns a NULL appender list.
+//=========================================================================
+//  Parameters:
+//   void
+//
+//  Returns:
+//   pAppList      - Appender list NULL handle.
+//=========================================================================
+dcl-proc AppenderList_null export;
+  dcl-pi *n like(LOG4RPG_pAppenderList_t);
+  end-pi;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+return BasicMap_null();
+
+
+end-proc;
+

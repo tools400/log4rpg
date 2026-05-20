@@ -1,41 +1,44 @@
-      /IF NOT DEFINED(QUSRJOBI)
-      /DEFINE QUSRJOBI
-      *
-      *  Retrieve Job Information (QUSRJOBI) API
-     D QUSRJOBI        PR                  extpgm('QUSRJOBI')
-     D  o_rcvVar                  32767A          options(*varsize)
-     D  i_lenRcvVar                  10I 0 const
-     D  i_format                      8A   const
-     D  i_qJob                       26A   const
-     D  i_intJobID                   16A   const
-     D  io_errCode                32767A          options(*varsize)
-      *
-     D jobi0600_t      DS                  qualified template
-     D  bytRet                       10I 0
-     D  bytAvl                       10I 0
-     D  job                          10A
-     D  user                         10A
-     D  nbr                           6A
-     D  intJobID                     16A
-     D  status                       10A
-     D  type                          1A
-     D  subType                       1A
-     D  jobSws                        8A
-     D  endStatus                     1A
-     D  sbsD                         10A
-     D  sbsDLib                      10A
-     D  curUser                      10A
-     D  dbcs                          1A
-     D  exitKey                       1A
-     D  cancelKey                     1A
-     D  prdRetCode                   10I 0
-     D  userRetCode                  10I 0
-     D  pgmretCode                   10I 0
-     D  spcEnv                       10A
-     D  device                       10A
-     D  grpPrf                       10A
-     D  grpPrfAry                    10A   dim(15)
-     D  jobUsrID                     10A
-     D  jobUsrIDStg                   1A
-      *
-      /ENDIF
+**FREE
+/IF NOT DEFINED(QUSRJOBI)
+/DEFINE QUSRJOBI
+//
+//  Retrieve Job Information (QUSRJOBI) API
+dcl-pr QUSRJOBI extpgm('QUSRJOBI');
+  o_rcvVar        char(32767) options(*varsize);
+  i_lenRcvVar     int(10) const;
+  i_format        char(8) const;
+  i_qJob          char(26) const;
+  i_intJobID      char(16) const;
+  io_errCode      char(32767) options(*varsize);
+end-pr;
+//
+dcl-ds jobi0600_t qualified template;
+  bytRet          int(10);
+  bytAvl          int(10);
+  job             char(10);
+  user            char(10);
+  nbr             char(6);
+  intJobID        char(16);
+  status          char(10);
+  type            char(1);
+  subType         char(1);
+  jobSws          char(8);
+  endStatus       char(1);
+  sbsD            char(10);
+  sbsDLib         char(10);
+  curUser         char(10);
+  dbcs            char(1);
+  exitKey         char(1);
+  cancelKey       char(1);
+  prdRetCode      int(10);
+  userRetCode     int(10);
+  pgmretCode      int(10);
+  spcEnv          char(10);
+  device          char(10);
+  grpPrf          char(10);
+  grpPrfAry       char(10) dim(15);
+  jobUsrID        char(10);
+  jobUsrIDStg     char(1);
+end-ds;
+//
+/ENDIF

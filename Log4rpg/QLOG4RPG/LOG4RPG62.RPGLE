@@ -1,594 +1,547 @@
-      *=====================================================================*
-      *  SrvPgm: LOG4RPG - Object: XMLLayout                                *
-      *=====================================================================*
-      *  Author  :  Thomas Raddatz                                          *
-      *  Date    :  13.06.2006                                              *
-      *  E-mail  :  thomas.raddatz@tools400.de                              *
-      *  Homepage:  www.tools400.de                                         *
-      *=====================================================================*
-      *                                                                     *
-      *  This software is free software, you can redistribute it and/or     *
-      *  modify it under the terms of the GNU General Public License (GPL)  *
-      *  as published by the Free Software Foundation.                      *
-      *                                                                     *
-      *  See GNU General Public License for details.                        *
-      *          http://www.opensource.org                                  *
-      *          http://www.opensource.org/licenses/gpl-license.html        *
-      *                                                                     *
-      *=====================================================================*
-      *  History:                                                           *
-      *                                                                     *
-      *  Datum       Name          Änderung                                 *
-      *  ----------  ------------  ---------------------------------------  *
-      *  27.10.2006  Th.Raddatz    Replaced data structure logEvent with    *
-      *                            object LogEvent.                         *
-      *                            Removed return value from procedure      *
-      *                            PatternLayout_format().                  *
-      *                            Fixed problem that properties were not   *
-      *                            found because auf case mismatch.         *
-      *                                                                     *
-      *  25.04.2007  Th.Raddatz    The log event was not correctly produced *
-      *                            when i_text contained ']]>'. Now ']]>'   *
-      *                            is replaced with ']]&gt'.                *
-      *                                                                     *
-      *  03.04.2012  Th.Raddatz    Fixed problem that some special          *
-      *                            charcaters were not properly translated  *
-      *                            to job CCSID when producing the XML      *
-      *                            message.                                 *
-      *                                                                     *
-      *=====================================================================*
-      *   >>PRE-COMPILER<<                                                  *
-      *                                                                     *
-      *     >>CRTCMD<<  CRTRPGMOD    MODULE(&LI/&OB) +                      *
-      *                              SRCFILE(&SL/&SF) +                     *
-      *                              SRCMBR(&SM);                           *
-      *                                                                     *
-      *     >>COMPILE<<                                                     *
-      *       >>PARM<< TRUNCNBR(*NO);                                       *
-      *       >>PARM<< DBGVIEW(*LIST);                                      *
-      *       >>PARM<< OPTION(*EVENTF);                                     *
-      *       >>PARM<< TGTRLS(V7R3M0  );                                    *
-      *     >>END-COMPILE<<                                                 *
-      *                                                                     *
-      *     >>EXECUTE<<                                                     *
-      *                                                                     *
-      *   >>END-PRE-COMPILER<<                                              *
-      *=====================================================================*
-      /COPY QLOG4RPG,H_SPEC
-      *=====================================================================*
-      *
-      * -----------------------------------------
-      *  Exported functions
-      * -----------------------------------------
-      /COPY QLOG4RPG,PLOG4RPG62
-      *
-      * -----------------------------------------
-      *  Type definitions
-      * -----------------------------------------
-      *
-     D handle_t...
-     D                 DS                  qualified           based(pDummy)
-     D  pSuper                             like(LOG4RPG_pLayout_t  )
-     D  rplUnprtChars                  N
-     D  substitutionChar...
-     D                                1A   varying
-     D  encoding                     32A   varying
-      *
-      * -----------------------------------------
-      *  Prototypes
-      * -----------------------------------------
-      /COPY QLOG4RPG,PLOG4RPG07                    PropertyList
-      /COPY QLOG4RPG,PLOG4RPG09                    Level
-      /COPY QLOG4RPG,PLOG4RPG10                    LogLog
-      /COPY QLOG4RPG,PLOG4RPG99                    Helper
-      *
-      * -----------------------------------------
-      *  Private prototypes
-      * -----------------------------------------
-      *
-      *  Loads the configuration parameters from the specified property list.
-     D loadConfiguration...
-     D                 PR
-     D                                            extproc('loadConfiguration')
-     D  io_handle                                 likeds(handle_t              )
-     D  i_pPropList                        const  like(LOG4RPG_pPropertyList_t )
-     D  i_prefix                           const  like(LOG4RPG_prefix_t        )
-      *
-      *  Ersetzt nicht darstellbare Zeichen
-     D rplcUnprtChars...
-     D                 PR                         like(LOG4RPG_formattedText_t)
-     D                                            extproc('rplcUnprtChars')
-     D  i_handle                           const  likeds(handle_t             )
-     D  i_text                             const  like(LOG4RPG_formattedText_t)
-      *
-      * -----------------------------------------
-      *  Global constants
-      * -----------------------------------------
-     D cTHIS_CLASS...
-     D                 C                          const(
+**free
+//=====================================================================*
+//  SrvPgm: LOG4RPG - Object: XMLLayout                                *
+//=====================================================================*
+//  Author  :  Thomas Raddatz                                          *
+//  Date    :  13.06.2006                                              *
+//  E-mail  :  thomas.raddatz@tools400.de                              *
+//  Homepage:  www.tools400.de                                         *
+//=====================================================================*
+//                                                                     *
+//  This software is free software, you can redistribute it and/or     *
+//  modify it under the terms of the GNU General Public License (GPL)  *
+//  as published by the Free Software Foundation.                      *
+//                                                                     *
+//  See GNU General Public License for details.                        *
+//          http://www.opensource.org                                  *
+//          http://www.opensource.org/licenses/gpl-license.html        *
+//                                                                     *
+//=====================================================================*
+//  History:                                                           *
+//                                                                     *
+//  Datum       Name          Änderung                                 *
+//  ----------  ------------  ---------------------------------------  *
+//  27.10.2006  Th.Raddatz    Replaced data structure logEvent with    *
+//                            object LogEvent.                         *
+//                            Removed return value from procedure      *
+//                            PatternLayout_format().                  *
+//                            Fixed problem that properties were not   *
+//                            found because auf case mismatch.         *
+//                                                                     *
+//  25.04.2007  Th.Raddatz    The log event was not correctly produced *
+//                            when i_text contained ']]>'. Now ']]>'   *
+//                            is replaced with ']]&gt'.                *
+//                                                                     *
+//  03.04.2012  Th.Raddatz    Fixed problem that some special          *
+//                            charcaters were not properly translated  *
+//                            to job CCSID when producing the XML      *
+//                            message.                                 *
+//                                                                     *
+//=====================================================================*
+//   >>PRE-COMPILER<<                                                  *
+//                                                                     *
+//     >>CRTCMD<<  CRTRPGMOD    MODULE(&LI/&OB) +                      *
+//                              SRCFILE(&SL/&SF) +                     *
+//                              SRCMBR(&SM);                           *
+//                                                                     *
+//     >>COMPILE<<                                                     *
+//       >>PARM<< TRUNCNBR(*NO);                                       *
+//       >>PARM<< DBGVIEW(*LIST);                                      *
+//       >>PARM<< OPTION(*EVENTF);                                     *
+//       >>PARM<< TGTRLS(V7R3M0  );                                    *
+//     >>END-COMPILE<<                                                 *
+//                                                                     *
+//     >>EXECUTE<<                                                     *
+//                                                                     *
+//   >>END-PRE-COMPILER<<                                              *
+//=====================================================================*
+/copy QLOG4RPG,H_SPEC
+//=====================================================================*
+//
+// -----------------------------------------
+//  Exported functions
+// -----------------------------------------
+/copy QLOG4RPG,PLOG4RPG62
+
+// -----------------------------------------
+//  Type definitions
+// -----------------------------------------
+
+dcl-ds handle_t qualified based(pDummy);
+  pSuper           like(LOG4RPG_pLayout_t);
+  rplUnprtChars    ind;
+  substitutionChar varchar(1);
+  encoding         varchar(32);
+end-ds;
+
+// -----------------------------------------
+//  Prototypes
+// -----------------------------------------
+/copy QLOG4RPG,PLOG4RPG07                    PropertyList
+/copy QLOG4RPG,PLOG4RPG09                    Level
+/copy QLOG4RPG,PLOG4RPG10                    LogLog
+/copy QLOG4RPG,PLOG4RPG99                    Helper
+
+// -----------------------------------------
+//  Private prototypes
+// -----------------------------------------
+
+//  Loads the configuration parameters from the specified property list.
+dcl-pr loadConfiguration extproc('loadConfiguration');
+  io_handle   likeds(handle_t);
+  i_pPropList like(LOG4RPG_pPropertyList_t) const;
+  i_prefix    like(LOG4RPG_prefix_t) const;
+end-pr;
+
+//  Ersetzt nicht darstellbare Zeichen
+dcl-pr rplcUnprtChars like(LOG4RPG_formattedText_t) extproc('rplcUnprtChars');
+  i_handle likeds(handle_t) const;
+  i_text   like(LOG4RPG_formattedText_t) const;
+end-pr;
+
+// -----------------------------------------
+//  Global constants
+// -----------------------------------------
+dcl-c cTHIS_CLASS;
      D                                            'XMLLayout')
-      *
-     D cPARAMETER_REPLACE_UNPRINTABLE_CHARACTERS...
-     D                 C                          const('replace+
-     D                                                   unprintablecharacters')
-     D cPARAMETER_SUBSTITUTION_CHARACTER...
-     D                 C                          const('substitutionCharacter')
-     D cPARAMETER_ENCODING...
-     D                 C                          const('encoding')
-      *
-      * -----------------------------------------
-      *  Global fields
-      * -----------------------------------------
-      *
-      * -----------------------------------------
-      *  Program status data structure
-      * -----------------------------------------
-      /DEFINE SDS_EXTENDED
-      /COPY QLOG4RPG,SDS
-      /UNDEFINE SDS_EXTENDED
-      *
-      *=========================================================================
-      *  Creates a new XMLLayout.
-      *=========================================================================
-      *  Parameters:
-      *   io_pHandle    - Handle that is passed around the various calls to
-      *                   this XMLLayout.
-      *   i_pPropsList  - Handle of the property list that contains the
-      *                   properties for the appender.
-      *   i_prefix      - Prefix of the relevant property keys.
-      *
-      *  Returns:
-      *   isDone        - Returns TRUE on success, else FALSE.
-      *=========================================================================
-     P XMLLayout_new...
-     P                 B                   export
-      *
-     D XMLLayout_new...
-     D                 PI              N
-     D  i_pSuper                           const  like(LOG4RPG_pLayout_t       )
-     D  io_pHandle                     *
-     D  i_pPropList                        const  like(LOG4RPG_pPropertyList_t )
-     D  i_prefix                           const  like(LOG4RPG_prefix_t        )
-      *
-      *  Return value
-     D isDone          S               N                         inz(*off)
-      *
-     D REPLACEMENT_CHARACTER...
-     D                 S              1C   inz(u'00F7')
-      *
-      *  Helper fields
-     D tempHandle      DS                  likeds(handle_t          ) inz
-      *
-      *  XMLLayout handle
-     D handle          DS                  likeds(handle_t ) based(io_pHandle)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+//
+dcl-c cPARAMETER_REPLACE_UNPRINTABLE_CHARACTERS
+      const('replace+
+              unprintablecharacters');
+dcl-c cPARAMETER_SUBSTITUTION_CHARACTER 'substitutionCharacter';
+dcl-c cPARAMETER_ENCODING 'encoding';
 
-         clear tempHandle;
+// -----------------------------------------
+//  Global fields
+// -----------------------------------------
+//
+// -----------------------------------------
+//  Program status data structure
+// -----------------------------------------
+/define SDS_EXTENDED
+/copy QLOG4RPG,SDS
+/undefine SDS_EXTENDED
 
-         // Initialize handle
-         tempHandle.pSuper        = i_pSuper;   // Handle of the super class 'Layout'
-         tempHandle.rplUnprtChars = *off;
-         tempHandle.substitutionChar = REPLACEMENT_CHARACTER;
-         tempHandle.encoding         = '';
+//=========================================================================
+//  Creates a new XMLLayout.
+//=========================================================================
+//  Parameters:
+//   io_pHandle    - Handle that is passed around the various calls to
+//                   this XMLLayout.
+//   i_pPropsList  - Handle of the property list that contains the
+//                   properties for the appender.
+//   i_prefix      - Prefix of the relevant property keys.
+//
+//  Returns:
+//   isDone        - Returns TRUE on success, else FALSE.
+//=========================================================================
+dcl-proc XMLLayout_new export;
+  dcl-pi *n ind;
+    i_pSuper    like(LOG4RPG_pLayout_t) const;
+    io_pHandle  pointer;
+    i_pPropList like(LOG4RPG_pPropertyList_t) const;
+    i_prefix    like(LOG4RPG_prefix_t) const;
+  end-pi;
 
-         // Initialize handle from configuration properties
-         if (i_pPropList <> *NULL) and not PropertyList_isNull(i_pPropList);
-            loadConfiguration(tempHandle: i_pPropList: i_prefix);
-         endif;
+//  Return value
+  dcl-s isDone ind inz(*off);
 
-         io_pHandle = %alloc(%size(tempHandle));
-         handle = tempHandle;
+  dcl-s REPLACEMENT_CHARACTER ucs2(1) inz(u'00F7');
 
-         LogLog_debug('Loaded instance of [' + cTHIS_CLASS + '].');
+//  Helper fields
+  dcl-ds tempHandle likeds(handle_t) inz;
 
-         return isDone;
+//  XMLLayout handle
+  dcl-ds handle likeds(handle_t) based(io_pHandle);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-      /END-FREE
-      *
-     P XMLLayout_new...
-     P                 E
-      *
-      *=========================================================================
-      *  Formats a logging event and returns the result as a string.
-      *=========================================================================
-      *  Parameters:
-      *   i_pHandle     - Handle that is passed around the various calls to
-      *                   this XMLLayout.
-      *   i_pLogEvent   - Handle of the Log event returned by LogEvent_new().
-      *                   text of the log event that is formated.
-      *
-      *  Returns:
-      *   text          - Returns the formatted text of the log event.
-      *=========================================================================
-     P XMLLayout_format...
-     P                 B                   export
-      *
-     D XMLLayout_format...
-     D                 PI
-     D  i_pHandle                      *   const
-     D  i_pLogEvent                        const  like(LOG4RPG_pLogEvent_t )
-      *
-      *  Helper fields
-     D xmlString       S                   like(LOG4RPG_formattedText_t) inz
-     D isStarted       S               N   inz(*off)
-     D pPropList       S                   like(LOG4RPG_pPropertyList_t ) inz
-     D caller          DS                  likeds(LOG4RPG_caller_t      ) inz
-     D property        DS                  likeds(LOG4RPG_property_t    ) inz
-     D propIter        DS                  likeds(LOG4RPG_Property...
-     D                                                    ListIterator_t) inz
-      *
-      *  Convert RPG timestamp to Epoch time (mSeconds since January 1, 1970)
-     D elapsedEpochTime...
-     D                 S             20U 0 inz
-     D mSeconds        S             20U 0 inz
-     D logTime         S               Z   inz
-      *
-     D cBASE_TIME      C                          const(
+clear tempHandle;
+
+// Initialize handle
+tempHandle.pSuper        = i_pSuper;   // Handle of the super class 'Layout'
+tempHandle.rplUnprtChars = *off;
+tempHandle.substitutionChar = REPLACEMENT_CHARACTER;
+tempHandle.encoding         = '';
+
+// Initialize handle from configuration properties
+if (i_pPropList <> *NULL) and not PropertyList_isNull(i_pPropList);
+   loadConfiguration(tempHandle: i_pPropList: i_prefix);
+endif;
+
+io_pHandle = %alloc(%size(tempHandle));
+handle = tempHandle;
+
+LogLog_debug('Loaded instance of [' + cTHIS_CLASS + '].');
+
+return isDone;
+
+
+end-proc;
+
+//=========================================================================
+//  Formats a logging event and returns the result as a string.
+//=========================================================================
+//  Parameters:
+//   i_pHandle     - Handle that is passed around the various calls to
+//                   this XMLLayout.
+//   i_pLogEvent   - Handle of the Log event returned by LogEvent_new().
+//                   text of the log event that is formated.
+//
+//  Returns:
+//   text          - Returns the formatted text of the log event.
+//=========================================================================
+dcl-proc XMLLayout_format export;
+  dcl-pi *n;
+    i_pHandle   pointer const;
+    i_pLogEvent like(LOG4RPG_pLogEvent_t) const;
+  end-pi;
+
+//  Helper fields
+  dcl-s xmlString like(LOG4RPG_formattedText_t) inz;
+  dcl-s isStarted ind inz(*off);
+  dcl-s pPropList like(LOG4RPG_pPropertyList_t) inz;
+  dcl-ds caller likeds(LOG4RPG_caller_t) inz;
+  dcl-ds property likeds(LOG4RPG_property_t) inz;
+  dcl-ds propIter DS likeds(LOG4RPG_Property: ListIterator_t) inz;
+  end-ds;
+
+//  Convert RPG timestamp to Epoch time (mSeconds since January 1, 1970)
+  dcl-s elapsedEpochTime uns(20) inz;
+  dcl-s mSeconds uns(20) inz;
+  dcl-s logTime timestamp inz;
+
+  dcl-c cBASE_TIME;
      D                                            z'1970-01-01-00.00.00.000000')
-      *
-      *  Get Offset from Universal Time Coordinated to Local Time (CEEUTCO) API
-     D hours           S             10I 0 inz
-     D minutes         S             10I 0 inz
-     D seconds         S              8F   inz
-      *
-     D CEEUTCO         PR                  opdesc
-     D  Hours                        10I 0
-     D  Minutes                      10I 0
-     D  Seconds                       8F
-      *
-      *  XMLLayout handle
-     D handle          DS                  likeds(handle_t ) based(i_pHandle)
-      *
-     D START_CDATA     S              9C   inz(u'003C0021005B00430044+
-     D                                           004100540041005B')             <![CDATA[
-     D END_CDATA       S              3C   inz(u'005D005D003E')                 ]]>
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+//
+//  Get Offset from Universal Time Coordinated to Local Time (CEEUTCO) API
+dcl-s hours           int(10) inz;
+  dcl-s minutes int(10) inz;
+  dcl-s seconds float(8) inz;
 
-         // Convert log timestamp to Epoch time since this is
-         // what 'Chainsaw' expects:
-         mSeconds = %subdt(LogEvent_getTime(i_pLogEvent): *MSECONDS);
-         logTime  = LogEvent_getTime(i_pLogEvent) - %mseconds(mSeconds);
-         elapsedEpochTime = %diff(logTime: cBASE_TIME: *SECONDS);
-         CEEUTCO(hours: minutes: seconds);
-         elapsedEpochTime = elapsedEpochTime - seconds;
-         elapsedEpochTime = (elapsedEpochTime * 1000) + (mSeconds / 1000);
+  dcl-pr CEEUTCO opdesc;
+    Hours   int(10);
+    Minutes int(10);
+    Seconds float(8);
+  end-pr;
 
-         // Start log event ...
-         xmlString = '<log4j:event logger="'                  +
-                        LogEvent_getLoggerName(i_pLogEvent)   + '" ' +
-                     'timestamp="'                            +
-                        %char(elapsedEpochTime)               + '" ' +
-                     'level="'                                +
-                        Level_toString(
-                           LogEvent_getPriority(i_pLogEvent)) + '" ' +
-                     'thread="'                               +
-                        %editc(sds.nbr: 'X') + '/' +
-                        %trimR(sds.user)     + '/' +
-                        %trimR(sds.job )                      + '" ' +
-                     '>';
+//  XMLLayout handle
+  dcl-ds handle likeds(handle_t) based(i_pHandle);
 
-         // ... append message text
-         xmlString = xmlString +
-                     '<log4j:message>' + %char(START_CDATA) +
-                        rplcUnprtChars(handle
-                                       : LogEvent_getText(i_pLogEvent)) +
-                     %char(END_CDATA) +
-                     '</log4j:message>';
+  dcl-s START_CDATA ucs2(9) inz(u'003C0021005B00430044004100540041005B'); // <![CDATA[
+  dcl-s END_CDATA ucs2(3) inz(u'005D005D003E'); // ]]>
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-         // ... append caller information
-         caller = LogEvent_getCaller(i_pLogEvent);
+// Convert log timestamp to Epoch time since this is
+// what 'Chainsaw' expects:
+mSeconds = %subdt(LogEvent_getTime(i_pLogEvent): *MSECONDS);
+logTime  = LogEvent_getTime(i_pLogEvent) - %mseconds(mSeconds);
+elapsedEpochTime = %diff(logTime: cBASE_TIME: *SECONDS);
+CEEUTCO(hours: minutes: seconds);
+elapsedEpochTime = elapsedEpochTime - seconds;
+elapsedEpochTime = (elapsedEpochTime * 1000) + (mSeconds / 1000);
 
-         xmlString = xmlString +
-                     '<log4j:locationInfo class="' +
-                        %trimR(caller.pgm.name)    + '" ' +
-                     'method="'                    +
-                        %trimR(caller.procedure)   + '" ' +
-                     'file="'                      +
-                        %trimR(caller.module.name) + '" ' +
-                     'line="'                      +
-                        %trimR(caller.stmtID)      + '" ' +
-                     '/>';
+// Start log event ...
+xmlString = '<log4j:event logger="'                  +
+               LogEvent_getLoggerName(i_pLogEvent)   + '" ' +
+            'timestamp="'                            +
+               %char(elapsedEpochTime)               + '" ' +
+            'level="'                                +
+               Level_toString(
+                  LogEvent_getPriority(i_pLogEvent)) + '" ' +
+            'thread="'                               +
+               %editc(sds.nbr: 'X') + '/' +
+               %trimR(sds.user)     + '/' +
+               %trimR(sds.job )                      + '" ' +
+            '>';
 
-         // ... append properties
-         pPropList = LogEvent_getPropertyList(i_pLogEvent);
+// ... append message text
+xmlString = xmlString +
+            '<log4j:message>' + %char(START_CDATA) +
+               rplcUnprtChars(handle
+                              : LogEvent_getText(i_pLogEvent)) +
+            %char(END_CDATA) +
+            '</log4j:message>';
 
-         if not PropertyList_isNull(pPropList);
+// ... append caller information
+caller = LogEvent_getCaller(i_pLogEvent);
 
-            propIter = PropertyList_getIterator(pPropList);
+xmlString = xmlString +
+            '<log4j:locationInfo class="' +
+               %trimR(caller.pgm.name)    + '" ' +
+            'method="'                    +
+               %trimR(caller.procedure)   + '" ' +
+            'file="'                      +
+               %trimR(caller.module.name) + '" ' +
+            'line="'                      +
+               %trimR(caller.stmtID)      + '" ' +
+            '/>';
 
-            isStarted = *off;
-            property = PropertyList_getFirst(propIter);
+// ... append properties
+pPropList = LogEvent_getPropertyList(i_pLogEvent);
 
-            dow property.key <> '';
+if not PropertyList_isNull(pPropList);
 
-               if not isStarted;
-                  xmlString = xmlString + '<log4j:properties>';
-                  isStarted = *on;
-               endif;
+   propIter = PropertyList_getIterator(pPropList);
 
-               xmlString = xmlString +
-                           '<log4j:data name="' + property.key   +
-                                    '" value="' + property.value + '"' +
-                           '/>';
+   isStarted = *off;
+   property = PropertyList_getFirst(propIter);
 
-               property = PropertyList_getNext(propIter);
-            enddo;
+   dow property.key <> '';
 
-            if isStarted;
-               xmlString = xmlString + '</log4j:properties>';
-            endif;
+      if not isStarted;
+         xmlString = xmlString + '<log4j:properties>';
+         isStarted = *on;
+      endif;
+
+      xmlString = xmlString +
+                  '<log4j:data name="' + property.key   +
+                           '" value="' + property.value + '"' +
+                  '/>';
+
+      property = PropertyList_getNext(propIter);
+   enddo;
+
+   if isStarted;
+      xmlString = xmlString + '</log4j:properties>';
+   endif;
+endif;
+
+// ... close.
+xmlString = xmlString + '</log4j:event>';
+
+LogEvent_setText(i_pLogEvent: xmlString);
+
+return;
+
+
+end-proc;
+
+//=====================================================================*
+//  Returns the header of this layout.
+//=====================================================================*
+//  Parameters:
+//   i_pHandle    - Handle that is passed around the various calls to
+//                  this XMLLayout.
+
+//  Returns:
+//   header       - The header string of this layout.
+//=====================================================================*
+dcl-proc XMLLayout_getHeader export;
+  dcl-pi *n like(LOG4RPG_header_t);
+    i_pHandle pointer const;
+  end-pi;
+
+//  Helper fields
+  dcl-s xmlString like(LOG4RPG_header_t) inz;
+
+//  Layout handle
+  dcl-ds handle likeds(handle_t) based(i_pHandle);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+xmlString = '';
+
+return xmlString;
+
+
+end-proc;
+
+//=====================================================================*
+//  Returns the footer of this layout.
+//=====================================================================*
+//  Parameters:
+//   i_pHandle    - Handle that is passed around the various calls to
+//                  this XMLLayout.
+
+//  Returns:
+//   footer       - The footer string of this layout.
+//=====================================================================*
+dcl-proc XMLLayout_getFooter export;
+  dcl-pi *n like(LOG4RPG_footer_t);
+    i_pHandle pointer const;
+  end-pi;
+
+//  Helper fields
+  dcl-s xmlString like(LOG4RPG_footer_t) inz;
+
+//  Layout handle
+  dcl-ds handle likeds(handle_t) based(i_pHandle);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+xmlString = '';
+
+return xmlString;
+
+
+end-proc;
+
+//=====================================================================*
+//  Used to set the properties of the layout.
+//=====================================================================*
+//  Parameters:
+//   i_pHandle     - Handle that is passed around the various calls to
+//                   this XMLLayout.
+//   i_pPropsList  - Handle of the property list that contains the
+//                   properties for the appender.
+//   i_prefix      - Prefix of the relevant property keys.
+
+//  Returns:
+//   isDone        - Returns TRUE on success, else FALSE.
+//=====================================================================*
+dcl-proc XMLLayout_setProperties export;
+  dcl-pi *n;
+    i_pHandle   pointer const;
+    i_pPropList like(LOG4RPG_pPropertyList_t) const;
+    i_prefix    like(LOG4RPG_prefix_t) const;
+  end-pi;
+
+//  XMLLayout handle
+  dcl-ds handle likeds(handle_t) based(i_pHandle);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+loadConfiguration(handle: i_pPropList: i_prefix);
+
+return;
+
+
+end-proc;
+
+//=====================================================================*
+//  Deletes a given XMLLayout.
+//=====================================================================*
+//  Parameters:
+//   io_pHandle    - Handle that is passed around the various calls to
+//                   this XMLLayout.
+
+//  Returns:
+//   void
+//=====================================================================*
+dcl-proc XMLLayout_delete export;
+  dcl-pi *n ind;
+    io_pHandle pointer;
+  end-pi;
+
+//  Return value
+  dcl-s isDone ind inz(*off);
+
+//  XMLLayout handle
+  dcl-ds handle likeds(handle_t) based(io_pHandle);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+// Clear handle data
+clear handle;
+
+// Free handle memory
+dealloc(N) io_pHandle;
+
+LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
+
+isDone = *on;
+
+return isDone;
+
+
+end-proc;
+
+//=========================================================================
+//  *** Private ***
+//  Loads the configuration parameters from the specified property list.
+//=========================================================================
+dcl-proc loadConfiguration;
+  dcl-pi *n;
+    io_handle   likeds(handle_t);
+    i_pPropList like(LOG4RPG_pPropertyList_t) const;
+    i_prefix    like(LOG4RPG_prefix_t) const;
+  end-pi;
+
+//  Local fields
+  dcl-s parameter like(property.key) inz;
+  dcl-s prefix like(i_prefix) inz;
+  dcl-ds property likeds(LOG4RPG_property_t) inz;
+  dcl-ds propIter DS likeds(LOG4RPG_Property: ListIterator_t) inz;
+  end-ds;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+prefix = f_lcase(i_prefix);
+
+propIter = PropertyList_getIterator(i_pPropList);
+
+property = PropertyList_getFirst(propIter);
+
+dow property.key <> '';
+
+   if (prefix = '') or (f_startsWith(prefix: property.key) and
+                        %len(property.key) > %len(prefix));
+
+      parameter = f_lcase(%subst(property.key: %len(prefix) + 1));
+
+      select;
+      when parameter = cPARAMETER_REPLACE_UNPRINTABLE_CHARACTERS;
+         if property.value = '1' or f_lcase(property.value) = 'true';
+            io_handle.rplUnprtChars = *on;
+         else;
+            io_handle.rplUnprtChars = *off;
          endif;
+      when parameter = cPARAMETER_SUBSTITUTION_CHARACTER;
+         io_handle.substitutionChar = property.value;
+      when parameter = cPARAMETER_ENCODING;
+         io_handle.encoding         = property.value;
+      when Layout_knowsProperty(parameter);
+         // Ignore all parameters known by super Layout class
+      other;
+         LogLog_warning('No such property ['     +
+                         property.key            +
+                        '] in [' + cTHIS_CLASS + ']');
+      endsl;
 
-         // ... close.
-         xmlString = xmlString + '</log4j:event>';
+   endif;
 
-         LogEvent_setText(i_pLogEvent: xmlString);
+   property = PropertyList_getNext(propIter);
+enddo;
 
-         return;
+return;
 
-      /END-FREE
-      *
-     P XMLLayout_format...
-     P                 E
-      *
-      *=====================================================================*
-      *  Returns the header of this layout.
-      *=====================================================================*
-      *  Parameters:
-      *   i_pHandle    - Handle that is passed around the various calls to
-      *                  this XMLLayout.
-      *
-      *  Returns:
-      *   header       - The header string of this layout.
-      *=====================================================================*
-     P XMLLayout_getHeader...
-     P                 B                   export
-      *
-     D XMLLayout_getHeader...
-     D                 PI                         like(LOG4RPG_header_t)
-     D  i_pHandle                      *   const
-      *
-      *  Helper fields
-     D xmlString       S                   like(LOG4RPG_header_t  ) inz
-      *
-      *  Layout handle
-     D handle          DS                  likeds(handle_t ) based(i_pHandle)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
 
-         xmlString = '';
+end-proc;
 
-         return xmlString;
+//=====================================================================*
+//  *** private ***
+//  Entfernt nicht darstellbare Zeichen
+//=====================================================================*
+dcl-proc rplcUnprtChars export;
+  dcl-pi *n like(LOG4RPG_formattedText_t);
+    i_handle likeds(handle_t) const;
+    i_text   like(LOG4RPG_formattedText_t) const;
+  end-pi;
 
-      /END-FREE
-      *
-     P XMLLayout_getHeader...
-     P                 E
-      *
-      *=====================================================================*
-      *  Returns the footer of this layout.
-      *=====================================================================*
-      *  Parameters:
-      *   i_pHandle    - Handle that is passed around the various calls to
-      *                  this XMLLayout.
-      *
-      *  Returns:
-      *   footer       - The footer string of this layout.
-      *=====================================================================*
-     P XMLLayout_getFooter...
-     P                 B                   export
-      *
-     D XMLLayout_getFooter...
-     D                 PI                         like(LOG4RPG_footer_t)
-     D  i_pHandle                      *   const
-      *
-      *  Helper fields
-     D xmlString       S                   like(LOG4RPG_footer_t  ) inz
-      *
-      *  Layout handle
-     D handle          DS                  likeds(handle_t ) based(i_pHandle)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+//  Return value
+  dcl-s text1 like(LOG4RPG_formattedText_t) inz;
+  dcl-s text2 like(LOG4RPG_formattedText_t) inz;
 
-         xmlString = '';
+//  Arbeitsfelder
+  dcl-s x int(10) inz;
 
-         return xmlString;
+  dcl-s END_CDATA ucs2(3) inz(u'005D005D003E'); // ]]>
+  dcl-s ESC_END_CDATA ucs2(6) inz(u'005D005D002600670074003B'); // ]]&gt;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-      /END-FREE
-      *
-     P XMLLayout_getFooter...
-     P                 E
-      *
-      *=====================================================================*
-      *  Used to set the properties of the layout.
-      *=====================================================================*
-      *  Parameters:
-      *   i_pHandle     - Handle that is passed around the various calls to
-      *                   this XMLLayout.
-      *   i_pPropsList  - Handle of the property list that contains the
-      *                   properties for the appender.
-      *   i_prefix      - Prefix of the relevant property keys.
-      *
-      *  Returns:
-      *   isDone        - Returns TRUE on success, else FALSE.
-      *=====================================================================*
-     P XMLLayout_setProperties...
-     P                 B                   export
-      *
-     D XMLLayout_setProperties...
-     D                 PI
-     D  i_pHandle                      *   const
-     D  i_pPropList                        const  like(LOG4RPG_pPropertyList_t )
-     D  i_prefix                           const  like(LOG4RPG_prefix_t        )
-      *
-      *  XMLLayout handle
-     D handle          DS                  likeds(handle_t ) based(i_pHandle)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+// Replace closing string of CDATA section
+text1 = f_replace(%char(END_CDATA): %char(ESC_END_CDATA): i_text);
 
-         loadConfiguration(handle: i_pPropList: i_prefix);
+// Replace unprintable characters
+if not i_handle.rplUnprtChars;
+   return text1;
+endif;
 
-         return;
+for x = 1 to %len(text1);
+   if %subst(text1: x: 1) < x'40' or %subst(text1: x: 1) > x'FE';
+      text2 = text2 + i_handle.substitutionChar;
+   else;
+      text2 = text2 + %subst(text1: x: 1);
+   endif;
+endfor;
 
-      /END-FREE
-      *
-     P XMLLayout_setProperties...
-     P                 E
-      *
-      *=====================================================================*
-      *  Deletes a given XMLLayout.
-      *=====================================================================*
-      *  Parameters:
-      *   io_pHandle    - Handle that is passed around the various calls to
-      *                   this XMLLayout.
-      *
-      *  Returns:
-      *   void
-      *=====================================================================*
-     P XMLLayout_delete...
-     P                 B                   export
-      *
-     D XMLLayout_delete...
-     D                 PI              N
-     D  io_pHandle                     *
-      *
-      *  Return value
-     D isDone          S               N                         inz(*off)
-      *
-      *  XMLLayout handle
-     D handle          DS                  likeds(handle_t ) based(io_pHandle)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+return text2;
 
-         // Clear handle data
-         clear handle;
 
-         // Free handle memory
-         dealloc(N) io_pHandle;
+end-proc;
 
-         LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
-
-         isDone = *on;
-
-         return isDone;
-
-      /END-FREE
-      *
-     P XMLLayout_delete...
-     P                 E
-      *
-      *=========================================================================
-    R *  *** Private ***
-      *  Loads the configuration parameters from the specified property list.
-      *=========================================================================
-     P loadConfiguration...
-     P                 B
-      *
-     D loadConfiguration...
-     D                 PI
-     D  io_handle                                 likeds(handle_t              )
-     D  i_pPropList                        const  like(LOG4RPG_pPropertyList_t )
-     D  i_prefix                           const  like(LOG4RPG_prefix_t        )
-      *
-      *  Local fields
-     D parameter       S                   like(property.key        ) inz
-     D prefix          S                   like(i_prefix            ) inz
-     D property        DS                  likeds(LOG4RPG_property_t) inz
-     D propIter        DS                  likeds(LOG4RPG_Property...
-     D                                                    ListIterator_t) inz
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
-
-         prefix = f_lcase(i_prefix);
-
-         propIter = PropertyList_getIterator(i_pPropList);
-
-         property = PropertyList_getFirst(propIter);
-
-         dow property.key <> '';
-
-            if (prefix = '') or (f_startsWith(prefix: property.key) and
-                                 %len(property.key) > %len(prefix));
-
-               parameter = f_lcase(%subst(property.key: %len(prefix) + 1));
-
-               select;
-               when parameter = cPARAMETER_REPLACE_UNPRINTABLE_CHARACTERS;
-                  if property.value = '1' or f_lcase(property.value) = 'true';
-                     io_handle.rplUnprtChars = *on;
-                  else;
-                     io_handle.rplUnprtChars = *off;
-                  endif;
-               when parameter = cPARAMETER_SUBSTITUTION_CHARACTER;
-                  io_handle.substitutionChar = property.value;
-               when parameter = cPARAMETER_ENCODING;
-                  io_handle.encoding         = property.value;
-               when Layout_knowsProperty(parameter);
-                  // Ignore all parameters known by super Layout class
-               other;
-                  LogLog_warning('No such property ['     +
-                                  property.key            +
-                                 '] in [' + cTHIS_CLASS + ']');
-               endsl;
-
-            endif;
-
-            property = PropertyList_getNext(propIter);
-         enddo;
-
-         return;
-
-      /END-FREE
-      *
-     P loadConfiguration...
-     P                 E
-      *
-      *=====================================================================*
-    R *  *** private ***
-      *  Entfernt nicht darstellbare Zeichen
-      *=====================================================================*
-     P rplcUnprtChars...
-     P                 B                   export
-      *
-     D rplcUnprtChars...
-     D                 PI                         like(LOG4RPG_formattedText_t)
-     D  i_handle                           const  likeds(handle_t             )
-     D  i_text                             const  like(LOG4RPG_formattedText_t)
-      *
-      *  Return value
-     D text1           S                   like(LOG4RPG_formattedText_t) inz
-     D text2           S                   like(LOG4RPG_formattedText_t) inz
-      *
-      *  Arbeitsfelder
-     D x               S             10I 0 inz
-      *
-     D END_CDATA       S              3C   inz(u'005D005D003E')                 ]]>
-     D ESC_END_CDATA   S              6C   inz(u'005D005D002600670074003B')     ]]&gt;
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
-
-         // Replace closing string of CDATA section
-         text1 = f_replace(%char(END_CDATA): %char(ESC_END_CDATA): i_text);
-
-         // Replace unprintable characters
-         if not i_handle.rplUnprtChars;
-            return text1;
-         endif;
-
-         for x = 1 to %len(text1);
-            if %subst(text1: x: 1) < x'40' or %subst(text1: x: 1) > x'FE';
-               text2 = text2 + i_handle.substitutionChar;
-            else;
-               text2 = text2 + %subst(text1: x: 1);
-            endif;
-         endfor;
-
-         return text2;
-
-      /END-FREE
-      *
-     P rplcUnprtChars...
-     P                 E
-      *

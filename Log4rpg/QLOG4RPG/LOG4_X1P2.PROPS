@@ -1,9 +1,9 @@
- 
+
 log4rpg.debug=off, printer
- 
+
 log4rpg.rootLogger=DEBUG, print
 log4rpg.logger.de.tools400=INFO
- 
+
 log4rpg.appender.print=*LIBL/LOG4RPG(DailyRollingPrintAppender)
 log4rpg.appender.print.splfName=LOG4_X1P2
 log4rpg.appender.print.length=49
@@ -15,4 +15,4 @@ log4rpg.appender.print.leftMargin=10
 log4rpg.appender.print.rightMargin=10
 log4rpg.appender.print.layout=PatternLayout
 log4rpg.appender.print.layout.conversionPattern=%z [%-5p] %P(%M).%F (%S) %m%n
- 
+

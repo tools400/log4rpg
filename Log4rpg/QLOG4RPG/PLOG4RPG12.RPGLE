@@ -1,127 +1,134 @@
-      /IF NOT DEFINED(PLOG4RPG12)
-      /DEFINE PLOG4RPG12
-      *
-      * -----------------------------------------
-      *  Type definitions
-      * -----------------------------------------
-      /COPY QLOG4RPG,PTYPES                        Private type definitions
-      *
-      *  Appender:
-     D LOG4RPG_classAppender_t...
-     D                 DS                  qualified               based(pDummy)
-     D  srvPgm                             likeds(actSrvPgm_t )
-     D  pHandle                        *
-     D  proc                               like(LOG4RPG_procedure_t )
-     D  procNew                            likeds(actProc_t   )
-     D  procRequiresLayout...
-     D                                     likeds(actProc_t   )
-     D  procDoAppend                       likeds(actProc_t   )
-     D  procSetProperties...
-     D                                     likeds(actProc_t   )
-     D  procDelete                         likeds(actProc_t   )
-      *
-      *  Layout:
-     D LOG4RPG_classLayout_t...
-     D                 DS                  qualified               based(pDummy)
-     D  srvPgm                             likeds(actSrvPgm_t )
-     D  pHandle                        *
-     D  proc                               like(LOG4RPG_procedure_t )
-     D  procNew                            likeds(actProc_t   )
-     D  procFormat                         likeds(actProc_t   )
-     D  procSetProperties...
-     D                                     likeds(actProc_t   )
-     D  procDelete                         likeds(actProc_t   )
-     D  procGetHeader                      likeds(actProc_t   )
-     D  procGetFooter                      likeds(actProc_t   )
-      *
-      *  Filter:
-     D LOG4RPG_classFilter_t...
-     D                 DS                  qualified               based(pDummy)
-     D  srvPgm                             likeds(actSrvPgm_t )
-     D  pHandle                        *
-     D  proc                               like(LOG4RPG_procedure_t )
-     D  procNew                            likeds(actProc_t   )
-     D  procDecide                         likeds(actProc_t   )
-     D  procSetProperties...
-     D                                     likeds(actProc_t   )
-     D  procDelete                         likeds(actProc_t   )
-      *
-      * -----------------------------------------
-      *  Constants
-      * -----------------------------------------
-      *
-      * -----------------------------------------
-      *  Global fields
-      * -----------------------------------------
-      *  Appender:
-     D g_pAppender_new...
-     D                 S               *   procptr
-     D g_pAppender_requiresLayout...
-     D                 S               *   procptr
-     D g_pAppender_doAppend...
-     D                 S               *   procptr
-     D g_pAppender_setProperties...
-     D                 S               *   procptr
-     D g_pAppender_delete...
-     D                 S               *   procptr
-      *
-      *  Layout:
-     D g_pLayout_new...
-     D                 S               *   procptr
-     D g_pLayout_format...
-     D                 S               *   procptr
-     D g_pLayout_setProperties...
-     D                 S               *   procptr
-     D g_pLayout_delete...
-     D                 S               *   procptr
-     D g_pLayout_getHeader...
-     D                 S               *   procptr
-     D g_pLayout_getFooter...
-     D                 S               *   procptr
-      *
-      *  Filter:
-     D g_pFilter_new...
-     D                 S               *   procptr
-     D g_pFilter_decide...
-     D                 S               *   procptr
-     D g_pFilter_setProperties...
-     D                 S               *   procptr
-     D g_pFilter_delete...
-     D                 S               *   procptr
-      *
-      * -----------------------------------------
-      *  Prototypes
-      * -----------------------------------------
-      *
-      *  Resolves the service program that provides the implementation
-      *  of an appender.
-     D ClassLoader_resolveAppender...
-     D                 PR              N
-     D                                     extproc('LOG4RPG12+
-     D                                     _ClassLoader_resolveAppender+
-     D                                     ')
-     D  i_value                            const like(LOG4RPG_Property_value_t )
-     D  o_classAppender...
-     D                                           likeds(LOG4RPG_classAppender_t)
-      *
-      *  Resolves the service program that provides the implementation
-      *  of a layout.
-     D ClassLoader_resolveLayout...
-     D                 PR              N
-     D                                     extproc('LOG4RPG12+
-     D                                     _ClassLoader_resolveLayout+
-     D                                     ')
-     D  i_value                            const like(LOG4RPG_Property_value_t )
-     D  o_classLayout                            likeds(LOG4RPG_classLayout_t  )
-      *
-      *  Resolves the service program that provides the implementation
-      *  of a filter.
-     D ClassLoader_resolveFilter...
-     D                 PR              N
-     D                                     extproc('LOG4RPG12+
-     D                                     _ClassLoader_resolveFilter+
-     D                                     ')
-     D  i_value                            const like(LOG4RPG_Property_value_t )
-     D  o_classFilter                            likeds(LOG4RPG_classFilter_t  )
-      *
-      /ENDIF
+**FREE
+/IF NOT DEFINED(PLOG4RPG12)
+/DEFINE PLOG4RPG12
+//
+// -----------------------------------------
+//  Type definitions
+// -----------------------------------------
+/COPY QLOG4RPG,PTYPES                        Private type definitions
+//
+//  Appender:
+dcl-ds LOG4RPG_classAppender_t
+       qualified               based(pDummy);
+  srvPgm          likeds(actSrvPgm_t );
+pHandle         pointer;
+proc            like(LOG4RPG_procedure_t );
+procNew         likeds(actProc_t   );
+procRequiresLayout
+     likeds(actProc_t   );
+procDoAppend    likeds(actProc_t   );
+procSetProperties
+     likeds(actProc_t   );
+procDelete      likeds(actProc_t   );
+end-ds;
+//
+//  Layout:
+dcl-ds LOG4RPG_classLayout_t
+       qualified               based(pDummy);
+  srvPgm          likeds(actSrvPgm_t );
+pHandle         pointer;
+proc            like(LOG4RPG_procedure_t );
+procNew         likeds(actProc_t   );
+procFormat      likeds(actProc_t   );
+procSetProperties
+     likeds(actProc_t   );
+procDelete      likeds(actProc_t   );
+procGetHeader   likeds(actProc_t   );
+procGetFooter   likeds(actProc_t   );
+end-ds;
+//
+//  Filter:
+dcl-ds LOG4RPG_classFilter_t
+       qualified               based(pDummy);
+  srvPgm          likeds(actSrvPgm_t );
+pHandle         pointer;
+proc            like(LOG4RPG_procedure_t );
+procNew         likeds(actProc_t   );
+procDecide      likeds(actProc_t   );
+procSetProperties
+     likeds(actProc_t   );
+procDelete      likeds(actProc_t   );
+end-ds;
+//
+// -----------------------------------------
+//  Constants
+// -----------------------------------------
+//
+// -----------------------------------------
+//  Global fields
+// -----------------------------------------
+//  Appender:
+dcl-s g_pAppender_new
+      pointer(*proc);
+dcl-s g_pAppender_requiresLayout
+      pointer(*proc);
+dcl-s g_pAppender_doAppend
+      pointer(*proc);
+dcl-s g_pAppender_setProperties
+      pointer(*proc);
+dcl-s g_pAppender_delete
+      pointer(*proc);
+//
+//  Layout:
+dcl-s g_pLayout_new
+      pointer(*proc);
+dcl-s g_pLayout_format
+      pointer(*proc);
+dcl-s g_pLayout_setProperties
+      pointer(*proc);
+dcl-s g_pLayout_delete
+      pointer(*proc);
+dcl-s g_pLayout_getHeader
+      pointer(*proc);
+dcl-s g_pLayout_getFooter
+      pointer(*proc);
+//
+//  Filter:
+dcl-s g_pFilter_new
+      pointer(*proc);
+dcl-s g_pFilter_decide
+      pointer(*proc);
+dcl-s g_pFilter_setProperties
+      pointer(*proc);
+dcl-s g_pFilter_delete
+      pointer(*proc);
+//
+// -----------------------------------------
+//  Prototypes
+// -----------------------------------------
+//
+//  Resolves the service program that provides the implementation
+//  of an appender.
+dcl-pr ClassLoader_resolveAppender
+       ind
+       extproc('LOG4RPG12+
+       _ClassLoader_resolveAppender+
+       ');
+  i_value         const like(LOG4RPG_Property_value_t );
+  o_classAppender
+       likeds(LOG4RPG_classAppender_t);
+end-pr;
+//
+//  Resolves the service program that provides the implementation
+//  of a layout.
+dcl-pr ClassLoader_resolveLayout
+       ind
+       extproc('LOG4RPG12+
+       _ClassLoader_resolveLayout+
+       ');
+  i_value         const like(LOG4RPG_Property_value_t );
+  o_classLayout   likeds(LOG4RPG_classLayout_t  );
+end-pr;
+//
+//  Resolves the service program that provides the implementation
+//  of a filter.
+dcl-pr ClassLoader_resolveFilter
+       ind
+       extproc('LOG4RPG12+
+       _ClassLoader_resolveFilter+
+       ');
+  i_value         const like(LOG4RPG_Property_value_t );
+  o_classFilter   likeds(LOG4RPG_classFilter_t  );
+end-pr;
+//
+/ENDIF

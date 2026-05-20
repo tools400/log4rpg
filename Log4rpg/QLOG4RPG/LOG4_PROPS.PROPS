@@ -5,7 +5,7 @@
 #      mode     :  on, off
 # -----------------------------------------------------------------------
 log4rpg=on
- 
+
 # -----------------------------------------------------------------------
 #  Set internal logging
 #    log4rpg.debug=mode, output
@@ -14,7 +14,7 @@ log4rpg=on
 #      output   :  printer, stdout
 # -----------------------------------------------------------------------
 log4rpg.debug=on, printer
- 
+
 # -----------------------------------------------------------------------
 #  Set log level for root logger
 #    log4rpg.rootLogger=level, appender, ...
@@ -23,7 +23,7 @@ log4rpg.debug=on, printer
 #      appender : a1, a2, a3, ...
 # -----------------------------------------------------------------------
 log4rpg.rootLogger=DEBUG, file
- 
+
 # -----------------------------------------------------------------------
 #  Set log level for named logger
 #    log4rpg.logger.name=level, appender, ...
@@ -32,7 +32,7 @@ log4rpg.rootLogger=DEBUG, file
 #      appender : [a1, a2, a3, ...
 # -----------------------------------------------------------------------
 log4rpg.logger.de.tools400=DEBUG
- 
+
 # -----------------------------------------------------------------------
 #  Define a print appender
 #    log4rpg.appender.name=lib/srvpgm(procedure)
@@ -73,7 +73,7 @@ log4rpg.appender.print.rightMargin=10
 log4rpg.appender.print.datePattern=yyyy-MM-dd-HH.mm
 log4rpg.appender.print.layout=PatternLayout
 log4rpg.appender.print.layout.conversionPattern=%z [%-5p] %P(%M).%F (%S) %m%n
- 
+
 # -----------------------------------------------------------------------
 #  Define a file appender
 #    log4rpg.appender.name=lib/srvpgm(procedure)
@@ -99,7 +99,7 @@ log4rpg.appender.file.path=log4rpg.log
 log4rpg.appender.file.datePattern=yyyy-MM-dd-HH.mm.
 log4rpg.appender.file.layout=PatternLayout
 log4rpg.appender.file.layout.conversionPattern=%z [%-5p] %L/%P(%M).%F (%S) %m%n
- 
+
 # -----------------------------------------------------------------------
 #  Define a HTML file appender
 #    log4rpg.appender.name=lib/srvpgm(procedure)
@@ -108,7 +108,7 @@ log4rpg.appender.html=*LIBL/LOG4RPG(DailyRollingFileAppender)
 log4rpg.appender.html.path=log4rpg.html
 log4rpg.appender.html.datePattern=yyyy-MM-dd-HH.mm.
 log4rpg.appender.html.layout=*LIBL/LOG4HTMLAY(HTMLLayout)
- 
+
 # -----------------------------------------------------------------------
 #  Define a XMLSocketAppender
 #    log4rpg.appender.name=lib/srvpgm(procedure)
@@ -132,10 +132,10 @@ log4rpg.appender.chainsaw.port=4448
 log4rpg.appender.chainsaw.ccsid=819
 log4rpg.appender.chainsaw.layout=XMLLayout
 log4rpg.appender.chainsaw.filter=AppName
- 
+
 log4rpg.filter.appName=LOG4PROFLT(PropertyFilter)
 log4rpg.filter.appName.property.application=myApplication
- 
+
 # -----------------------------------------------------------------------
 #  Properties of the 'PatternLayout'
 #      %p      priority
@@ -165,4 +165,4 @@ log4rpg.filter.appName.property.application=myApplication
 #                  '%S'          prints the statement identifier the logger was called
 #                  '%m'          prints the message text supplied by the application.
 # -----------------------------------------------------------------------
- 
+

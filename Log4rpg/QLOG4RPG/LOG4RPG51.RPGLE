@@ -1,837 +1,755 @@
-      *=====================================================================*
-      *  SrvPgm: LOG4RPG - Object: DailyRollingPrintAppender                *
-      *=====================================================================*
-      *  Author  :  Thomas Raddatz                                          *
-      *  Date    :  13.06.2006                                              *
-      *  E-mail  :  thomas.raddatz@tools400.de                              *
-      *  Homepage:  www.tools400.de                                         *
-      *=====================================================================*
-      *                                                                     *
-      *  This software is free software, you can redistribute it and/or     *
-      *  modify it under the terms of the GNU General Public License (GPL)  *
-      *  as published by the Free Software Foundation.                      *
-      *                                                                     *
-      *  See GNU General Public License for details.                        *
-      *          http://www.opensource.org                                  *
-      *          http://www.opensource.org/licenses/gpl-license.html        *
-      *                                                                     *
-      *=====================================================================*
-      *  History:                                                           *
-      *                                                                     *
-      *  Datum       Name          Änderung                                 *
-      *  ----------  ------------  ---------------------------------------  *
-      *  25.10.2006  Th.Raddatz    Replaced data structure logEvent with    *
-      *                            object LogEvent.                         *
-      *                                                                     *
-      *  26.10.2006  Th.Raddatz    Moved wordWrap processing to Appender    *
-      *                            implementation objects.                  *
-      *                                                                     *
-      *  27.10.2006  Th.Raddatz    Fixed problem that properties were not   *
-      *                            found because auf case mismatch.         *
-      *                                                                     *
-      *  22.04.2008  Th.Raddatz    Now usinng the OptionConverter to        *
-      *                            convert properties.                      *
-      *                                                                     *
-      *  09.09.2008  Th.Raddatz    Change doAppend() procedure to call      *
-      *                            LogEvent_getFirstLineOfText() and        *
-      *                            LogEvent_getNextLineOfText() instead     *
-      *                            utilizing f_wordwrap().                  *
-      *                            Improving performance by passing a       *
-      *                            pointer instead of a field to Rwrite().  *
-      *                                                                     *
-      *=====================================================================*
-      *   >>PRE-COMPILER<<                                                  *
-      *                                                                     *
-      *     >>CRTCMD<<  CRTRPGMOD    MODULE(&LI/&OB) +                      *
-      *                              SRCFILE(&SL/&SF) +                     *
-      *                              SRCMBR(&SM);                           *
-      *                                                                     *
-      *     >>COMPILE<<                                                     *
-      *       >>PARM<< TRUNCNBR(*NO);                                       *
-      *       >>PARM<< DBGVIEW(*LIST);                                      *
-      *       >>PARM<< OPTION(*EVENTF);                                     *
-      *       >>PARM<< TGTRLS(V7R3M0  );                                    *
-      *     >>END-COMPILE<<                                                 *
-      *                                                                     *
-      *     >>EXECUTE<<                                                     *
-      *                                                                     *
-      *   >>END-PRE-COMPILER<<                                              *
-      *=====================================================================*
-      /COPY QLOG4RPG,H_SPEC
-      *=====================================================================*
-      *
-      * -----------------------------------------
-      *  Exported functions
-      * -----------------------------------------
-      /COPY QLOG4RPG,PLOG4RPG51
-      *
-      * -----------------------------------------
-      *  Type definitions
-      * -----------------------------------------
-      /COPY QLOG4RPG,PLOG4RPG                     Public interface & type definitions
-      /COPY QLOG4RPG,PLOG4RPG12                   ClassLoader
-      *
-     D handle_t...
-     D                 DS                  qualified           based(pDummy)
-     D  pSuper                             like(LOG4RPG_pAppender_t)
-     D  isOpen                         N
-     D  hFile                          *
-     D  outQ                               like(LOG4RPG_path_t  )
-     D  splfname                     10A
-     D  usrDta                       10A
-     D  length                       10I 0
-     D  width                        10I 0
-     D  lpi                          10I 0
-     D  cpi                          10I 0
-     D  ovrflw                       10I 0
-     D  leftMargin                   10I 0
-     D  rightMargin                  10I 0
-     D  datePattern                  32A   varying
-     D  dateValue                    32A   varying
-     D  layoutImpl                         likeds(LOG4RPG_classLayout_t)
-      *
-      * -----------------------------------------
-      *  Prototypes
-      * -----------------------------------------
-      /COPY QLOG4RPG,CLIB                         C-Library
-      /COPY QLOG4RPG,CLIB2                        C-Library 2 (Record IO)
-      *
-      /COPY QLOG4RPG,PLOG4RPG07                   PropertyList
-      /COPY QLOG4RPG,PLOG4RPG10                   LogLog
-      /COPY QLOG4RPG,PLOG4RPG98                   OptionConverter
-      /COPY QLOG4RPG,PLOG4RPG99                   Helper
-      *
-      *  Execute Command (QCMDEXC) API
-     D QCMDEXC...
-     D                 PR                  extpgm('QCMDEXC')
-     D  i_cmd                     32702A   const  options(*varsize)
-     D  i_length                     15P 5 const
-      *
-      * -----------------------------------------
-      *  Private prototypes
-      * -----------------------------------------
-      *
-      *  Opens a DailyRollingPrintAppender for output.
-     D openAppender...
-     D                 PR              N
-     D  i_pHandle                      *   const
-      *
-      *  Closes a DailyRollingPrintAppender.
-     D closeAppender...
-     D                 PR              N
-     D  i_pHandle                      *   const
-      *
-      *  Check if a new file must be started.
-     D isNewFileCondition...
-     D                 PR              N
-     D  i_handle                           const  likeds(handle_t )
-      *
-      *  Replace variables.
-     D replaceVariables...
-     D                 PR                         like(handle_t.datePattern )
-     D  i_string                           const  like(handle_t.datePattern )
-      *
-      *  Returns the overwrite command for the printer file.
-     D getOverwriteCmd...
-     D                 PR           512A          varying
-     D  i_handle                           const  likeds(handle_t      )
-      *
-      *  Returns the output queue from handle.outQ.
-     D getOutQ...
-     D                 PR                         like(qObj_t          )
-     D  i_path                             const  like(LOG4RPG_path_t  )
-      *
-      *  Loads the configuration parameters from the specified property list.
-     D loadConfiguration...
-     D                 PR
-     D  io_handle                                 likeds(handle_t              )
-     D  i_pPropList                        const  like(LOG4RPG_pPropertyList_t )
-     D  i_prefix                           const  like(LOG4RPG_prefix_t        )
-      *
-      * -----------------------------------------
-      *  Global constants
-      * -----------------------------------------
-     D cTHIS_CLASS...
-     D                 C                          const(
+**free
+//=====================================================================*
+//  SrvPgm: LOG4RPG - Object: DailyRollingPrintAppender                *
+//=====================================================================*
+//  Author  :  Thomas Raddatz                                          *
+//  Date    :  13.06.2006                                              *
+//  E-mail  :  thomas.raddatz@tools400.de                              *
+//  Homepage:  www.tools400.de                                         *
+//=====================================================================*
+//                                                                     *
+//  This software is free software, you can redistribute it and/or     *
+//  modify it under the terms of the GNU General Public License (GPL)  *
+//  as published by the Free Software Foundation.                      *
+//                                                                     *
+//  See GNU General Public License for details.                        *
+//          http://www.opensource.org                                  *
+//          http://www.opensource.org/licenses/gpl-license.html        *
+//                                                                     *
+//=====================================================================*
+//  History:                                                           *
+//                                                                     *
+//  Datum       Name          Änderung                                 *
+//  ----------  ------------  ---------------------------------------  *
+//  25.10.2006  Th.Raddatz    Replaced data structure logEvent with    *
+//                            object LogEvent.                         *
+//                                                                     *
+//  26.10.2006  Th.Raddatz    Moved wordWrap processing to Appender    *
+//                            implementation objects.                  *
+//                                                                     *
+//  27.10.2006  Th.Raddatz    Fixed problem that properties were not   *
+//                            found because auf case mismatch.         *
+//                                                                     *
+//  22.04.2008  Th.Raddatz    Now usinng the OptionConverter to        *
+//                            convert properties.                      *
+//                                                                     *
+//  09.09.2008  Th.Raddatz    Change doAppend() procedure to call      *
+//                            LogEvent_getFirstLineOfText() and        *
+//                            LogEvent_getNextLineOfText() instead     *
+//                            utilizing f_wordwrap().                  *
+//                            Improving performance by passing a       *
+//                            pointer instead of a field to Rwrite().  *
+//                                                                     *
+//=====================================================================*
+//   >>PRE-COMPILER<<                                                  *
+//                                                                     *
+//     >>CRTCMD<<  CRTRPGMOD    MODULE(&LI/&OB) +                      *
+//                              SRCFILE(&SL/&SF) +                     *
+//                              SRCMBR(&SM);                           *
+//                                                                     *
+//     >>COMPILE<<                                                     *
+//       >>PARM<< TRUNCNBR(*NO);                                       *
+//       >>PARM<< DBGVIEW(*LIST);                                      *
+//       >>PARM<< OPTION(*EVENTF);                                     *
+//       >>PARM<< TGTRLS(V7R3M0  );                                    *
+//     >>END-COMPILE<<                                                 *
+//                                                                     *
+//     >>EXECUTE<<                                                     *
+//                                                                     *
+//   >>END-PRE-COMPILER<<                                              *
+//=====================================================================*
+/copy QLOG4RPG,H_SPEC
+//=====================================================================*
+//
+// -----------------------------------------
+//  Exported functions
+// -----------------------------------------
+/copy QLOG4RPG,PLOG4RPG51
+
+// -----------------------------------------
+//  Type definitions
+// -----------------------------------------
+/copy QLOG4RPG,PLOG4RPG                     Public interface & type definitions
+/copy QLOG4RPG,PLOG4RPG12                   ClassLoader
+
+dcl-ds handle_t qualified based(pDummy);
+  pSuper      like(LOG4RPG_pAppender_t);
+  isOpen      ind;
+  hFile       pointer;
+  outQ        like(LOG4RPG_path_t);
+  splfname    char(10);
+  usrDta      char(10);
+  length      int(10);
+  width       int(10);
+  lpi         int(10);
+  cpi         int(10);
+  ovrflw      int(10);
+  leftMargin  int(10);
+  rightMargin int(10);
+  datePattern varchar(32);
+  dateValue   varchar(32);
+  layoutImpl  likeds(LOG4RPG_classLayout_t);
+end-ds;
+
+// -----------------------------------------
+//  Prototypes
+// -----------------------------------------
+/copy QLOG4RPG,CLIB                         C-Library
+/copy QLOG4RPG,CLIB2                        C-Library 2 (Record IO)
+
+/copy QLOG4RPG,PLOG4RPG07                   PropertyList
+/copy QLOG4RPG,PLOG4RPG10                   LogLog
+/copy QLOG4RPG,PLOG4RPG98                   OptionConverter
+/copy QLOG4RPG,PLOG4RPG99                   Helper
+
+//  Execute Command (QCMDEXC) API
+dcl-pr QCMDEXC extpgm('QCMDEXC');
+  i_cmd    char(32702) options(*varsize) const;
+  i_length packed(15: 5) const;
+end-pr;
+
+// -----------------------------------------
+//  Private prototypes
+// -----------------------------------------
+
+//  Opens a DailyRollingPrintAppender for output.
+dcl-pr openAppender ind;
+  i_pHandle pointer const;
+end-pr;
+
+//  Closes a DailyRollingPrintAppender.
+dcl-pr closeAppender ind;
+  i_pHandle pointer const;
+end-pr;
+
+//  Check if a new file must be started.
+dcl-pr isNewFileCondition ind;
+  i_handle likeds(handle_t) const;
+end-pr;
+
+//  Replace variables.
+dcl-pr replaceVariables like(handle_t.datePattern);
+  i_string like(handle_t.datePattern) const;
+end-pr;
+
+//  Returns the overwrite command for the printer file.
+dcl-pr getOverwriteCmd varchar(512);
+  i_handle likeds(handle_t) const;
+end-pr;
+
+//  Returns the output queue from handle.outQ.
+dcl-pr getOutQ like(qObj_t);
+  i_path like(LOG4RPG_path_t) const;
+end-pr;
+
+//  Loads the configuration parameters from the specified property list.
+dcl-pr loadConfiguration;
+  io_handle   likeds(handle_t);
+  i_pPropList like(LOG4RPG_pPropertyList_t) const;
+  i_prefix    like(LOG4RPG_prefix_t) const;
+end-pr;
+
+// -----------------------------------------
+//  Global constants
+// -----------------------------------------
+dcl-c cTHIS_CLASS;
      D                                            'DailyRollingPrintAppender')
-      *
-     D cDEFAULT_LENGTH...
-     D                 C                          const(70)
-     D cDEFAULT_WIDTH...
-     D                 C                          const(132)
-     D cDEFAULT_LPI...
-     D                 C                          const(6)
-     D cDEFAULT_CPI...
-     D                 C                          const(10)
-     D cDEFAULT_OVRFLW...
-     D                 C                          const(60)
-     D cDEFAULT_LEFT_MARGIN...
-     D                 C                          const(10)
-     D cDEFAULT_RIGHT_MARGIN...
-     D                 C                          const(10)
-      *
-     D cPARAMETER_OUTQ...
-     D                 C                          const('outq')
-     D cPARAMETER_SPLFNAME...
-     D                 C                          const('splfname')
-     D cPARAMETER_USRDTA...
-     D                 C                          const('usrdta')
-     D cPARAMETER_PAGE_LENGTH...
-     D                 C                          const('length')
-     D cPARAMETER_PAGE_WIDTH...
-     D                 C                          const('width')
-     D cPARAMETER_LPI...
-     D                 C                          const('lpi')
-     D cPARAMETER_CPI...
-     D                 C                          const('cpi')
-     D cPARAMETER_OVERFLOW...
-     D                 C                          const('ovrflw')
-     D cPARAMETER_LEFT_MARGIN...
-     D                 C                          const('leftmargin')
-     D cPARAMETER_RIGHT_MARGIN...
-     D                 C                          const('rightmargin')
-     D cPARAMETER_DATE_PATTERN...
-     D                 C                          const('datepattern')
-      *
-     D cDATE_PATTERN_DAYS...
-     D                 C                          const('dd')
-     D cDATE_PATTERN_MONTHS...
-     D                 C                          const('MM')
-     D cDATE_PATTERN_YEARS...
-     D                 C                          const('yyyy')
-     D cDATE_PATTERN_MINUTES...
-     D                 C                          const('mm')
-     D cDATE_PATTERN_HOURS...
-     D                 C                          const('HH')
-      *
-      * -----------------------------------------
-      *  Global fields
-      * -----------------------------------------
-      *
-      *=====================================================================*
-      *  Creates a new DailyRollingPrintAppender.
-      *=====================================================================*
-      *  Parameters:
-      *   io_pHandle    - Handle that is passed around the various calls to
-      *                   this DailyRollingPrintAppender.
-      *   i_pPropsList  - Handle of the property list that contains the
-      *                   properties for the appender.
-      *   i_prefix      - Prefix of the relevant property keys.
-      *
-      *  Returns:
-      *   isDone        - Returns TRUE on success, else FALSE.
-      *=====================================================================*
-     P DailyRollingPrintAppender_new...
-     P                 B                   export
-      *
-     D DailyRollingPrintAppender_new...
-     D                 PI              N
-     D  i_pSuper                           const  like(LOG4RPG_pAppender_t     )
-     D  io_pHandle                     *
-     D  i_pPropList                        const  like(LOG4RPG_pPropertyList_t )
-     D  i_prefix                           const  like(LOG4RPG_prefix_t        )
-      *
-      *  Return value
-     D isDone          S               N                         inz(*off)
-      *
-      *  Helper fields
-     D tempHandle      DS                  likeds(handle_t          ) inz
-      *
-      *  Appender handle
-     D handle          DS                  likeds(handle_t ) based(io_pHandle)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+//
+dcl-c cDEFAULT_LENGTH
+      const(70);
+dcl-c cDEFAULT_WIDTH 132;
+dcl-c cDEFAULT_LPI 6;
+dcl-c cDEFAULT_CPI 10;
+dcl-c cDEFAULT_OVRFLW 60;
+dcl-c cDEFAULT_LEFT_MARGIN 10;
+dcl-c cDEFAULT_RIGHT_MARGIN 10;
 
-         clear tempHandle;
+dcl-c cPARAMETER_OUTQ 'outq';
+dcl-c cPARAMETER_SPLFNAME 'splfname';
+dcl-c cPARAMETER_USRDTA 'usrdta';
+dcl-c cPARAMETER_PAGE_LENGTH 'length';
+dcl-c cPARAMETER_PAGE_WIDTH 'width';
+dcl-c cPARAMETER_LPI 'lpi';
+dcl-c cPARAMETER_CPI 'cpi';
+dcl-c cPARAMETER_OVERFLOW 'ovrflw';
+dcl-c cPARAMETER_LEFT_MARGIN 'leftmargin';
+dcl-c cPARAMETER_RIGHT_MARGIN 'rightmargin';
+dcl-c cPARAMETER_DATE_PATTERN 'datepattern';
 
-         // Initialize handle
-         tempHandle.pSuper          = i_pSuper;
-         tempHandle.isOpen          = *off;
-         tempHandle.hFile           = *NULL;
-         tempHandle.outQ            = '*N/LOG4RPG';
-         tempHandle.splfname        = 'LOG4RPG';
-         tempHandle.usrdta          = 'LOG';
-         tempHandle.length          = cDEFAULT_LENGTH;
-         tempHandle.width           = cDEFAULT_WIDTH;
-         tempHandle.lpi             = cDEFAULT_LPI;
-         tempHandle.cpi             = cDEFAULT_CPI;
-         tempHandle.ovrflw          = cDEFAULT_OVRFLW;
-         tempHandle.leftMargin      = cDEFAULT_LEFT_MARGIN;
-         tempHandle.rightMargin     = cDEFAULT_RIGHT_MARGIN;
-         tempHandle.datePattern     = 'yyyy-MM-dd';
-         tempHandle.dateValue       = '';
+dcl-c cDATE_PATTERN_DAYS 'dd';
+dcl-c cDATE_PATTERN_MONTHS 'MM';
+dcl-c cDATE_PATTERN_YEARS 'yyyy';
+dcl-c cDATE_PATTERN_MINUTES 'mm';
+dcl-c cDATE_PATTERN_HOURS 'HH';
 
-         // Initialize handle from configuration properties
-         if (i_pPropList <> *NULL) and not PropertyList_isNull(i_pPropList);
-            loadConfiguration(tempHandle: i_pPropList: i_prefix);
-         endif;
+// -----------------------------------------
+//  Global fields
+// -----------------------------------------
 
-         io_pHandle = %alloc(%size(tempHandle));
-         handle = tempHandle;
+//=====================================================================*
+//  Creates a new DailyRollingPrintAppender.
+//=====================================================================*
+//  Parameters:
+//   io_pHandle    - Handle that is passed around the various calls to
+//                   this DailyRollingPrintAppender.
+//   i_pPropsList  - Handle of the property list that contains the
+//                   properties for the appender.
+//   i_prefix      - Prefix of the relevant property keys.
 
-         LogLog_debug('Loaded instance of [' + cTHIS_CLASS + '].');
+//  Returns:
+//   isDone        - Returns TRUE on success, else FALSE.
+//=====================================================================*
+dcl-proc DailyRollingPrintAppender_new export;
+  dcl-pi *n ind;
+    i_pSuper    like(LOG4RPG_pAppender_t) const;
+    io_pHandle  pointer;
+    i_pPropList like(LOG4RPG_pPropertyList_t) const;
+    i_prefix    like(LOG4RPG_prefix_t) const;
+  end-pi;
 
-         return isDone;
+//  Return value
+  dcl-s isDone ind inz(*off);
 
-      /END-FREE
-      *
-     P DailyRollingPrintAppender_new...
-     P                 E
-      *
-      *=====================================================================*
-      *  Returns TRUE if the appender requires a layout.
-      *=====================================================================*
-      *  Parameters:
-      *   i_pHandle     - Handle that is passed around the various calls to
-      *                   this DailyRollingPrintAppender.
-      *
-      *  Returns:
-      *   isDone        - Returns TRUE if the appender requires a layout,
-      *                   else FALSE.
-      *=====================================================================*
-     P DailyRollingPrintAppender_requiresLayout...
-     P                 B                   export
-      *
-     D DailyRollingPrintAppender_requiresLayout...
-     D                 PI              N
-     D  i_pHandle                      *   const
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+//  Helper fields
+  dcl-ds tempHandle likeds(handle_t) inz;
 
-         return *on;
+//  Appender handle
+  dcl-ds handle likeds(handle_t) based(io_pHandle);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-      /END-FREE
-      *
-     P DailyRollingPrintAppender_requiresLayout...
-     P                 E
-      *
-      *=====================================================================*
-      *  Appends a message to the PrinterAppender.
-      *=====================================================================*
-      *  Parameters:
-      *   i_pHandle     - Handle that is passed around the various calls to
-      *                   this DailyRollingPrintAppender.
-      *   i_pLogEvent   - Handle of the Log event returned by LogEvent_new().
-      *
-      *  Returns:
-      *   isDone        - Returns TRUE on success, else FALSE.
-      *=====================================================================*
-     P DailyRollingPrintAppender_doAppend...
-     P                 B                   export
-      *
-     D DailyRollingPrintAppender_doAppend...
-     D                 PI              N
-     D  i_pHandle                      *   const
-     D  i_pLogEvent                        const like(LOG4RPG_pLogEvent_t )
-      *
-      *  Return value
-     D isDone          S               N   inz(*off)
-      *
-      *  Helper fields
-     D isText          S               N   inz
-     D pageWidth       S             10U 0 inz
-     D text            S                   like(LOG4RPG_formattedText_t) inz
-     D msg             DS                  likeds(msg_t          ) inz
-     D RIOFB           DS                  likeds(RIOFB_t        ) based(pRIOFB)
-      *
-      *  Appender handle
-     D handle          DS                  likeds(handle_t ) based(i_pHandle)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+clear tempHandle;
 
-         // Return if there is no text
-         if LogEvent_textLength(i_pLogEvent) = 0;
-            return *on;
-         endif;
+// Initialize handle
+tempHandle.pSuper          = i_pSuper;
+tempHandle.isOpen          = *off;
+tempHandle.hFile           = *NULL;
+tempHandle.outQ            = '*N/LOG4RPG';
+tempHandle.splfname        = 'LOG4RPG';
+tempHandle.usrdta          = 'LOG';
+tempHandle.length          = cDEFAULT_LENGTH;
+tempHandle.width           = cDEFAULT_WIDTH;
+tempHandle.lpi             = cDEFAULT_LPI;
+tempHandle.cpi             = cDEFAULT_CPI;
+tempHandle.ovrflw          = cDEFAULT_OVRFLW;
+tempHandle.leftMargin      = cDEFAULT_LEFT_MARGIN;
+tempHandle.rightMargin     = cDEFAULT_RIGHT_MARGIN;
+tempHandle.datePattern     = 'yyyy-MM-dd';
+tempHandle.dateValue       = '';
 
-         // Open the appender for output is it is not yet open
-         if not handle.isOpen;
-            openAppender(i_pHandle);
-         endif;
+// Initialize handle from configuration properties
+if (i_pPropList <> *NULL) and not PropertyList_isNull(i_pPropList);
+   loadConfiguration(tempHandle: i_pPropList: i_prefix);
+endif;
 
-         // Check if a new file must be started.
-         if isNewFileCondition(handle);
-            if handle.isOpen;
-               closeAppender(i_pHandle);
-            endif;
-            openAppender(i_pHandle);
-         endif;
+io_pHandle = %alloc(%size(tempHandle));
+handle = tempHandle;
 
-         // Write to file
-         f_clrErrno();
+LogLog_debug('Loaded instance of [' + cTHIS_CLASS + '].');
 
-         pageWidth = handle.width - handle.leftMargin - handle.rightMargin;
-         text = LogEvent_getFirstLineOfText(i_pLogEvent: isText: pageWidth);
-         dow isText;
+return isDone;
 
-            if handle.leftMargin > 0;
-               text = f_space(handle.leftMargin) + text;
-            endif;
 
-            %len(text) = handle.width;   // Add trailing blanks to clear
-                                         // print line of QSYSPRT
+end-proc;
 
-            monitor;
-               text = text;
-               pRIOFB = Rwrite(handle.hFile: %addr(text)+2: %len(text));
-               if RIOFB.numByt = 0;
-                  isDone = *off;
-               else;
-                  isDone = *on;
-               endif;
-            on-error;
-               p_rmvPgmMsg(cMsg_Rmv_All: *omit: cMsg_Same: cMsg_ToMyself);
-               isDone = *off;
-            endmon;
+//=====================================================================*
+//  Returns TRUE if the appender requires a layout.
+//=====================================================================*
+//  Parameters:
+//   i_pHandle     - Handle that is passed around the various calls to
+//                   this DailyRollingPrintAppender.
 
-            text = LogEvent_getNextLineOfText(i_pLogEvent: isText: pageWidth);
-         enddo;
+//  Returns:
+//   isDone        - Returns TRUE if the appender requires a layout,
+//                   else FALSE.
+//=====================================================================*
+dcl-proc DailyRollingPrintAppender_requiresLayout export;
+  dcl-pi *n ind;
+    i_pHandle pointer const;
+  end-pi;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-         if not isDone;
-            LogLog_error('Failed to write logEevent to file [' +
-                          handle.outQ + ']');
-            if f_errno() <> 0;
-               LogLog_errorMsg(f_cvtErrnoToMsg(f_errno));
-            endif;
-         endif;
+return *on;
 
-         return isDone;
 
-      /END-FREE
-      *
-     P DailyRollingPrintAppender_doAppend...
-     P                 E
-      *
-      *=====================================================================*
-      *  Used to set the properties of the appender.
-      *=====================================================================*
-      *  Parameters:
-      *   i_pHandle     - Handle that is passed around the various calls to
-      *                   this DailyRollingFileAppender.
-      *   i_pPropsList  - Handle of the property list that contains the
-      *                   properties for the appender.
-      *   i_prefix      - Prefix of the relevant property keys.
-      *
-      *  Returns:
-      *   void
-      *=====================================================================*
-     P DailyRollingPrintAppender_setProperties...
-     P                 B                   export
-      *
-     D DailyRollingPrintAppender_setProperties...
-     D                 PI
-     D  i_pHandle                      *   const
-     D  i_pPropList                        const  like(LOG4RPG_pPropertyList_t )
-     D  i_prefix                           const  like(LOG4RPG_prefix_t        )
-      *
-      *  DailyRollingPrintAppender handle
-     D handle          DS                  likeds(handle_t ) based(i_pHandle)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+end-proc;
 
-         loadConfiguration(handle: i_pPropList: i_prefix);
+//=====================================================================*
+//  Appends a message to the PrinterAppender.
+//=====================================================================*
+//  Parameters:
+//   i_pHandle     - Handle that is passed around the various calls to
+//                   this DailyRollingPrintAppender.
+//   i_pLogEvent   - Handle of the Log event returned by LogEvent_new().
 
-         return;
+//  Returns:
+//   isDone        - Returns TRUE on success, else FALSE.
+//=====================================================================*
+dcl-proc DailyRollingPrintAppender_doAppend export;
+  dcl-pi *n ind;
+    i_pHandle   pointer const;
+    i_pLogEvent like(LOG4RPG_pLogEvent_t) const;
+  end-pi;
 
-      /END-FREE
-      *
-     P DailyRollingPrintAppender_setProperties...
-     P                 E
-      *
-      *=====================================================================*
-      *  Deletes a given DailyRollingPrintAppender.
-      *=====================================================================*
-      *  Parameters:
-      *   io_pHandle    - Handle that is passed around the various calls to
-      *                   this DailyRollingPrintAppender.
-      *
-      *  Returns:
-      *   void
-      *=====================================================================*
-     P DailyRollingPrintAppender_delete...
-     P                 B                   export
-      *
-     D DailyRollingPrintAppender_delete...
-     D                 PI              N
-     D  io_pHandle                     *
-      *
-      *  Return value
-     D isDone          S               N                         inz(*off)
-      *
-      *  Appender handle
-     D handle          DS                  likeds(handle_t ) based(io_pHandle)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+//  Return value
+  dcl-s isDone ind inz(*off);
 
-         // Close file if it is left open
-         if handle.isOpen;
-            closeAppender(io_pHandle);
-         endif;
+//  Helper fields
+  dcl-s isText ind inz;
+  dcl-s pageWidth uns(10) inz;
+  dcl-s text like(LOG4RPG_formattedText_t) inz;
+  dcl-ds msg likeds(msg_t) inz;
+  dcl-ds RIOFB likeds(RIOFB_t) based(pRIOFB);
 
-         // Clear handle data
-         clear handle;
+//  Appender handle
+  dcl-ds handle likeds(handle_t) based(i_pHandle);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-         // Free handle memory
-         dealloc(N) io_pHandle;
+// Return if there is no text
+if LogEvent_textLength(i_pLogEvent) = 0;
+   return *on;
+endif;
 
-         LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
+// Open the appender for output is it is not yet open
+if not handle.isOpen;
+   openAppender(i_pHandle);
+endif;
 
+// Check if a new file must be started.
+if isNewFileCondition(handle);
+   if handle.isOpen;
+      closeAppender(i_pHandle);
+   endif;
+   openAppender(i_pHandle);
+endif;
+
+// Write to file
+f_clrErrno();
+
+pageWidth = handle.width - handle.leftMargin - handle.rightMargin;
+text = LogEvent_getFirstLineOfText(i_pLogEvent: isText: pageWidth);
+dow isText;
+
+   if handle.leftMargin > 0;
+      text = f_space(handle.leftMargin) + text;
+   endif;
+
+   %len(text) = handle.width;   // Add trailing blanks to clear
+   // print line of QSYSPRT
+
+   monitor;
+      text = text;
+      pRIOFB = Rwrite(handle.hFile: %addr(text)+2: %len(text));
+      if RIOFB.numByt = 0;
+         isDone = *off;
+      else;
          isDone = *on;
+      endif;
+   on-error;
+      p_rmvPgmMsg(cMsg_Rmv_All: *omit: cMsg_Same: cMsg_ToMyself);
+      isDone = *off;
+   endmon;
 
-         return isDone;
+   text = LogEvent_getNextLineOfText(i_pLogEvent: isText: pageWidth);
+enddo;
 
-      /END-FREE
-      *
-     P DailyRollingPrintAppender_delete...
-     P                 E
-      *
-      *=====================================================================*
-    R *  *** Private ***
-      *  Opens a DailyRollingPrintAppender for output.
-      *=====================================================================*
-     P openAppender...
-     P                 B
-      *
-     D openAppender...
-     D                 PI              N
-     D  i_pHandle                      *   const
-      *
-      *  Return value
-     D isDone          S               N                         inz(*off)
-      *
-      *  Appender handle
-     D handle          DS                  likeds(handle_t ) based(i_pHandle)
-      *
-      *  Helper fields
-     D cmd             S            512A   inz varying
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+if not isDone;
+   LogLog_error('Failed to write logEevent to file [' +
+                 handle.outQ + ']');
+   if f_errno() <> 0;
+      LogLog_errorMsg(f_cvtErrnoToMsg(f_errno));
+   endif;
+endif;
 
-         // Set end of livetime of file
-         handle.dateValue = replaceVariables(handle.datePattern);
+return isDone;
 
-         // Open new instance of file
-         if handle.hFile = *NULL;
-            cmd   = getOverwriteCmd(handle);
 
-            monitor;
-               p_rmvPgmMsg(cMsg_Rmv_All: *omit: cMsg_Same: cMsg_ToMyself);
-               qcmdexc(cmd: %len(cmd));
-            on-error;
-               p_rmvPgmMsg(cMsg_Rmv_All: *omit: cMsg_Same: cMsg_ToMyself);
-               LogLog_error('Error on OVRPRTF with command ' + cmd);
-            endmon;
+end-proc;
 
-            handle.hFile = Ropen('*LIBL/QSYSPRT': 'wr');
+//=====================================================================*
+//  Used to set the properties of the appender.
+//=====================================================================*
+//  Parameters:
+//   i_pHandle     - Handle that is passed around the various calls to
+//                   this DailyRollingFileAppender.
+//   i_pPropsList  - Handle of the property list that contains the
+//                   properties for the appender.
+//   i_prefix      - Prefix of the relevant property keys.
 
-            if handle.hFile = *NULL;
-               isDone = *off;
-            else;
-               isDone = *on;
-               handle.isOpen = *on;
-            endif;
+//  Returns:
+//   void
+//=====================================================================*
+dcl-proc DailyRollingPrintAppender_setProperties export;
+  dcl-pi *n;
+    i_pHandle   pointer const;
+    i_pPropList like(LOG4RPG_pPropertyList_t) const;
+    i_prefix    like(LOG4RPG_prefix_t) const;
+  end-pi;
 
-         endif;
+//  DailyRollingPrintAppender handle
+  dcl-ds handle likeds(handle_t) based(i_pHandle);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-         return isDone;
+loadConfiguration(handle: i_pPropList: i_prefix);
 
-      /END-FREE
-      *
-     P openAppender...
-     P                 E
-      *
-      *=====================================================================*
-    R *  *** Private ***
-      *  Closes a DailyRollingPrintAppender.
-      *=====================================================================*
-     P closeAppender...
-     P                 B
-      *
-     D closeAppender...
-     D                 PI              N
-     D  i_pHandle                      *   const
-      *
-      *  Return value
-     D isDone          S               N                         inz(*off)
-      *
-      *  Appender handle
-     D handle          DS                  likeds(handle_t ) based(i_pHandle)
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+return;
 
-         if Rclose(handle.hFile) = 0;
-            handle.isOpen = *off;
-            handle.hFile  = *NULL;
-            isDone = *on;
-         else;
-            isDone = *off;
-         endif;
 
-         return isDone;
+end-proc;
 
-      /END-FREE
-      *
-     P closeAppender...
-     P                 E
-      *
-      *=====================================================================*
-    R *  *** private ***
-      *  Check overflow condition.
-      *=====================================================================*
-     P isNewFileCondition...
-     P                 B
-      *
-     D isNewFileCondition...
-     D                 PI              N
-     D  i_handle                           const  likeds(handle_t )
-      *
-      *  Return value
-     D isNewFile       S               N   inz(*off)
-      *
-      *  Helper fields
-     D cmpDateValue    S                   like(i_handle.dateValue  ) inz
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+//=====================================================================*
+//  Deletes a given DailyRollingPrintAppender.
+//=====================================================================*
+//  Parameters:
+//   io_pHandle    - Handle that is passed around the various calls to
+//                   this DailyRollingPrintAppender.
 
-         cmpdateValue = replaceVariables(i_handle.datePattern);
+//  Returns:
+//   void
+//=====================================================================*
+dcl-proc DailyRollingPrintAppender_delete export;
+  dcl-pi *n ind;
+    io_pHandle pointer;
+  end-pi;
 
-         if i_handle.dateValue <> cmpDateValue;
-            isNewFile = *on;
-         else;
-            isNewFile = *off;
-         endif;
+//  Return value
+  dcl-s isDone ind inz(*off);
 
-         return isNewFile;
+//  Appender handle
+  dcl-ds handle likeds(handle_t) based(io_pHandle);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-      /END-FREE
-      *
-     P isNewFileCondition...
-     P                 E
-      *
-      *=========================================================================
-    R *  *** Private ***
-      *  Replace variables.
-      *=========================================================================
-     P replaceVariables...
-     P                 B
-      *
-     D replaceVariables...
-     D                 PI                         like(handle_t.datePattern )
-     D  i_string                           const  like(handle_t.datePattern )
-      *
-      *  Return value
-     D string          S                   like(handle_t.datePattern ) inz
-      *
-      *  Helper fields
-     D timestamp       S               Z   inz
-     D days            S              2S 0 inz
-     D months          S              2S 0 inz
-     D years           S              4S 0 inz
-     D minutes         S              2S 0 inz
-     D hours           S              2S 0 inz
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+// Close file if it is left open
+if handle.isOpen;
+   closeAppender(io_pHandle);
+endif;
 
-         timestamp = %timestamp();
-         days    = %subdt(timestamp: *DAYS    );
-         months  = %subdt(timestamp: *MONTHS  );
-         years   = %subdt(timestamp: *YEARS   );
-         minutes = %subdt(timestamp: *MINUTES );
-         hours   = %subdt(timestamp: *HOURS   );
+// Clear handle data
+clear handle;
 
-         string = i_string;
+// Free handle memory
+dealloc(N) io_pHandle;
 
-         string = f_replace(cDATE_PATTERN_DAYS
-                            : %editc(days   : 'X'): string);
-         string = f_replace(cDATE_PATTERN_MONTHS
-                            : %editc(months : 'X'): string);
-         string = f_replace(cDATE_PATTERN_YEARS
-                            : %editc(years  : 'X'): string);
-         string = f_replace(cDATE_PATTERN_MINUTES
-                            : %editc(minutes: 'X'): string);
-         string = f_replace(cDATE_PATTERN_HOURS
-                            : %editc(hours  : 'X'): string);
+LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
 
-         return string;
+isDone = *on;
 
-      /END-FREE
-      *
-     P replaceVariables...
-     P                 E
-      *
-      *=========================================================================
-    R *  *** Private ***
-      *  Returns the overwrite command for the printer file.
-      *=========================================================================
-     P getOverwriteCmd...
-     P                 B
-      *
-     D getOverwriteCmd...
-     D                 PI           512A          varying
-     D  i_handle                           const  likeds(handle_t      )
-      *
-      *  Return value
-     D cmd             S            512A   inz  varying
-      *
-      *  Helper fields
-     D qOutq           DS                  likeds(qObj_t   ) inz
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+return isDone;
 
-         qOutQ = getOutQ(i_handle.outQ);
 
-         cmd = 'OVRPRTF ' +
-                  'FILE(QSYSPRT) ' +
-                  'TOFILE(*FILE) ' +
-                  'PAGESIZE('   + %char(i_handle.length)  + ' ' +
-                                  %char(i_handle.width )  + ') ' +
-                  'LPI('        + %char(i_handle.lpi)     + ') ' +
-                  'CPI('        + %char(i_handle.cpi)     + ') ' +
-                  'OVRFLW('     + %char(i_handle.ovrflw)  + ') ' +
-                  'OUTQ('       + %trim(qOutQ.lib)  + '/' +
-                                  %trim(qOutQ.name)       + ') ' +
-                  'USRDTA('''   + i_handle.usrDta         + ''') ' +
-                  'SPLFNAME('   + i_handle.splfname       + ') ' +
-                  'OVRSCOPE(*CALLLVL)';
+end-proc;
 
-         return cmd;
+//=====================================================================*
+//  *** Private ***
+//  Opens a DailyRollingPrintAppender for output.
+//=====================================================================*
+dcl-proc openAppender;
+  dcl-pi *n ind;
+    i_pHandle pointer const;
+  end-pi;
 
-      /END-FREE
-      *
-     P getOverwriteCmd...
-     P                 E
-      *
-      *=========================================================================
-    R *  *** Private ***
-      *  Returns the output queue from handle.outQ.
-      *=========================================================================
-     P getOutQ...
-     P                 B
-      *
-     D getOutQ...
-     D                 PI                         like(qObj_t          )
-     D  i_outQ                             const  like(LOG4RPG_path_t  )
-      *
-      *  Return value
-     D qOutQ           DS                  likeds(qObj_t   ) inz
-      *
-      *  Local fields
-     D x               S             10I 0 inz
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+//  Return value
+  dcl-s isDone ind inz(*off);
 
-            if i_outQ = '';
-               qOutQ.name = '*N';
-               qOutQ.lib  = '*N';
-               return qOutQ;
-            endif;
+//  Appender handle
+  dcl-ds handle likeds(handle_t) based(i_pHandle);
 
-            x = %scan('/': i_outQ);
+//  Helper fields
+  dcl-s cmd varchar(512) inz;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-            if (x > 1) and (x < %len(i_outQ));
-               qOutQ.name = %subst(i_outQ: x+1);
-               qOutQ.lib  = f_left(i_outQ: x-1);
-            else;
-               qOutQ.name = i_outQ;
-               qOutQ.lib  = '*N';
-            endif;
+// Set end of livetime of file
+handle.dateValue = replaceVariables(handle.datePattern);
 
-         return qOutQ;
+// Open new instance of file
+if handle.hFile = *NULL;
+   cmd   = getOverwriteCmd(handle);
 
-      /END-FREE
-      *
-     P getOutQ...
-     P                 E
-      *
-      *=========================================================================
-    R *  *** Private ***
-      *  Loads the configuration parameters from the specified property list.
-      *=========================================================================
-     P loadConfiguration...
-     P                 B
-      *
-     D loadConfiguration...
-     D                 PI
-     D  io_handle                                 likeds(handle_t              )
-     D  i_pPropList                        const  like(LOG4RPG_pPropertyList_t )
-     D  i_prefix                           const  like(LOG4RPG_prefix_t        )
-      *
-      *  Local fields
-     D parameter       S                   like(property.key        ) inz
-     D prefix          S                   like(i_prefix            ) inz
-     D property        DS                  likeds(LOG4RPG_property_t) inz
-     D propIter        DS                  likeds(LOG4RPG_Property...
-     D                                                    ListIterator_t) inz
-      * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      /FREE
+   monitor;
+      p_rmvPgmMsg(cMsg_Rmv_All: *omit: cMsg_Same: cMsg_ToMyself);
+      qcmdexc(cmd: %len(cmd));
+   on-error;
+      p_rmvPgmMsg(cMsg_Rmv_All: *omit: cMsg_Same: cMsg_ToMyself);
+      LogLog_error('Error on OVRPRTF with command ' + cmd);
+   endmon;
 
-         prefix = f_lcase(i_prefix);
+   handle.hFile = Ropen('*LIBL/QSYSPRT': 'wr');
 
-         propIter = PropertyList_getIterator(i_pPropList);
+   if handle.hFile = *NULL;
+      isDone = *off;
+   else;
+      isDone = *on;
+      handle.isOpen = *on;
+   endif;
 
-         property = PropertyList_getFirst(propIter);
+endif;
 
-         dow property.key <> '';
+return isDone;
 
-            if (prefix = '') or (f_startsWith(prefix: property.key) and
-                                 %len(property.key) > %len(prefix));
 
-               parameter = f_lcase(%subst(property.key: %len(prefix) + 1));
+end-proc;
 
-               select;
-               when parameter = cPARAMETER_OUTQ;
-                  io_handle.outQ        = property.value;
-               when parameter = cPARAMETER_SPLFNAME;
-                  io_handle.splfname    = property.value;
-               when parameter = cPARAMETER_USRDTA;
-                  io_handle.usrdta      = property.value;
-               when parameter = cPARAMETER_PAGE_LENGTH;
-                  io_handle.length =
-                     OptionConverter_toInt(
-                        property.value: cDEFAULT_LENGTH);
-               when parameter = cPARAMETER_PAGE_WIDTH;
-                  io_handle.width =
-                     OptionConverter_toInt(
-                        property.value: cDEFAULT_WIDTH);
-               when parameter = cPARAMETER_LPI;
-                  io_handle.lpi =
-                     OptionConverter_toInt(
-                        property.value: cDEFAULT_LPI);
-               when parameter = cPARAMETER_CPI;
-                  io_handle.cpi =
-                     OptionConverter_toInt(
-                        property.value: cDEFAULT_CPI);
-               when parameter = cPARAMETER_OVERFLOW;
-                  io_handle.ovrflw =
-                     OptionConverter_toInt(
-                        property.value: cDEFAULT_OVRFLW);
-               when parameter = cPARAMETER_LEFT_MARGIN;
-                  io_handle.leftMargin =
-                     OptionConverter_toInt(
-                        property.value: cDEFAULT_LEFT_MARGIN);
-               when parameter = cPARAMETER_RIGHT_MARGIN;
-                  io_handle.rightMargin =
-                     OptionConverter_toInt(
-                        property.value: cDEFAULT_RIGHT_MARGIN);
-               when parameter = cPARAMETER_DATE_PATTERN;
-                  io_handle.datePattern = property.value;
-               when Appender_knowsProperty(parameter);
-                  // Ignore all parameters known by super Appender class
-               other;
-                  LogLog_warning('No such property ['     +
-                                  property.key            +
-                                 '] in [' + cTHIS_CLASS + ']');
-               endsl;
+//=====================================================================*
+//  *** Private ***
+//  Closes a DailyRollingPrintAppender.
+//=====================================================================*
+dcl-proc closeAppender;
+  dcl-pi *n ind;
+    i_pHandle pointer const;
+  end-pi;
 
-            endif;
+//  Return value
+  dcl-s isDone ind inz(*off);
 
-            property = PropertyList_getNext(propIter);
-         enddo;
+//  Appender handle
+  dcl-ds handle likeds(handle_t) based(i_pHandle);
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-         return;
+if Rclose(handle.hFile) = 0;
+   handle.isOpen = *off;
+   handle.hFile  = *NULL;
+   isDone = *on;
+else;
+   isDone = *off;
+endif;
 
-      /END-FREE
-      *
-     P loadConfiguration...
-     P                 E
-      *
+return isDone;
+
+
+end-proc;
+
+//=====================================================================*
+//  *** private ***
+//  Check overflow condition.
+//=====================================================================*
+dcl-proc isNewFileCondition;
+  dcl-pi *n ind;
+    i_handle likeds(handle_t) const;
+  end-pi;
+
+//  Return value
+  dcl-s isNewFile ind inz(*off);
+
+//  Helper fields
+  dcl-s cmpDateValue like(i_handle.dateValue) inz;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+cmpdateValue = replaceVariables(i_handle.datePattern);
+
+if i_handle.dateValue <> cmpDateValue;
+   isNewFile = *on;
+else;
+   isNewFile = *off;
+endif;
+
+return isNewFile;
+
+
+end-proc;
+
+//=========================================================================
+//  *** Private ***
+//  Replace variables.
+//=========================================================================
+dcl-proc replaceVariables;
+  dcl-pi *n like(handle_t.datePattern);
+    i_string like(handle_t.datePattern) const;
+  end-pi;
+
+//  Return value
+  dcl-s string like(handle_t.datePattern) inz;
+
+//  Helper fields
+  dcl-s timestamp timestamp inz;
+  dcl-s days zoned(2) inz;
+  dcl-s months zoned(2) inz;
+  dcl-s years zoned(4) inz;
+  dcl-s minutes zoned(2) inz;
+  dcl-s hours zoned(2) inz;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+timestamp = %timestamp();
+days    = %subdt(timestamp: *DAYS    );
+months  = %subdt(timestamp: *MONTHS  );
+years   = %subdt(timestamp: *YEARS   );
+minutes = %subdt(timestamp: *MINUTES );
+hours   = %subdt(timestamp: *HOURS   );
+
+string = i_string;
+
+string = f_replace(cDATE_PATTERN_DAYS
+                   : %editc(days   : 'X'): string);
+string = f_replace(cDATE_PATTERN_MONTHS
+                   : %editc(months : 'X'): string);
+string = f_replace(cDATE_PATTERN_YEARS
+                   : %editc(years  : 'X'): string);
+string = f_replace(cDATE_PATTERN_MINUTES
+                   : %editc(minutes: 'X'): string);
+string = f_replace(cDATE_PATTERN_HOURS
+                   : %editc(hours  : 'X'): string);
+
+return string;
+
+
+end-proc;
+
+//=========================================================================
+//  *** Private ***
+//  Returns the overwrite command for the printer file.
+//=========================================================================
+dcl-proc getOverwriteCmd;
+  dcl-pi *n varchar(512);
+    i_handle likeds(handle_t) const;
+  end-pi;
+
+//  Return value
+  dcl-s cmd varchar(512) inz;
+
+//  Helper fields
+  dcl-ds qOutq likeds(qObj_t) inz;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+qOutQ = getOutQ(i_handle.outQ);
+
+cmd = 'OVRPRTF ' +
+         'FILE(QSYSPRT) ' +
+         'TOFILE(*FILE) ' +
+         'PAGESIZE('   + %char(i_handle.length)  + ' ' +
+                         %char(i_handle.width )  + ') ' +
+         'LPI('        + %char(i_handle.lpi)     + ') ' +
+         'CPI('        + %char(i_handle.cpi)     + ') ' +
+         'OVRFLW('     + %char(i_handle.ovrflw)  + ') ' +
+         'OUTQ('       + %trim(qOutQ.lib)  + '/' +
+                         %trim(qOutQ.name)       + ') ' +
+         'USRDTA('''   + i_handle.usrDta         + ''') ' +
+         'SPLFNAME('   + i_handle.splfname       + ') ' +
+         'OVRSCOPE(*CALLLVL)';
+
+return cmd;
+
+
+end-proc;
+
+//=========================================================================
+//  *** Private ***
+//  Returns the output queue from handle.outQ.
+//=========================================================================
+dcl-proc getOutQ;
+  dcl-pi *n like(qObj_t);
+    i_outQ like(LOG4RPG_path_t) const;
+  end-pi;
+
+//  Return value
+  dcl-ds qOutQ likeds(qObj_t) inz;
+
+//  Local fields
+  dcl-s x int(10) inz;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+if i_outQ = '';
+   qOutQ.name = '*N';
+   qOutQ.lib  = '*N';
+   return qOutQ;
+endif;
+
+x = %scan('/': i_outQ);
+
+if (x > 1) and (x < %len(i_outQ));
+   qOutQ.name = %subst(i_outQ: x+1);
+   qOutQ.lib  = f_left(i_outQ: x-1);
+else;
+   qOutQ.name = i_outQ;
+   qOutQ.lib  = '*N';
+endif;
+
+return qOutQ;
+
+
+end-proc;
+
+//=========================================================================
+//  *** Private ***
+//  Loads the configuration parameters from the specified property list.
+//=========================================================================
+dcl-proc loadConfiguration;
+  dcl-pi *n;
+    io_handle   likeds(handle_t);
+    i_pPropList like(LOG4RPG_pPropertyList_t) const;
+    i_prefix    like(LOG4RPG_prefix_t) const;
+  end-pi;
+
+//  Local fields
+  dcl-s parameter like(property.key) inz;
+  dcl-s prefix like(i_prefix) inz;
+  dcl-ds property likeds(LOG4RPG_property_t) inz;
+  dcl-ds propIter DS likeds(LOG4RPG_Property: ListIterator_t) inz;
+  end-ds;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+prefix = f_lcase(i_prefix);
+
+propIter = PropertyList_getIterator(i_pPropList);
+
+property = PropertyList_getFirst(propIter);
+
+dow property.key <> '';
+
+   if (prefix = '') or (f_startsWith(prefix: property.key) and
+                        %len(property.key) > %len(prefix));
+
+      parameter = f_lcase(%subst(property.key: %len(prefix) + 1));
+
+      select;
+      when parameter = cPARAMETER_OUTQ;
+         io_handle.outQ        = property.value;
+      when parameter = cPARAMETER_SPLFNAME;
+         io_handle.splfname    = property.value;
+      when parameter = cPARAMETER_USRDTA;
+         io_handle.usrdta      = property.value;
+      when parameter = cPARAMETER_PAGE_LENGTH;
+         io_handle.length =
+            OptionConverter_toInt(
+               property.value: cDEFAULT_LENGTH);
+      when parameter = cPARAMETER_PAGE_WIDTH;
+         io_handle.width =
+            OptionConverter_toInt(
+               property.value: cDEFAULT_WIDTH);
+      when parameter = cPARAMETER_LPI;
+         io_handle.lpi =
+            OptionConverter_toInt(
+               property.value: cDEFAULT_LPI);
+      when parameter = cPARAMETER_CPI;
+         io_handle.cpi =
+            OptionConverter_toInt(
+               property.value: cDEFAULT_CPI);
+      when parameter = cPARAMETER_OVERFLOW;
+         io_handle.ovrflw =
+            OptionConverter_toInt(
+               property.value: cDEFAULT_OVRFLW);
+      when parameter = cPARAMETER_LEFT_MARGIN;
+         io_handle.leftMargin =
+            OptionConverter_toInt(
+               property.value: cDEFAULT_LEFT_MARGIN);
+      when parameter = cPARAMETER_RIGHT_MARGIN;
+         io_handle.rightMargin =
+            OptionConverter_toInt(
+               property.value: cDEFAULT_RIGHT_MARGIN);
+      when parameter = cPARAMETER_DATE_PATTERN;
+         io_handle.datePattern = property.value;
+      when Appender_knowsProperty(parameter);
+         // Ignore all parameters known by super Appender class
+      other;
+         LogLog_warning('No such property ['     +
+                         property.key            +
+                        '] in [' + cTHIS_CLASS + ']');
+      endsl;
+
+   endif;
+
+   property = PropertyList_getNext(propIter);
+enddo;
+
+return;
+
+
+end-proc;
+

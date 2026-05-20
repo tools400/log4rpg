@@ -1,172 +1,186 @@
-      /IF NOT DEFINED(PLOG4RPG13)
-      /DEFINE PLOG4RPG13
-      *
-      * -----------------------------------------
-      *  Type definitions
-      * -----------------------------------------
-      /COPY QLOG4RPG,PTYPES                        Private type definitions
-      *
-      * -----------------------------------------
-      *  Constants
-      * -----------------------------------------
-      *
-      * -----------------------------------------
-      *  Prototypes
-      * -----------------------------------------
-      *
-      *  Adds a logger to the repository.
-     D Repository_addLogger...
-     D                 PR            10I 0
-     D                                     extproc('LOG4RPG13+
-     D                                     _Repository_addLogger+
-     D                                     ')
-     D  i_pLogger                          const  like(LOG4RPG_hLogger_t )
-      *
-      *  Removes a logger from the logger list of the repository.
-     D Repository_removeLogger...
-     D                 PR            10I 0
-     D                                     extproc('LOG4RPG13+
-     D                                     _Repository_removeLogger+
-     D                                     ')
-     D  i_logName                          const  like(LOG4RPG_loggerName_t)
-      *
-      *  Test, whether the specified logger exists in the logger list.
-     D Repository_existLogger...
-     D                 PR              N
-     D                                     extproc('LOG4RPG13+
-     D                                     _Repository_existLogger+
-     D                                     ')
-     D  i_logName                          const  like(LOG4RPG_loggerName_t)
-      *
-      *  Searches the logger list for the specified logger.
-     D Repository_getLogger...
-     D                 PR                         like(LOG4RPG_hLogger_t )
-     D                                     extproc('LOG4RPG13+
-     D                                     _Repository_getLogger+
-     D                                     ')
-     D  i_logName                          const  like(LOG4RPG_loggerName_t)
-      *
-      *  Adds an appender to the repository.
-     D Repository_addAppender...
-     D                 PR            10I 0
-     D                                     extproc('LOG4RPG13+
-     D                                     _Repository_addAppender+
-     D                                     ')
-     D  i_pAppender                        const  like(LOG4RPG_pAppender_t)
-      *
-      *  Removes an appender from the appender list of the repository.
-     D Repository_removeAppender...
-     D                 PR            10I 0
-     D                                     extproc('LOG4RPG13+
-     D                                     _Repository_removeAppender+
-     D                                     ')
-     D  i_appName                          const  like(LOG4RPG_appenderName_t  )
-      *
-      *  Test, whether the specified logger exists in the logger list.
-     D Repository_existAppender...
-     D                 PR              N
-     D                                     extproc('LOG4RPG13+
-     D                                     _Repository_existAppender+
-     D                                     ')
-     D  i_appName                          const  like(LOG4RPG_appenderName_t  )
-      *
-      *  Searches the appender list for the specified appender.
-     D Repository_getAppender...
-     D                 PR                         like(LOG4RPG_pAppender_t    )
-     D                                     extproc('LOG4RPG13+
-     D                                     _Repository_getAppender+
-     D                                     ')
-     D  i_appName                          const  like(LOG4RPG_appenderName_t )
-      *
-      *  Adds a filter to the repository.
-     D Repository_addFilter...
-     D                 PR            10I 0
-     D                                     extproc('LOG4RPG13+
-     D                                     _Repository_addFilter+
-     D                                     ')
-     D  i_pFilter                          const  like(LOG4RPG_pFilter_t)
-      *
-      *  Removes a filter from the filter list of the repository.
-     D Repository_removeFilter...
-     D                 PR            10I 0
-     D                                     extproc('LOG4RPG13+
-     D                                     _Repository_removeFilter+
-     D                                     ')
-     D  i_fltName                          const  like(LOG4RPG_filterName_t  )
-      *
-      *  Test, whether the specified filter exists in the filter list.
-     D Repository_existFilter...
-     D                 PR              N
-     D                                     extproc('LOG4RPG13+
-     D                                     _Repository_existFilter+
-     D                                     ')
-     D  i_fltName                          const  like(LOG4RPG_filterName_t  )
-      *
-      *  Searches the filter list for the specified filter.
-     D Repository_getFilter...
-     D                 PR                         like(LOG4RPG_pFilter_t    )
-     D                                     extproc('LOG4RPG13+
-     D                                     _Repository_getFilter+
-     D                                     ')
-     D  i_fltName                          const  like(LOG4RPG_filterName_t )
-      *
-      *  Initializes the logger repositiory.
-     D Repository_initialize...
-     D                 PR
-     D                                     extproc('LOG4RPG13+
-     D                                     _Repository_initialize+
-     D                                     ')
-      *
-      *  Prepare repository for re-loading configuration data.
-     D Repository_prepareReload...
-     D                 PR
-     D                                     extproc('LOG4RPG13+
-     D                                     _Repository_prepareReload+
-     D                                     ')
-      *
-      *  Dumps the children of a given logger.
-     D Repository_dumpHierarchy...
-     D                 PR
-     D                                     extproc('LOG4RPG13+
-     D                                     _Repository_dumpHierarchy+
-     D                                     ')
-     D  i_pLogger                          const  like(LOG4RPG_hLogger_t )
-     D                                            options(*nopass)
-      *
-      *  Clears the repository.
-     D Repository_clear...
-     D                 PR
-     D                                     extproc('LOG4RPG13+
-     D                                     _Repository_clear+
-     D                                     ')
-      *
-      *  Clears all filters in the repository.
-     D Repository_clearFilters...
-     D                 PR
-     D                                     extproc('LOG4RPG13+
-     D                                     _Repository_clearFilters+
-     D                                     ')
-      *
-      *  Clears all appenders in the repository.
-     D Repository_clearAppenders...
-     D                 PR
-     D                                     extproc('LOG4RPG13+
-     D                                     _Repository_clearAppenders+
-     D                                     ')
-      *
-      *  Sets the SHUTDOWN-Flag if the repository.
-     D Repository_setShutdown...
-     D                 PR
-     D                                     extproc('LOG4RPG13+
-     D                                     _Repository_setShutdown+
-     D                                     ')
-     D  i_isShutdown                   N   const
-      *
-      *  Tests, if the repository is in SHUTDOWN mode.
-     D Repository_isShutdown...
-     D                 PR              N
-     D                                     extproc('LOG4RPG13+
-     D                                     _Repository_isShutdown+
-     D                                     ')
-      *
-      /ENDIF
+**FREE
+/IF NOT DEFINED(PLOG4RPG13)
+/DEFINE PLOG4RPG13
+//
+// -----------------------------------------
+//  Type definitions
+// -----------------------------------------
+/COPY QLOG4RPG,PTYPES                        Private type definitions
+//
+// -----------------------------------------
+//  Constants
+// -----------------------------------------
+//
+// -----------------------------------------
+//  Prototypes
+// -----------------------------------------
+//
+//  Adds a logger to the repository.
+dcl-pr Repository_addLogger
+       int(10)
+       extproc('LOG4RPG13+
+       _Repository_addLogger+
+       ');
+  i_pLogger       const  like(LOG4RPG_hLogger_t );
+end-pr;
+//
+//  Removes a logger from the logger list of the repository.
+dcl-pr Repository_removeLogger
+       int(10)
+       extproc('LOG4RPG13+
+       _Repository_removeLogger+
+       ');
+  i_logName       const  like(LOG4RPG_loggerName_t);
+end-pr;
+//
+//  Test, whether the specified logger exists in the logger list.
+dcl-pr Repository_existLogger
+       ind
+       extproc('LOG4RPG13+
+       _Repository_existLogger+
+       ');
+  i_logName       const  like(LOG4RPG_loggerName_t);
+end-pr;
+//
+//  Searches the logger list for the specified logger.
+dcl-pr Repository_getLogger
+       like(LOG4RPG_hLogger_t )
+       extproc('LOG4RPG13+
+       _Repository_getLogger+
+       ');
+  i_logName       const  like(LOG4RPG_loggerName_t);
+end-pr;
+//
+//  Adds an appender to the repository.
+dcl-pr Repository_addAppender
+       int(10)
+       extproc('LOG4RPG13+
+       _Repository_addAppender+
+       ');
+  i_pAppender     const  like(LOG4RPG_pAppender_t);
+end-pr;
+//
+//  Removes an appender from the appender list of the repository.
+dcl-pr Repository_removeAppender
+       int(10)
+       extproc('LOG4RPG13+
+       _Repository_removeAppender+
+       ');
+  i_appName       const  like(LOG4RPG_appenderName_t  );
+end-pr;
+//
+//  Test, whether the specified logger exists in the logger list.
+dcl-pr Repository_existAppender
+       ind
+       extproc('LOG4RPG13+
+       _Repository_existAppender+
+       ');
+  i_appName       const  like(LOG4RPG_appenderName_t  );
+end-pr;
+//
+//  Searches the appender list for the specified appender.
+dcl-pr Repository_getAppender
+       like(LOG4RPG_pAppender_t    )
+       extproc('LOG4RPG13+
+       _Repository_getAppender+
+       ');
+  i_appName       const  like(LOG4RPG_appenderName_t );
+end-pr;
+//
+//  Adds a filter to the repository.
+dcl-pr Repository_addFilter
+       int(10)
+       extproc('LOG4RPG13+
+       _Repository_addFilter+
+       ');
+  i_pFilter       const  like(LOG4RPG_pFilter_t);
+end-pr;
+//
+//  Removes a filter from the filter list of the repository.
+dcl-pr Repository_removeFilter
+       int(10)
+       extproc('LOG4RPG13+
+       _Repository_removeFilter+
+       ');
+  i_fltName       const  like(LOG4RPG_filterName_t  );
+end-pr;
+//
+//  Test, whether the specified filter exists in the filter list.
+dcl-pr Repository_existFilter
+       ind
+       extproc('LOG4RPG13+
+       _Repository_existFilter+
+       ');
+  i_fltName       const  like(LOG4RPG_filterName_t  );
+end-pr;
+//
+//  Searches the filter list for the specified filter.
+dcl-pr Repository_getFilter
+       like(LOG4RPG_pFilter_t    )
+       extproc('LOG4RPG13+
+       _Repository_getFilter+
+       ');
+  i_fltName       const  like(LOG4RPG_filterName_t );
+end-pr;
+//
+//  Initializes the logger repositiory.
+dcl-pr Repository_initialize
+       extproc('LOG4RPG13+
+       _Repository_initialize+
+       ');
+end-pr;
+//
+//  Prepare repository for re-loading configuration data.
+dcl-pr Repository_prepareReload
+       extproc('LOG4RPG13+
+       _Repository_prepareReload+
+       ');
+end-pr;
+//
+//  Dumps the children of a given logger.
+dcl-pr Repository_dumpHierarchy
+       extproc('LOG4RPG13+
+       _Repository_dumpHierarchy+
+       ');
+  i_pLogger       const  like(LOG4RPG_hLogger_t )
+       options(*nopass);
+end-pr;
+//
+//  Clears the repository.
+dcl-pr Repository_clear
+       extproc('LOG4RPG13+
+       _Repository_clear+
+       ');
+end-pr;
+//
+//  Clears all filters in the repository.
+dcl-pr Repository_clearFilters
+       extproc('LOG4RPG13+
+       _Repository_clearFilters+
+       ');
+end-pr;
+//
+//  Clears all appenders in the repository.
+dcl-pr Repository_clearAppenders
+       extproc('LOG4RPG13+
+       _Repository_clearAppenders+
+       ');
+end-pr;
+//
+//  Sets the SHUTDOWN-Flag if the repository.
+dcl-pr Repository_setShutdown
+       extproc('LOG4RPG13+
+       _Repository_setShutdown+
+       ');
+  i_isShutdown    ind const;
+end-pr;
+//
+//  Tests, if the repository is in SHUTDOWN mode.
+dcl-pr Repository_isShutdown
+       ind
+       extproc('LOG4RPG13+
+       _Repository_isShutdown+
+       ');
+end-pr;
+//
+/ENDIF

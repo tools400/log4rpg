@@ -1,45 +1,49 @@
-      /IF NOT DEFINED(PLOG4RPG15)
-      /DEFINE PLOG4RPG15
-      *
-      * -----------------------------------------
-      *  Type definitions
-      * -----------------------------------------
-      /COPY QLOG4RPG,PTYPES                        Private type definitions
-      *
-      * -----------------------------------------
-      *  Constants
-      * -----------------------------------------
-     D cLOG4RPG_INT_DEBUG_OUTPUT_PRINTER...
-     D                 C                   const(1)
-     D cLOG4RPG_INT_DEBUG_OUTPUT_STDOUT...
-     D                 C                   const(2)
-      *
-      * -----------------------------------------
-      *  Prototypes
-      * -----------------------------------------
-      *
-      *  Converts the string passed as argument to an integer debug output.
-     D DebugOutput_toInt...
-     D                 PR             5I 0
-     D                                     extproc('LOG4RPG15+
-     D                                     _DebugOutput_toInt+
-     D                                     ')
-     D  i_debugOutput                      const  like(LOG4RPG_debugOutput_t)
-      *
-      *  Converts the integer passed as argument to a string debug output.
-     D DebugOutput_toString...
-     D                 PR                         like(LOG4RPG_debugOutput_t)
-     D                                     extproc('LOG4RPG15+
-     D                                     _DebugOutput_toString+
-     D                                     ')
-     D  i_debugOutput                 5I 0 const
-      *
-      *  Tests, if the specified debug output is valid (well known).
-     D DebugOutput_isValid...
-     D                 PR              N
-     D                                     extproc('LOG4RPG15+
-     D                                     _DebugOutput_isValid+
-     D                                     ')
-     D  i_debugOutput                      const  like(LOG4RPG_debugOutput_t)
-      *
-      /ENDIF
+**FREE
+/IF NOT DEFINED(PLOG4RPG15)
+/DEFINE PLOG4RPG15
+//
+// -----------------------------------------
+//  Type definitions
+// -----------------------------------------
+/COPY QLOG4RPG,PTYPES                        Private type definitions
+//
+// -----------------------------------------
+//  Constants
+// -----------------------------------------
+dcl-c cLOG4RPG_INT_DEBUG_OUTPUT_PRINTER
+      const(1);
+dcl-c cLOG4RPG_INT_DEBUG_OUTPUT_STDOUT
+      const(2);
+//
+// -----------------------------------------
+//  Prototypes
+// -----------------------------------------
+//
+//  Converts the string passed as argument to an integer debug output.
+dcl-pr DebugOutput_toInt
+       int(5)
+       extproc('LOG4RPG15+
+       _DebugOutput_toInt+
+       ');
+  i_debugOutput   const  like(LOG4RPG_debugOutput_t);
+end-pr;
+//
+//  Converts the integer passed as argument to a string debug output.
+dcl-pr DebugOutput_toString
+       like(LOG4RPG_debugOutput_t)
+       extproc('LOG4RPG15+
+       _DebugOutput_toString+
+       ');
+  i_debugOutput   int(5) const;
+end-pr;
+//
+//  Tests, if the specified debug output is valid (well known).
+dcl-pr DebugOutput_isValid
+       ind
+       extproc('LOG4RPG15+
+       _DebugOutput_isValid+
+       ');
+  i_debugOutput   const  like(LOG4RPG_debugOutput_t);
+end-pr;
+//
+/ENDIF

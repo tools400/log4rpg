@@ -1,307 +1,330 @@
-      /IF NOT DEFINED(PLOG4RPG01)
-      /DEFINE PLOG4RPG01
-      *
-      * -----------------------------------------
-      *  Type definitions
-      * -----------------------------------------
-      /COPY QLOG4RPG,PTYPES                        Private type definitions
-      *
-      * -----------------------------------------
-      *  Constants
-      * -----------------------------------------
-      *
-      * -----------------------------------------
-      *  Prototypes
-      * -----------------------------------------
-      *    Refer to: PLOG4RPG
-      *
-      *  Creates a new logger instance.
-     D Logger_new...
-     D                 PR                         like(LOG4RPG_hLogger_t )
-     D                                     extproc('LOG4RPG01+
-     D                                     _Logger_new+
-     D                                     ')
-     D  i_logName                          const  like(LOG4RPG_loggerName_t)
-      *
-      *  Resets the logging level of the specified logger to use the
-      *  log level of the parent logger.
-     D Logger_resetLevel...
-     D                 PR
-     D                                     extproc('LOG4RPG01+
-     D                                     _Logger_resetLevel+
-     D                                     ')
-     D  i_hLogger                          const  like(LOG4RPG_hLogger_t )
-      *
-      *  Adds an appender to the specified logger.
-      *  ==> PLOG4RPG
-      *
-      *  Removes the specified appender from a given logger.
-     D Logger_removeAppender...
-     D                 PR
-     D                                     extproc('LOG4RPG01+
-     D                                     _Logger_removeAppender+
-     D                                     ')
-     D  i_hLogger                          const  like(LOG4RPG_hLogger_t       )
-     D  i_appName                          const  like(LOG4RPG_appenderName_t  )
-      *
-      *  Removes all appenders from the specified logger.
-     D Logger_removeAllAppenders...
-     D                 PR
-     D                                     extproc('LOG4RPG01+
-     D                                     _Logger_removeAllAppenders+
-     D                                     ')
-     D  i_hLogger                          const  like(LOG4RPG_hLogger_t   )
-      *
-      *  Deletes a logger.
-     D Logger_delete...
-     D                 PR
-     D                                     extproc('LOG4RPG01+
-     D                                     _Logger_delete+
-     D                                     ')
-     D  io_hLogger                                like(LOG4RPG_hLogger_t )
-      *
-      *  Adds a child to the specified logger node.
-     D Logger_addChild...
-     D                 PR            10I 0
-     D                                     extproc('LOG4RPG01+
-     D                                     _Logger_addChild+
-     D                                     ')
-     D  i_hLogger                          const  like(LOG4RPG_hLogger_t )
-     D  i_hChild                           const  like(LOG4RPG_hLogger_t )
-      *
-      *  Sets the parent logger of the specified logger.
-     D Logger_setParent...
-     D                 PR
-     D                                     extproc('LOG4RPG01+
-     D                                     _Logger_setParent+
-     D                                     ')
-     D  i_hLogger                          const  like(LOG4RPG_hLogger_t )
-     D  i_hParent                          const  like(LOG4RPG_hLogger_t )
-      *
-      *  Returns the parent of the specified logger.
-     D Logger_getParent...
-     D                 PR                         like(LOG4RPG_hLogger_t )
-     D                                     extproc('LOG4RPG01+
-     D                                     _Logger_getParent+
-     D                                     ')
-     D  i_hLogger                          const  like(LOG4RPG_hLogger_t )
-      *
-      *  returns the name of a given Node.
-     D Node_getName...
-     D                 PR                         like(LOG4RPG_loggerName_t)
-     D                                     extproc('LOG4RPG01+
-     D                                     _Node_getName+
-     D                                     ')
-     D  i_hNode                            const  like(LOG4RPG_hLogger_t )
-      *
-      *  Test the specified logger handle for a logger node.
-     D Node_isLoggerNode...
-     D                 PR              N
-     D                                     extproc('LOG4RPG01+
-     D                                     _Node_isLoggerNode+
-     D                                     ')
-     D  i_hLogger                          const  like(LOG4RPG_hLogger_t )
-      *
-      *  Test the specified logger handle for a provision node.
-     D Node_isProvisionNode...
-     D                 PR              N
-     D                                     extproc('LOG4RPG01+
-     D                                     _Node_isProvisionNode+
-     D                                     ')
-     D  i_hLogger                          const  like(LOG4RPG_hLogger_t )
-      *
-      *  Returns the number of children of the specified node.
-     D Node_getNumChildren...
-     D                 PR            10I 0
-     D                                     extproc('LOG4RPG01+
-     D                                     _Node_getNumChildren+
-     D                                     ')
-     D  i_hLogger                          const  like(LOG4RPG_hLogger_t   )
-      *
-      *  Returns a reference to a child of the specified node.
-     D Node_getChild...
-     D                 PR                         like(LOG4RPG_hLogger_t   )
-     D                                     extproc('LOG4RPG01+
-     D                                     _Node_getChild+
-     D                                     ')
-     D  i_hLogger                          const  like(LOG4RPG_hLogger_t   )
-     D  i_index                      10I 0 const
-      *
-      *  Adds a child to the specified node.
-     D Node_addChild...
-     D                 PR            10I 0
-     D                                     extproc('LOG4RPG01+
-     D                                     _Node_addChild+
-     D                                     ')
-     D  i_hNode                            const  like(LOG4RPG_hLogger_t   )
-     D  i_hChild                           const  like(LOG4RPG_hLogger_t   )
-      *
-      *  Sets the parent node of the specified node.
-     D Node_setParent...
-     D                 PR
-     D                                     extproc('LOG4RPG01+
-     D                                     _Node_setParent+
-     D                                     ')
-     D  i_hLogger                          const  like(LOG4RPG_hLogger_t )
-     D  i_hParent                          const  like(LOG4RPG_hLogger_t )
-      *
-      *  Returns the parent node of a given node.
-     D Node_getParent...
-     D                 PR                         like(LOG4RPG_hLogger_t )
-     D                                     extproc('LOG4RPG01+
-     D                                     _Node_getParent+
-     D                                     ')
-     D  i_hLogger                          const  like(LOG4RPG_hLogger_t )
-      *
-      *  Removes a child from the list of children of the specified node.
-     D Node_removeChild...
-     D                 PR            10I 0
-     D                                     extproc('LOG4RPG01+
-     D                                     _Node_removeChild+
-     D                                     ')
-     D  i_hLogger                          const  like(LOG4RPG_hLogger_t   )
-     D  i_index                      10I 0 const
-      *
-      *  Searches the children of a given node for a given child.
-     D Node_findChild...
-     D                 PR            10I 0
-     D                                     extproc('LOG4RPG01+
-     D                                     _Node_findChild+
-     D                                     ')
-     D  i_hNode                            const  like(LOG4RPG_hLogger_t )
-     D  i_hChild                           const  like(LOG4RPG_hLogger_t )
-      *
-      *  Tests the specified node handle for a NULL value.
-     D Node_isNull...
-     D                 PR              N
-     D                                     extproc('LOG4RPG01+
-     D                                     _Node_isNull+
-     D                                     ')
-     D  i_hNode                            const  like(LOG4RPG_hLogger_t )
-      *
-      *  Returns a node NULL handle.
-     D Node_null...
-     D                 PR                         like(LOG4RPG_hLogger_t )
-     D                                     extproc('LOG4RPG01+
-     D                                     _Node_null+
-     D                                     ')
-      *
-      *  Returns a brief description of the node.
-     D Node_toString...
-     D                 PR           117A          varying
-     D                                     extproc('LOG4RPG01+
-     D                                     _Node_toString+
-     D                                     ')
-     D  i_hNode                            const  like(LOG4RPG_hLogger_t   )
-      *
-      *  Returns the number of children of the specified provision node.
-     D ProvisionNode_getNumChildren...
-     D                 PR            10I 0
-     D                                     extproc('LOG4RPG01+
-     D                                     _ProvisionNode_getNumChildren+
-     D                                     ')
-     D  i_hLogger                          const  like(LOG4RPG_hLogger_t   )
-      *
-      *  Adds a child to the specified provision node.
-     D ProvisionNode_addChild...
-     D                 PR            10I 0
-     D                                     extproc('LOG4RPG01+
-     D                                     _ProvisionNode_addChild+
-     D                                     ')
-     D  i_hLogger                          const  like(LOG4RPG_hLogger_t   )
-     D  i_hChild                           const  like(LOG4RPG_hLogger_t   )
-      *
-      *  Returns a reference to a child of the specified provision node.
-     D ProvisionNode_getChild...
-     D                 PR                         like(LOG4RPG_hLogger_t   )
-     D                                     extproc('LOG4RPG01+
-     D                                     _ProvisionNode_getChild+
-     D                                     ')
-     D  i_hLogger                          const  like(LOG4RPG_hLogger_t   )
-     D  i_index                      10I 0 const
-      *
-      *  Removes a child from the list of children of the specified logger.
-     D ProvisionNode_removeChild...
-     D                 PR            10I 0
-     D                                     extproc('LOG4RPG01+
-     D                                     _ProvisionNode_removeChild+
-     D                                     ')
-     D  i_hLogger                          const  like(LOG4RPG_hLogger_t   )
-     D  i_index                      10I 0 const
-      *
-      *  Sets the parent node of the specified logger.
-     D ProvisionNode_setParent...
-     D                 PR
-     D                                     extproc('LOG4RPG01+
-     D                                     _ProvisionNode_setParent+
-     D                                     ')
-     D  i_hProvNode                        const  like(LOG4RPG_hLogger_t )
-     D  i_hParent                          const  like(LOG4RPG_hLogger_t )
-      *
-      *  Returns the parent node of a given provision node.
-     D ProvisionNode_getParent...
-     D                 PR                         like(LOG4RPG_hLogger_t )
-     D                                     extproc('LOG4RPG01+
-     D                                     _ProvisionNode_getParent+
-     D                                     ')
-     D  i_hProvNode                        const  like(LOG4RPG_hLogger_t )
-      *
-      *  Factory: Produces a provision node and adds a child to it.
-     D ProvisionNode_makeProvisionNode...
-     D                 PR                         like(LOG4RPG_hLogger_t )
-     D                                     extproc('LOG4RPG01+
-     D                                     _ProvisionNode_makeProvisionNode+
-     D                                     ')
-     D  i_logName                          const  like(LOG4RPG_loggerName_t)
-     D  i_hChild                           const  like(LOG4RPG_hLogger_t   )
-      *
-      *  Frees a provision node.
-     D ProvisionNode_free...
-     D                 PR
-     D                                     extproc('LOG4RPG01+
-     D                                     _ProvisionNode_free+
-     D                                     ')
-     D  io_hProvNode                              like(LOG4RPG_hLogger_t )
-      *
-      *  Moves the children to a given logger node.
-     D ProvisionNode_moveChildren...
-     D                 PR
-     D                                     extproc('LOG4RPG01+
-     D                                     _ProvisionNode_moveChildren+
-     D                                     ')
-     D  i_hProvNode                               like(LOG4RPG_hLogger_t )
-     D  i_hLogger                                 like(LOG4RPG_hLogger_t )
-      *
-      *  Tests the specified provision node handle for a NULL value.
-     D ProvisionNode_isNull...
-     D                 PR              N
-     D                                     extproc('LOG4RPG01+
-     D                                     _ProvisionNode_isNull+
-     D                                     ')
-     D  i_hNode                            const  like(LOG4RPG_hLogger_t )
-      *
-      *  Returns a provision node NULL handle.
-     D ProvisionNode_null...
-     D                 PR                         like(LOG4RPG_hLogger_t )
-     D                                     extproc('LOG4RPG01+
-     D                                     _ProvisionNode_null+
-     D                                     ')
-      *
-      *  Sets an offset to let f_caller() skip the Log4rpg stub module
-      *  if present.
-      /IF NOT DEFINED(LOGGER_STUB)
-     D setStubOfs...
-     D                 PR
-     D                                     extproc('LOG4RPG01+
-     D                                     _setStubOfs Internal Use Only+
-     D                                     ')
-      /ELSE
-     D setStubOfs...
-     D                 PR
-     D                                     extproc(
-     D                                     g_procptr.setStubOfs
-     D                                     )
-      /ENDIF
-     D  i_stubOfs                     3I 0 const
-      *
-      /ENDIF
+**FREE
+/IF NOT DEFINED(PLOG4RPG01)
+/DEFINE PLOG4RPG01
+//
+// -----------------------------------------
+//  Type definitions
+// -----------------------------------------
+/COPY QLOG4RPG,PTYPES                        Private type definitions
+//
+// -----------------------------------------
+//  Constants
+// -----------------------------------------
+//
+// -----------------------------------------
+//  Prototypes
+// -----------------------------------------
+//    Refer to: PLOG4RPG
+//
+//  Creates a new logger instance.
+dcl-pr Logger_new
+       like(LOG4RPG_hLogger_t )
+       extproc('LOG4RPG01+
+       _Logger_new+
+       ');
+  i_logName       const  like(LOG4RPG_loggerName_t);
+end-pr;
+//
+//  Resets the logging level of the specified logger to use the
+//  log level of the parent logger.
+dcl-pr Logger_resetLevel
+       extproc('LOG4RPG01+
+       _Logger_resetLevel+
+       ');
+  i_hLogger       const  like(LOG4RPG_hLogger_t );
+end-pr;
+//
+//  Adds an appender to the specified logger.
+//  ==> PLOG4RPG
+//
+//  Removes the specified appender from a given logger.
+dcl-pr Logger_removeAppender
+       extproc('LOG4RPG01+
+       _Logger_removeAppender+
+       ');
+  i_hLogger       const  like(LOG4RPG_hLogger_t       );
+  i_appName       const  like(LOG4RPG_appenderName_t  );
+end-pr;
+//
+//  Removes all appenders from the specified logger.
+dcl-pr Logger_removeAllAppenders
+       extproc('LOG4RPG01+
+       _Logger_removeAllAppenders+
+       ');
+  i_hLogger       const  like(LOG4RPG_hLogger_t   );
+end-pr;
+//
+//  Deletes a logger.
+dcl-pr Logger_delete
+       extproc('LOG4RPG01+
+       _Logger_delete+
+       ');
+  io_hLogger      like(LOG4RPG_hLogger_t );
+end-pr;
+//
+//  Adds a child to the specified logger node.
+dcl-pr Logger_addChild
+       int(10)
+       extproc('LOG4RPG01+
+       _Logger_addChild+
+       ');
+  i_hLogger       const  like(LOG4RPG_hLogger_t );
+  i_hChild        const  like(LOG4RPG_hLogger_t );
+end-pr;
+//
+//  Sets the parent logger of the specified logger.
+dcl-pr Logger_setParent
+       extproc('LOG4RPG01+
+       _Logger_setParent+
+       ');
+  i_hLogger       const  like(LOG4RPG_hLogger_t );
+  i_hParent       const  like(LOG4RPG_hLogger_t );
+end-pr;
+//
+//  Returns the parent of the specified logger.
+dcl-pr Logger_getParent
+       like(LOG4RPG_hLogger_t )
+       extproc('LOG4RPG01+
+       _Logger_getParent+
+       ');
+  i_hLogger       const  like(LOG4RPG_hLogger_t );
+end-pr;
+//
+//  returns the name of a given Node.
+dcl-pr Node_getName
+       like(LOG4RPG_loggerName_t)
+       extproc('LOG4RPG01+
+       _Node_getName+
+       ');
+  i_hNode         const  like(LOG4RPG_hLogger_t );
+end-pr;
+//
+//  Test the specified logger handle for a logger node.
+dcl-pr Node_isLoggerNode
+       ind
+       extproc('LOG4RPG01+
+       _Node_isLoggerNode+
+       ');
+  i_hLogger       const  like(LOG4RPG_hLogger_t );
+end-pr;
+//
+//  Test the specified logger handle for a provision node.
+dcl-pr Node_isProvisionNode
+       ind
+       extproc('LOG4RPG01+
+       _Node_isProvisionNode+
+       ');
+  i_hLogger       const  like(LOG4RPG_hLogger_t );
+end-pr;
+//
+//  Returns the number of children of the specified node.
+dcl-pr Node_getNumChildren
+       int(10)
+       extproc('LOG4RPG01+
+       _Node_getNumChildren+
+       ');
+  i_hLogger       const  like(LOG4RPG_hLogger_t   );
+end-pr;
+//
+//  Returns a reference to a child of the specified node.
+dcl-pr Node_getChild
+       like(LOG4RPG_hLogger_t   )
+       extproc('LOG4RPG01+
+       _Node_getChild+
+       ');
+  i_hLogger       const  like(LOG4RPG_hLogger_t   );
+  i_index         int(10) const;
+end-pr;
+//
+//  Adds a child to the specified node.
+dcl-pr Node_addChild
+       int(10)
+       extproc('LOG4RPG01+
+       _Node_addChild+
+       ');
+  i_hNode         const  like(LOG4RPG_hLogger_t   );
+  i_hChild        const  like(LOG4RPG_hLogger_t   );
+end-pr;
+//
+//  Sets the parent node of the specified node.
+dcl-pr Node_setParent
+       extproc('LOG4RPG01+
+       _Node_setParent+
+       ');
+  i_hLogger       const  like(LOG4RPG_hLogger_t );
+  i_hParent       const  like(LOG4RPG_hLogger_t );
+end-pr;
+//
+//  Returns the parent node of a given node.
+dcl-pr Node_getParent
+       like(LOG4RPG_hLogger_t )
+       extproc('LOG4RPG01+
+       _Node_getParent+
+       ');
+  i_hLogger       const  like(LOG4RPG_hLogger_t );
+end-pr;
+//
+//  Removes a child from the list of children of the specified node.
+dcl-pr Node_removeChild
+       int(10)
+       extproc('LOG4RPG01+
+       _Node_removeChild+
+       ');
+  i_hLogger       const  like(LOG4RPG_hLogger_t   );
+  i_index         int(10) const;
+end-pr;
+//
+//  Searches the children of a given node for a given child.
+dcl-pr Node_findChild
+       int(10)
+       extproc('LOG4RPG01+
+       _Node_findChild+
+       ');
+  i_hNode         const  like(LOG4RPG_hLogger_t );
+  i_hChild        const  like(LOG4RPG_hLogger_t );
+end-pr;
+//
+//  Tests the specified node handle for a NULL value.
+dcl-pr Node_isNull
+       ind
+       extproc('LOG4RPG01+
+       _Node_isNull+
+       ');
+  i_hNode         const  like(LOG4RPG_hLogger_t );
+end-pr;
+//
+//  Returns a node NULL handle.
+dcl-pr Node_null
+       like(LOG4RPG_hLogger_t )
+       extproc('LOG4RPG01+
+       _Node_null+
+       ');
+end-pr;
+//
+//  Returns a brief description of the node.
+dcl-pr Node_toString
+       varchar(117)
+       extproc('LOG4RPG01+
+       _Node_toString+
+       ');
+  i_hNode         const  like(LOG4RPG_hLogger_t   );
+end-pr;
+//
+//  Returns the number of children of the specified provision node.
+dcl-pr ProvisionNode_getNumChildren
+       int(10)
+       extproc('LOG4RPG01+
+       _ProvisionNode_getNumChildren+
+       ');
+  i_hLogger       const  like(LOG4RPG_hLogger_t   );
+end-pr;
+//
+//  Adds a child to the specified provision node.
+dcl-pr ProvisionNode_addChild
+       int(10)
+       extproc('LOG4RPG01+
+       _ProvisionNode_addChild+
+       ');
+  i_hLogger       const  like(LOG4RPG_hLogger_t   );
+  i_hChild        const  like(LOG4RPG_hLogger_t   );
+end-pr;
+//
+//  Returns a reference to a child of the specified provision node.
+dcl-pr ProvisionNode_getChild
+       like(LOG4RPG_hLogger_t   )
+       extproc('LOG4RPG01+
+       _ProvisionNode_getChild+
+       ');
+  i_hLogger       const  like(LOG4RPG_hLogger_t   );
+  i_index         int(10) const;
+end-pr;
+//
+//  Removes a child from the list of children of the specified logger.
+dcl-pr ProvisionNode_removeChild
+       int(10)
+       extproc('LOG4RPG01+
+       _ProvisionNode_removeChild+
+       ');
+  i_hLogger       const  like(LOG4RPG_hLogger_t   );
+  i_index         int(10) const;
+end-pr;
+//
+//  Sets the parent node of the specified logger.
+dcl-pr ProvisionNode_setParent
+       extproc('LOG4RPG01+
+       _ProvisionNode_setParent+
+       ');
+  i_hProvNode     const  like(LOG4RPG_hLogger_t );
+  i_hParent       const  like(LOG4RPG_hLogger_t );
+end-pr;
+//
+//  Returns the parent node of a given provision node.
+dcl-pr ProvisionNode_getParent
+       like(LOG4RPG_hLogger_t )
+       extproc('LOG4RPG01+
+       _ProvisionNode_getParent+
+       ');
+  i_hProvNode     const  like(LOG4RPG_hLogger_t );
+end-pr;
+//
+//  Factory: Produces a provision node and adds a child to it.
+dcl-pr ProvisionNode_makeProvisionNode
+       like(LOG4RPG_hLogger_t )
+       extproc('LOG4RPG01+
+       _ProvisionNode_makeProvisionNode+
+       ');
+  i_logName       const  like(LOG4RPG_loggerName_t);
+  i_hChild        const  like(LOG4RPG_hLogger_t   );
+end-pr;
+//
+//  Frees a provision node.
+dcl-pr ProvisionNode_free
+       extproc('LOG4RPG01+
+       _ProvisionNode_free+
+       ');
+  io_hProvNode    like(LOG4RPG_hLogger_t );
+end-pr;
+//
+//  Moves the children to a given logger node.
+dcl-pr ProvisionNode_moveChildren
+       extproc('LOG4RPG01+
+       _ProvisionNode_moveChildren+
+       ');
+  i_hProvNode     like(LOG4RPG_hLogger_t );
+  i_hLogger       like(LOG4RPG_hLogger_t );
+end-pr;
+//
+//  Tests the specified provision node handle for a NULL value.
+dcl-pr ProvisionNode_isNull
+       ind
+       extproc('LOG4RPG01+
+       _ProvisionNode_isNull+
+       ');
+  i_hNode         const  like(LOG4RPG_hLogger_t );
+end-pr;
+//
+//  Returns a provision node NULL handle.
+dcl-pr ProvisionNode_null
+       like(LOG4RPG_hLogger_t )
+       extproc('LOG4RPG01+
+       _ProvisionNode_null+
+       ');
+end-pr;
+//
+//  Sets an offset to let f_caller() skip the Log4rpg stub module
+//  if present.
+/IF NOT DEFINED(LOGGER_STUB)
+dcl-pr setStubOfs
+       extproc('LOG4RPG01+
+       _setStubOfs Internal Use Only+
+       ');
+/ELSE
+dcl-pr setStubOfs
+       extproc(
+       g_procptr.setStubOfs
+       );
+/ENDIF
+     i_stubOfs                     int(5) const
+end-pr;
+
+/ENDIF
