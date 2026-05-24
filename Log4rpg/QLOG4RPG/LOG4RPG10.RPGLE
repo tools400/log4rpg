@@ -53,7 +53,7 @@ dcl-f LOG4RPG printer(132) usage(*output) usropn;
 // -----------------------------------------
 //  Imported functions
 // -----------------------------------------
-/copy QLOG4RPG,PLOG4RPG                      Public API Specification
+/copy QLOG4RPG,PLOG4RPG Public API Specification
 
 // -----------------------------------------
 //  Exported functions
@@ -63,15 +63,15 @@ dcl-f LOG4RPG printer(132) usage(*output) usropn;
 // -----------------------------------------
 //  Type definitions
 // -----------------------------------------
-/copy QLOG4RPG,PLOG4RPG                      Public interface & type definitions
+/copy QLOG4RPG,PLOG4RPG Public interface & type definitions
 
 // -----------------------------------------
 //  Prototypes
 // -----------------------------------------
-/copy QLOG4RPG,CLIB                          C-Library
-/copy QBASICS1,PBASICS1                      Basic RPG Extensions
-/copy QLOG4RPG,PLOG4RPG14                    DebugMode
-/copy QLOG4RPG,PLOG4RPG15                    DebugOutput
+/copy QLOG4RPG,CLIB C-Library
+/copy QBASICS1,PBASICS1 Basic RPG Extensions
+/copy QLOG4RPG,PLOG4RPG14 DebugMode
+/copy QLOG4RPG,PLOG4RPG15 DebugOutput
 
 // -----------------------------------------
 //  Private prototypes
@@ -118,8 +118,8 @@ dcl-s g_printText char(117);
 // -----------------------------------------
 //  Output to printer
 // -----------------------------------------
-     OLOG4RPG   E            printLine
-     O                       g_printText        127
+//     OLOG4RPG   E            printLine
+//     O                       g_printText        127
 //
 //=========================================================================
 //  Allows to enable/disable log4rpg internal logging.
@@ -132,52 +132,52 @@ dcl-s g_printText char(117);
 //   void
 //=========================================================================
 dcl-proc LogLog_setInternalDebugging export;
-dcl-pi LogLog_setInternalDebugging;
-  i_debugMode like(LOG4RPG_debugMode_t) const;
-  i_output    like(LOG4RPG_debugOutput_t) options(*nopass) const;
-end-pi;
+  dcl-pi *n;
+    i_debugMode like(LOG4RPG_debugMode_t) const;
+    i_output    like(LOG4RPG_debugOutput_t) options(*nopass) const;
+  end-pi;
 
-//  Parameter positions
-dcl-c p_output 2;
+  //  Parameter positions
+  dcl-c p_output 2;
 
-//  Fields for optional parameters
-dcl-s output like(i_output) inz;
+  //  Fields for optional parameters
+  dcl-s output like(i_output) inz;
 
-//  Helper fields
-dcl-s mode like(i_debugMode) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  //  Helper fields
+  dcl-s mode like(i_debugMode) inz;
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if %parms() >= p_output;
-   output = f_lcase(i_output);
-else;
-   output = cLOG4RPG_DEBUG_OUTPUT_PRINTER;
-endif;
+  if %parms() >= p_output;
+    output = f_lcase(i_output);
+  else;
+    output = cLOG4RPG_DEBUG_OUTPUT_PRINTER;
+  endif;
 
-mode = f_lcase(i_debugMode);
+  mode = f_lcase(i_debugMode);
 
-if DebugMode_isValid(mode);
-   g_debugMode = DebugMode_toInt(mode);
-else;
-   g_debugMode = DebugMode_toInt(cLOG4RPG_DEBUG_ON);
-   LogLog_error('Unexpected value [' + mode +
-                 '] passed for parameter ''debug mode'' to +
-                 procedure [' + f_this + ']');
-endif;
+  if DebugMode_isValid(mode);
+    g_debugMode = DebugMode_toInt(mode);
+  else;
+    g_debugMode = DebugMode_toInt(cLOG4RPG_DEBUG_ON);
+    LogLog_error('Unexpected value [' + mode +
+                  '] passed for parameter ''debug mode'' to +
+                  procedure [' + f_this + ']');
+  endif;
 
-if DebugOutput_isValid(output);
-   g_output = DebugOutput_toInt(output);
-else;
-   g_output = cLOG4RPG_INT_DEBUG_OUTPUT_PRINTER;
-   LogLog_error('Unexpected value [' + output +
-                 '] passed for parameter ''output'' to +
-                 procedure [' + f_this + ']');
-endif;
+  if DebugOutput_isValid(output);
+    g_output = DebugOutput_toInt(output);
+  else;
+    g_output = cLOG4RPG_INT_DEBUG_OUTPUT_PRINTER;
+    LogLog_error('Unexpected value [' + output +
+                  '] passed for parameter ''output'' to +
+                  procedure [' + f_this + ']');
+  endif;
 
-if (g_output <> cLOG4RPG_INT_DEBUG_OUTPUT_PRINTER) and %open(LOG4RPG);
-   close LOG4RPG;
-endif;
+  if (g_output <> cLOG4RPG_INT_DEBUG_OUTPUT_PRINTER) and %open(LOG4RPG);
+    close LOG4RPG;
+  endif;
 
-return;
+  return;
 
 
 end-proc;
@@ -194,9 +194,9 @@ end-proc;
 dcl-proc LogLog_getInternalDebugMode export;
   dcl-pi *n like(LOG4RPG_debugMode_t);
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return DebugMode_toString(g_debugMode);
+  return DebugMode_toString(g_debugMode);
 
 
 end-proc;
@@ -213,9 +213,9 @@ end-proc;
 dcl-proc LogLog_getInternalDebugOutput export;
   dcl-pi *n like(LOG4RPG_debugOutput_t);
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return DebugOutput_toString(g_output);
+  return DebugOutput_toString(g_output);
 
 
 end-proc;
@@ -233,21 +233,21 @@ dcl-proc LogLog_debug export;
   dcl-pi *n;
     i_text like(LOG4RPG_text_t) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if not Logger_isLogging();
-   return;
-endif;
+  if not Logger_isLogging();
+    return;
+  endif;
 
-if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
-   return;
-endif;
+  if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
+    return;
+  endif;
 
-if g_debugMode <> cLOG4RPG_INT_DEBUG_OFF;
-   streamOut(cPREFIX + i_text);
-endif;
+  if g_debugMode <> cLOG4RPG_INT_DEBUG_OFF;
+    streamOut(cPREFIX + i_text);
+  endif;
 
-return;
+  return;
 
 
 end-proc;
@@ -266,24 +266,24 @@ dcl-proc LogLog_debugMsg export;
     i_msg likeds(msg_t) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s text like(LOG4RPG_text_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if not Logger_isLogging();
-   return;
-endif;
+  if not Logger_isLogging();
+    return;
+  endif;
 
-if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
-   return;
-endif;
+  if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
+    return;
+  endif;
 
-if g_debugMode <> cLOG4RPG_INT_DEBUG_OFF;
-   text = %trimR(f_rtvMsgText(i_msg: *omit));
-   LogLog_debug(text);
-endif;
+  if g_debugMode <> cLOG4RPG_INT_DEBUG_OFF;
+    text = %trimR(f_rtvMsgText(i_msg: *omit));
+    LogLog_debug(text);
+  endif;
 
-return;
+  return;
 
 
 end-proc;
@@ -301,19 +301,19 @@ dcl-proc LogLog_error export;
   dcl-pi *n;
     i_text like(LOG4RPG_text_t) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if not Logger_isLogging();
-   return;
-endif;
+  if not Logger_isLogging();
+    return;
+  endif;
 
-if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
-   return;
-endif;
+  if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
+    return;
+  endif;
 
-streamOut(cERR_PREFIX + i_text);
+  streamOut(cERR_PREFIX + i_text);
 
-return;
+  return;
 
 
 end-proc;
@@ -332,22 +332,22 @@ dcl-proc LogLog_errorMsg export;
     i_msg likeds(msg_t) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s text like(LOG4RPG_text_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if not Logger_isLogging();
-   return;
-endif;
+  if not Logger_isLogging();
+    return;
+  endif;
 
-if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
-   return;
-endif;
+  if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
+    return;
+  endif;
 
-text = %trimR(f_rtvMsgText(i_msg: *omit));
-LogLog_error(text);
+  text = %trimR(f_rtvMsgText(i_msg: *omit));
+  LogLog_error(text);
 
-return;
+  return;
 
 
 end-proc;
@@ -365,19 +365,19 @@ dcl-proc LogLog_warning export;
   dcl-pi *n;
     i_text like(LOG4RPG_text_t) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if not Logger_isLogging();
-   return;
-endif;
+  if not Logger_isLogging();
+    return;
+  endif;
 
-if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
-   return;
-endif;
+  if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
+    return;
+  endif;
 
-streamOut(cWARN_PREFIX + i_text);
+  streamOut(cWARN_PREFIX + i_text);
 
-return;
+  return;
 
 
 end-proc;
@@ -396,22 +396,22 @@ dcl-proc LogLog_warningMsg export;
     i_msg likeds(msg_t) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s text like(LOG4RPG_text_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if not Logger_isLogging();
-   return;
-endif;
+  if not Logger_isLogging();
+    return;
+  endif;
 
-if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
-   return;
-endif;
+  if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
+    return;
+  endif;
 
-text = %trimR(f_rtvMsgText(i_msg: *omit));
-LogLog_warning(text);
+  text = %trimR(f_rtvMsgText(i_msg: *omit));
+  LogLog_warning(text);
 
-return;
+  return;
 
 
 end-proc;
@@ -429,21 +429,21 @@ dcl-proc LogLog_verbose export;
   dcl-pi *n;
     i_text like(LOG4RPG_text_t) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if not Logger_isLogging();
-   return;
-endif;
+  if not Logger_isLogging();
+    return;
+  endif;
 
-if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
-   return;
-endif;
+  if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
+    return;
+  endif;
 
-if g_debugMode = cLOG4RPG_INT_DEBUG_VERBOSE;
-   streamOut(cPREFIX + i_text);
-endif;
+  if g_debugMode = cLOG4RPG_INT_DEBUG_VERBOSE;
+    streamOut(cPREFIX + i_text);
+  endif;
 
-return;
+  return;
 
 
 end-proc;
@@ -462,24 +462,24 @@ dcl-proc LogLog_verboseMsg export;
     i_msg likeds(msg_t) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s text like(LOG4RPG_text_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if not Logger_isLogging();
-   return;
-endif;
+  if not Logger_isLogging();
+    return;
+  endif;
 
-if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
-   return;
-endif;
+  if g_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
+    return;
+  endif;
 
-if g_debugMode = cLOG4RPG_INT_DEBUG_VERBOSE;
-   text = %trimR(f_rtvMsgText(i_msg: *omit));
-   LogLog_verbose(text);
-endif;
+  if g_debugMode = cLOG4RPG_INT_DEBUG_VERBOSE;
+    text = %trimR(f_rtvMsgText(i_msg: *omit));
+    LogLog_verbose(text);
+  endif;
 
-return;
+  return;
 
 
 end-proc;
@@ -492,16 +492,16 @@ dcl-proc streamOut;
   dcl-pi *n;
     i_text like(LOG4RPG_formattedText_t) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-select;
-when g_output = cLOG4RPG_INT_DEBUG_OUTPUT_PRINTER;
-   writeToPrinter(i_text);
-when g_output = cLOG4RPG_INT_DEBUG_OUTPUT_STDOUT;
-   writeToStdout(i_text);
-endsl;
+  select;
+  when g_output = cLOG4RPG_INT_DEBUG_OUTPUT_PRINTER;
+    writeToPrinter(i_text);
+  when g_output = cLOG4RPG_INT_DEBUG_OUTPUT_STDOUT;
+    writeToStdout(i_text);
+  endsl;
 
-return;
+  return;
 
 
 end-proc;
@@ -516,29 +516,36 @@ dcl-proc writeToPrinter;
     i_text like(LOG4RPG_formattedText_t) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s startPos uns(10) inz(1);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if i_text = '';
-   return;
-endif;
+  //  Printer output
+  dcl-ds lineOutput len(132) inz;
+  end-ds;
 
-if not %open(LOG4RPG);
-   system('OVRPRTF FILE(LOG4RPG) +
-           TOFILE(QSYS/QSYSPRT) OVRSCOPE(*CALLLVL)');
-   open LOG4RPG;
-endif;
+  dcl-c LEFT_BORDER 10;
+  dcl-c RIGHT_BORDER 5;
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-dow   startPos > 0;
-   g_printText = f_wordWrap(i_text
-                            : %len(g_printText)
-                            : startPos
-                            : cWORDWRAP_PARAGRAPH_TEXT);
-   except printLine;
-enddo;
+  if i_text = '';
+    return;
+  endif;
 
-return;
+  if not %open(LOG4RPG);
+    system('OVRPRTF FILE(LOG4RPG) +
+            TOFILE(QSYS/QSYSPRT) OVRSCOPE(*CALLLVL)');
+    open LOG4RPG;
+  endif;
+
+  dow   startPos > 0;
+    g_printText = f_wordWrap(i_text
+                             : %len(lineOutput) - LEFT_BORDER - RIGHT_BORDER
+                             : startPos
+                             : cWORDWRAP_PARAGRAPH_TEXT);
+    write LOG4RPG lineOutput;
+  enddo;
+
+  return;
 
 
 end-proc;
@@ -553,16 +560,15 @@ dcl-proc writeToStdout;
     i_text like(LOG4RPG_formattedText_t) const;
   end-pi;
 
-//  printf -- Print Formatted Characters
+  //  printf -- Print Formatted Characters
   dcl-pr printf int(10) extproc('printf');
     i_fmtString pointer options(*string) value;
   end-pr;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-printf(i_text + cESC_NEW_LINE);
+  printf(i_text + cESC_NEW_LINE);
 
-return;
+  return;
 
 
 end-proc;
-

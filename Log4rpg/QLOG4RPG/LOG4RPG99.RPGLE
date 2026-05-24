@@ -60,9 +60,9 @@
 // -----------------------------------------
 //  Prototypes
 // -----------------------------------------
-/copy QBASICS1,PBASICS1                      Basic RPG Extensions
-/copy QBASICS1,BASICS1R0                     SrvPgm: Basic Routines - Declarations        cpyb
-/copy QLOG4RPG,PLOG4RPG10                    LogLog
+/copy QBASICS1,PBASICS1 Basic RPG Extensions
+/copy QBASICS1,BASICS1R0 SrvPgm Basic Routines - Declarations cpyb
+/copy QLOG4RPG,PLOG4RPG10 LogLog
 
 // -----------------------------------------
 //  Private prototypes
@@ -96,36 +96,36 @@ dcl-proc getSrvPgm export;
     i_value like(LOG4RPG_Property_value_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-ds srvPgm likeds(qObj_t) inz;
 
-//  Helper fields
+  //  Helper fields
   dcl-s x int(10) inz;
   dcl-s value like(i_value) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-value = i_value;
+  value = i_value;
 
-// Get library name ...
-x = %scan('/': value);
-if x > 1;
-   srvPgm.lib = %subst(value: 1: x - 1);
-   if %len(value) > x;
+  // Get library name ...
+  x = %scan('/': value);
+  if x > 1;
+    srvPgm.lib = %subst(value: 1: x - 1);
+    if %len(value) > x;
       value = %subst(value: x + 1);
-   endif;
-else;
-   srvPgm.lib = '*LIBL';
-endif;
+    endif;
+  else;
+    srvPgm.lib = '*LIBL';
+  endif;
 
-// Get service program name ...
-x = %scan('(': value);
-if x > 1;
-   srvPgm.name = %subst(value: 1: x - 1);
-else;
-   srvPgm.name = sds.pgmContProc;
-endif;
+  // Get service program name ...
+  x = %scan('(': value);
+  if x > 1;
+    srvPgm.name = %subst(value: 1: x - 1);
+  else;
+    srvPgm.name = sds.pgmContProc;
+  endif;
 
-return srvPgm;
+  return srvPgm;
 
 
 end-proc;
@@ -142,34 +142,34 @@ dcl-proc getProcedure export;
     i_value like(LOG4RPG_Property_value_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s procedure like(LOG4RPG_procedure_t) inz;
 
-//  Helper fields
+  //  Helper fields
   dcl-s start int(10) inz;
   dcl-s length int(10) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Get procedure prefix ...
-start = %scan('(': i_value);
-if start > 0 and start < %len(i_value);
-   start  = start + 1;
-   length = %scan(')': i_value: start);
-   if length > 0;
+  // Get procedure prefix ...
+  start = %scan('(': i_value);
+  if start > 0 and start < %len(i_value);
+    start  = start + 1;
+    length = %scan(')': i_value: start);
+    if length > 0;
       length = length - start;
-   endif;
-else;
-   start  = 1;
-   length = %len(i_value);
-endif;
+    endif;
+  else;
+    start  = 1;
+    length = %len(i_value);
+  endif;
 
-if length > 0;
-   procedure = %subst(i_value: start: length);
-else;
-   procedure = '';
-endif;
+  if length > 0;
+    procedure = %subst(i_value: start: length);
+  else;
+    procedure = '';
+  endif;
 
-return procedure;
+  return procedure;
 
 
 end-proc;
@@ -186,45 +186,45 @@ dcl-proc getObject export;
     i_value like(LOG4RPG_Property_value_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-ds qObj likeds(qObj_t) inz;
 
-//  Helper fields
+  //  Helper fields
   dcl-s x int(10) inz;
   dcl-s y int(10) inz;
   dcl-s value like(i_value) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-value = %trimR(i_value);
+  value = %trimR(i_value);
 
-x = %scan('/': value);
-if (x = 0);
-   qObj.name = value;
-else;
-   if (x > 1);
+  x = %scan('/': value);
+  if (x = 0);
+    qObj.name = value;
+  else;
+    if (x > 1);
       qObj.lib = %subst(value: 1: x-1);
-   endif;
-   if (x < %len(value));
+    endif;
+    if (x < %len(value));
       qObj.name = %subst(value: x+1);
-   endif;
-endif;
+    endif;
+  endif;
 
-// Remove trailing comments from object name e.g.:
-//    QGPL/QRPGLESRC; a comment
-//    QGPL/QRPGLESRC  # a comment
-//    QGPL/QRPGLESRC  ! a comment
-for x = 1 to %len(qObj.name);
-   y = %scan(%subst(qObj.name: x: 1): cOBJ_NAME_START_COMMENT_CHARS);
-   if (y <> 0);
+  // Remove trailing comments from object name e.g.:
+  //    QGPL/QRPGLESRC; a comment
+  //    QGPL/QRPGLESRC  # a comment
+  //    QGPL/QRPGLESRC  ! a comment
+  for x = 1 to %len(qObj.name);
+    y = %scan(%subst(qObj.name: x: 1): cOBJ_NAME_START_COMMENT_CHARS);
+    if (y <> 0);
       if (x = 1);
-         qObj.name = '';
+        qObj.name = '';
       else;
-         qObj.Name = %subst(qObj.name: 1: x-1);
+        qObj.Name = %subst(qObj.name: 1: x-1);
       endif;
-   endif;
-endfor;
+    endif;
+  endfor;
 
-return qObj;
+  return qObj;
 
 
 end-proc;
@@ -236,16 +236,16 @@ dcl-proc getCallingProcedure export;
   dcl-pi *n likeds(LOG4RPG_caller_t);
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-ds caller likeds(LOG4RPG_caller_t) inz;
 
-//  Helper fields
+  //  Helper fields
   dcl-s x int(10) inz;
   dcl-s y int(10) inz;
   dcl-s memSize int(10) inz;
   dcl-ds me likeds(qObj_t);
 
-//  Retrieve Call Stack (QWVRCSTK) API
+  //  Retrieve Call Stack (QWVRCSTK) API
   dcl-pr QWVRCSTK extpgm('QWVRCSTK');
     o_rcvVar    char(32767) options(*varsize);
     i_rcvVarLen int(10) const;
@@ -298,73 +298,73 @@ dcl-proc getCallingProcedure export;
   dcl-s stmtID char(10) based(pStmtID);
 
   dcl-s procName char(256) based(pProcName);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Materialize call stack
-clear errCode;
-clear jidf0100;
-jidf0100.job        = '*';
-jidf0100.user       = '';
-jidf0100.nbr        = '';
-jidf0100.intJobID   = '';
-jidf0100.reserved_1 = *ALLx'00';
-jidf0100.thdInd     = 1;
-jidf0100.thdID      = *ALLx'00';
+  // Materialize call stack
+  clear errCode;
+  clear jidf0100;
+  jidf0100.job        = '*';
+  jidf0100.user       = '';
+  jidf0100.nbr        = '';
+  jidf0100.intJobID   = '';
+  jidf0100.reserved_1 = *ALLx'00';
+  jidf0100.thdInd     = 1;
+  jidf0100.thdID      = *ALLx'00';
 
-// Check, how much memory we need.
-// Get an initial buffer of 4k.
-// Actually we should need about 2300 byte.
-memSize = 4096;
-pCstk0100 = %alloc(memsize);
-QWVRCSTK(cstk0100: memSize: 'CSTK0100': jidf0100: 'JIDF0100': errCode);
+  // Check, how much memory we need.
+  // Get an initial buffer of 4k.
+  // Actually we should need about 2300 byte.
+  memSize = 4096;
+  pCstk0100 = %alloc(memsize);
+  QWVRCSTK(cstk0100: memSize: 'CSTK0100': jidf0100: 'JIDF0100': errCode);
 
-// Call API again, providing enough memory for it
-if cstk0100.bytRet < cstk0100.bytAvl;
-   memSize = cstk0100.bytAvl;
-   pCstk0100 = %realloc(pCstk0100: memSize);
-   QWVRCSTK(cstk0100:memSize:'CSTK0100':jidf0100:'JIDF0100':errCode);
-   LogLog_debug('*** Performance problem encountered: +
-                 Needed to reallocate memory to get +
-                 full stack information.');
-endif;
+  // Call API again, providing enough memory for it
+  if cstk0100.bytRet < cstk0100.bytAvl;
+    memSize = cstk0100.bytAvl;
+    pCstk0100 = %realloc(pCstk0100: memSize);
+    QWVRCSTK(cstk0100:memSize:'CSTK0100':jidf0100:'JIDF0100':errCode);
+    LogLog_debug('*** Performance problem encountered: +
+                  Needed to reallocate memory to get +
+                  full stack information.');
+  endif;
 
-// Spin through the call stack entries searching for the caller
-clear me;
-clear caller;
-for x = 1 to cstk0100.numStkE;
-   if x = 1;
+  // Spin through the call stack entries searching for the caller
+  clear me;
+  clear caller;
+  for x = 1 to cstk0100.numStkE;
+    if x = 1;
       pStackE = pCstk0100 + cstk0100.ofsStkEInf;
-   else;
+    else;
       pStackE = pStackE + stackE.length;
-   endif;
+    endif;
 
-   pStmtID   = pStackE + stackE.disStmtID;
-   pProcName = pStackE + stackE.disProcName;
+    pStmtID   = pStackE + stackE.disStmtID;
+    pProcName = pStackE + stackE.disProcName;
 
-   if (stackE.pgmName = sds.pgmContProc) and
-      (stackE.pgmLibName = sds.pgmLib  );
+    if (stackE.pgmName = sds.pgmContProc) and
+       (stackE.pgmLibName = sds.pgmLib  );
       me.name        = stackE.pgmName;
       me.lib         = stackE.pgmLibName;
-   else;
+    else;
       if (me.name <> '') and (me.name <> stackE.pgmName);
-         caller.pgm.name    = stackE.pgmName;
-         caller.pgm.lib     = stackE.pgmLibName;
-         caller.module.name = stackE.modName;
-         caller.module.lib  = stackE.modLibName;
-         caller.procedure   = %subst(procName: 1: stackE.lenProcName);
-         caller.stmtID      = %trim(stmtID);
-         y = %check('0': caller.stmtID);
-         if y > 0;
-            caller.stmtID = %subst(caller.stmtID: y);
-         endif;
-         leave;
+        caller.pgm.name    = stackE.pgmName;
+        caller.pgm.lib     = stackE.pgmLibName;
+        caller.module.name = stackE.modName;
+        caller.module.lib  = stackE.modLibName;
+        caller.procedure   = %subst(procName: 1: stackE.lenProcName);
+        caller.stmtID      = %trim(stmtID);
+        y = %check('0': caller.stmtID);
+        if y > 0;
+          caller.stmtID = %subst(caller.stmtID: y);
+        endif;
+        leave;
       endif;
-   endif;
-endfor;
+    endif;
+  endfor;
 
-dealloc(N) pCstk0100;
+  dealloc(N) pCstk0100;
 
-return caller;
+  return caller;
 
 
 end-proc;
@@ -376,9 +376,9 @@ dcl-proc translateLoggerName export;
   dcl-pi *n like(LOG4RPG_loggerName_t);
     i_logName like(LOG4RPG_loggerName_t) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return %xlate('/\': '..': f_lcase(i_logName));
+  return %xlate('/\': '..': f_lcase(i_logName));
 
 
 end-proc;
@@ -396,26 +396,26 @@ dcl-proc rslvLibName export;
   dcl-ds qObj likeds(qObj_t) inz;
   dcl-ds objd0100 likeds(objd0100_t) inz;
   dcl-ds errCode likeds(errCode_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if (not f_startsWith('*': i_lib));
-   return i_lib;
-endif;
+  if (not f_startsWith('*': i_lib));
+    return i_lib;
+  endif;
 
-clear qObj;
-qObj.name = i_obj;
-qObj.lib = i_lib;
+  clear qObj;
+  qObj.name = i_obj;
+  qObj.lib = i_lib;
 
-clear errCode;
-errCode.bytPrv = %size(errCode);
-QUSROBJD(objd0100: %size(objd0100): 'OBJD0100'
-         : qObj: i_objType: errCode);
+  clear errCode;
+  errCode.bytPrv = %size(errCode);
+  QUSROBJD(objd0100: %size(objd0100): 'OBJD0100'
+           : qObj: i_objType: errCode);
 
-if (errCode.bytAvl = 0);
-   return objd0100.rtnLib;
-else;
-   return i_lib;
-endif;
+  if (errCode.bytAvl = 0);
+    return objd0100.rtnLib;
+  else;
+    return i_lib;
+  endif;
 
 
 end-proc;
@@ -435,27 +435,26 @@ dcl-proc rslvMbrName export;
   dcl-ds qFile likeds(qObj_t) inz;
   dcl-ds mbrd0100 likeds(mbrd0100_t) inz;
   dcl-ds errCode likeds(errCode_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if (not f_startsWith('*': i_mbr));
-   return i_mbr;
-endif;
+  if (not f_startsWith('*': i_mbr));
+    return i_mbr;
+  endif;
 
-clear qFile;
-qFile.name = i_file;
-qFile.lib = i_lib;
+  clear qFile;
+  qFile.name = i_file;
+  qFile.lib = i_lib;
 
-clear errCode;
-errCode.bytPrv = %size(errCode);
-QUSRMBRD(mbrd0100: %size(mbrd0100): 'MBRD0100'
-         : qFile: i_mbr: '0': errCode);
+  clear errCode;
+  errCode.bytPrv = %size(errCode);
+  QUSRMBRD(mbrd0100: %size(mbrd0100): 'MBRD0100'
+           : qFile: i_mbr: '0': errCode);
 
-if (errCode.bytAvl = 0);
-   return mbrd0100.mbr;
-else;
-   return i_mbr;
-endif;
+  if (errCode.bytAvl = 0);
+    return mbrd0100.mbr;
+  else;
+    return i_mbr;
+  endif;
 
 
 end-proc;
-

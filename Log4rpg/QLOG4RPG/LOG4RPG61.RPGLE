@@ -61,9 +61,9 @@
 // -----------------------------------------
 //  Prototypes
 // -----------------------------------------
-/copy QLOG4RPG,PLOG4RPG09                    Level
-/copy QLOG4RPG,PLOG4RPG10                    LogLog
-/copy QLOG4RPG,PLOG4RPG99                    Helper
+/copy QLOG4RPG,PLOG4RPG09 Level
+/copy QLOG4RPG,PLOG4RPG10 LogLog
+/copy QLOG4RPG,PLOG4RPG99 Helper
 
 // -----------------------------------------
 //  Private prototypes
@@ -72,9 +72,8 @@
 // -----------------------------------------
 //  Global constants
 // -----------------------------------------
-dcl-c cTHIS_CLASS;
-     D                                            'SimpleLayout')
-//
+dcl-c cTHIS_CLASS 'SimpleLayout';
+
 // -----------------------------------------
 //  Global fields
 // -----------------------------------------
@@ -97,20 +96,20 @@ dcl-c cTHIS_CLASS;
 //   isDone        - Returns TRUE on success, else FALSE.
 //=========================================================================
 dcl-proc SimpleLayout_new export;
-dcl-pi SimpleLayout_new ind;
-  i_pSuper    like(LOG4RPG_pLayout_t) const;
-  io_pHandle  pointer;
-  i_pPropList like(LOG4RPG_pPropertyList_t) const;
-  i_prefix    like(LOG4RPG_prefix_t) const;
-end-pi;
+  dcl-pi *n ind;
+    i_pSuper    like(LOG4RPG_pLayout_t) const;
+    io_pHandle  pointer;
+    i_pPropList like(LOG4RPG_pPropertyList_t) const;
+    i_prefix    like(LOG4RPG_prefix_t) const;
+  end-pi;
 
-//  Return value
-dcl-s isDone ind inz(*off);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  //  Return value
+  dcl-s isDone ind inz(*off);
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-LogLog_debug('Loaded instance of [' + cTHIS_CLASS + '].');
+  LogLog_debug('Loaded instance of [' + cTHIS_CLASS + '].');
 
-return isDone;
+  return isDone;
 
 
 end-proc;
@@ -133,16 +132,16 @@ dcl-proc SimpleLayout_format export;
     i_pLogEvent like(LOG4RPG_pLogEvent_t) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s string like(LOG4RPG_formattedText_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-string = Level_toString(LogEvent_getPriority(i_pLogEvent)) + ' - ' +
-                        LogEvent_getText(i_pLogEvent);
+  string = Level_toString(LogEvent_getPriority(i_pLogEvent)) + ' - ' +
+                          LogEvent_getText(i_pLogEvent);
 
-LogEvent_setText(i_pLogEvent: string);
+  LogEvent_setText(i_pLogEvent: string);
 
-return;
+  return;
 
 
 end-proc;
@@ -166,9 +165,9 @@ dcl-proc SimpleLayout_setProperties export;
     i_pPropList like(LOG4RPG_pPropertyList_t) const;
     i_prefix    like(LOG4RPG_prefix_t) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return;
+  return;
 
 
 end-proc;
@@ -188,16 +187,15 @@ dcl-proc SimpleLayout_delete export;
     io_pHandle pointer;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isDone ind inz(*off);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
+  LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
 
-isDone = *on;
+  isDone = *on;
 
-return isDone;
+  return isDone;
 
 
 end-proc;
-

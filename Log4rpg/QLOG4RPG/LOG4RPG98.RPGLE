@@ -55,9 +55,9 @@
 // -----------------------------------------
 //  Prototypes
 // -----------------------------------------
-/copy QLOG4RPG,CLIB                          C-Library
-/copy QBASICS1,PBASICS1                      Basic RPG Extensions
-/copy QLOG4RPG,PLOG4RPG10                    LogLog
+/copy QLOG4RPG,CLIB C-Library
+/copy QBASICS1,PBASICS1 Basic RPG Extensions
+/copy QLOG4RPG,PLOG4RPG10 LogLog
 
 // -----------------------------------------
 //  Private prototypes
@@ -89,71 +89,71 @@ dcl-proc OptionConverter_toFileSize export;
     i_default int(20) value;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s fileSize int(20) inz;
 
-//  Helper fields
+  //  Helper fields
   dcl-s string like(i_value);
   dcl-s multiplier int(10) inz;
   dcl-s index int(10) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-string = %trim(i_value);
+  string = %trim(i_value);
 
-if (string = '');
-   return i_default;
-endif;
+  if (string = '');
+    return i_default;
+  endif;
 
-string = f_ucase(string);
-multiplier = 1;
+  string = f_ucase(string);
+  multiplier = 1;
 
-dou '1';
+  dou '1';
 
-   index = %scan('KB': i_value);
-   if (index <> 0);
+    index = %scan('KB': i_value);
+    if (index <> 0);
       multiplier = 1024;
       string     = %trimR(%subst(string: 1: index));
       leave;
-   endif;
+    endif;
 
-   index = %scan('MB': i_value);
-   if (index <> 0);
+    index = %scan('MB': i_value);
+    if (index <> 0);
       multiplier = 1024 * 1024;
       string     = %trimR(%subst(string: 1: index));
       leave;
-   endif;
+    endif;
 
-   index = %scan('GB': i_value);
-   if (index <> 0);
+    index = %scan('GB': i_value);
+    if (index <> 0);
       multiplier = 1024 * 1024 * 1024;
       string     = %trimR(%subst(string: 1: index));
       leave;
-   endif;
+    endif;
 
-   index = %check('0123456789 ': string);
-   if (index > 0);
+    index = %check('0123456789 ': string);
+    if (index > 0);
       LogLog_error('[' + string + '] is not in proper int form.');
       LogLog_error('[' + i_value + '] not in expected format.');
-   endif;
+    endif;
 
-enddo;
+  enddo;
 
-if (string = '');
-   return i_default;
-endif;
+  if (string = '');
+    return i_default;
+  endif;
 
-monitor;
-   fileSize = atoi(string) * multiplier;
-on-error;
-   LogLog_error('[' + string + '] is not in proper int form.');
-   LogLog_error('[' + i_value + '] not in expected format.');
-endmon;
+  monitor;
+    fileSize = atoi(string) * multiplier;
+  on-error;
+    LogLog_error('[' + string + '] is not in proper int form.');
+    LogLog_error('[' + i_value + '] not in expected format.');
+  endmon;
 
-if (fileSize = 0);
-   return i_default;
-endif;
+  if (fileSize = 0);
+    return i_default;
+  endif;
 
-return fileSize;
+  return fileSize;
 
 
 end-proc;
@@ -172,26 +172,26 @@ dcl-proc OptionConverter_toBoolean export;
     i_default ind value;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s string like(i_value);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-string = %trim(i_value);
+  string = %trim(i_value);
 
-if (string = '');
-   return i_default;
-endif;
+  if (string = '');
+    return i_default;
+  endif;
 
-string = f_lcase(string);
+  string = f_lcase(string);
 
-select;
-when (string = '1' or string = 'true');
-   return *on;
-when (string = '0' or string = 'false');
-   return *off;
-endsl;
+  select;
+  when (string = '1' or string = 'true');
+    return *on;
+  when (string = '0' or string = 'false');
+    return *off;
+  endsl;
 
-return i_default;
+  return i_default;
 
 
 end-proc;
@@ -205,18 +205,17 @@ dcl-proc OptionConverter_toInt export;
     i_default int(10) value;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s string like(i_value);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-string = %trim(i_value);
+  string = %trim(i_value);
 
-if (string = '');
-   return i_default;
-endif;
+  if (string = '');
+    return i_default;
+  endif;
 
-return f_val(string);
+  return f_val(string);
 
 
 end-proc;
-

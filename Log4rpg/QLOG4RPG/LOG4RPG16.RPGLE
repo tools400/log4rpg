@@ -71,13 +71,13 @@ end-ds;
 // -----------------------------------------
 //  Prototypes
 // -----------------------------------------
-/copy QLOG4RPG,CLIB                          C-Library
-/copy QLOG4RPG,CEELIB                        CEE-Procedures
-/copy QBASICS1,PBASICS1                      Basic RPG Extensions
+/copy QLOG4RPG,CLIB C-Library
+/copy QLOG4RPG,CEELIB CEE-Procedures
+/copy QBASICS1,PBASICS1 Basic RPG Extensions
 
-/copy QLOG4RPG,PLOG4RPG07                    PropertyList
-/copy QLOG4RPG,PLOG4RPG09                    Level
-/copy QLOG4RPG,PLOG4RPG10                    LogLog
+/copy QLOG4RPG,PLOG4RPG07 PropertyList
+/copy QLOG4RPG,PLOG4RPG09 Level
+/copy QLOG4RPG,PLOG4RPG10 LogLog
 
 // -----------------------------------------
 //  Private prototypes
@@ -111,36 +111,36 @@ dcl-proc LogEvent_new export;
     i_caller   likeds(LOG4RPG_caller_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-ds logEvent likeds(handle_t) based(pLogEvent);
 
-//  Helper fields
+  //  Helper fields
   dcl-ds tmpLogEvent likeds(handle_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-LogLog_verbose('Creating log event for logger [' +
-               i_logName + '] ...');
+  LogLog_verbose('Creating log event for logger [' +
+                 i_logName + '] ...');
 
-pLogEvent = LogEvent_null();
+  pLogEvent = LogEvent_null();
 
-// Initialize log event
-clear tmpLogEvent;
-tmpLogEvent.logName     = i_logName;
-tmpLogEvent.time        = %timestamp();
-tmpLogEvent.priority    = i_priority;
-if %len(i_text) > 0;
-   tmpLogEvent.text = %subst(i_text: 1: %len(i_text));
-else;
-   tmpLogEvent.text = '';
-endif;
-tmpLogEvent.caller      = i_caller;
-tmpLogEvent.hPropList   = PropertyList_new();
+  // Initialize log event
+  clear tmpLogEvent;
+  tmpLogEvent.logName     = i_logName;
+  tmpLogEvent.time        = %timestamp();
+  tmpLogEvent.priority    = i_priority;
+  if %len(i_text) > 0;
+    tmpLogEvent.text = %subst(i_text: 1: %len(i_text));
+  else;
+    tmpLogEvent.text = '';
+  endif;
+  tmpLogEvent.caller      = i_caller;
+  tmpLogEvent.hPropList   = PropertyList_new();
 
-// Return layout to caller
-pLogEvent = %alloc(%size(handle_t));
-logEvent = tmpLogEvent;
+  // Return layout to caller
+  pLogEvent = %alloc(%size(handle_t));
+  logEvent = tmpLogEvent;
 
-return pLogEvent;
+  return pLogEvent;
 
 
 end-proc;
@@ -159,11 +159,11 @@ dcl-proc LogEvent_getPropertyList export;
     i_pLogEvent like(LOG4RPG_pLogEvent_t) const;
   end-pi;
 
-//  LogEvent handle
+  //  LogEvent handle
   dcl-ds logEvent likeds(handle_t) based(i_pLogEvent);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return logEvent.hPropList;
+  return logEvent.hPropList;
 
 
 end-proc;
@@ -184,17 +184,17 @@ dcl-proc LogEvent_setText export;
     i_text      like(LOG4RPG_formattedText_t) options(*varsize) const;
   end-pi;
 
-//  LogEvent handle
+  //  LogEvent handle
   dcl-ds logEvent likeds(handle_t) based(i_pLogEvent);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if (%len(i_text) > 0);
-   logEvent.text = %subst(i_text: 1: %len(i_text));
-else;
-   logEvent.text = '';
-endif;
+  if (%len(i_text) > 0);
+    logEvent.text = %subst(i_text: 1: %len(i_text));
+  else;
+    logEvent.text = '';
+  endif;
 
-return;
+  return;
 
 
 end-proc;
@@ -215,13 +215,13 @@ dcl-proc LogEvent_appendText export;
     i_text      like(LOG4RPG_formattedText_t) options(*varsize) const;
   end-pi;
 
-//  LogEvent handle
+  //  LogEvent handle
   dcl-ds logEvent likeds(handle_t) based(i_pLogEvent);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-logEvent.text = logEvent.text + %subst(i_text: 1: %len(i_text));
+  logEvent.text = logEvent.text + %subst(i_text: 1: %len(i_text));
 
-return;
+  return;
 
 
 end-proc;
@@ -240,11 +240,11 @@ dcl-proc LogEvent_getLoggerName export;
     i_pLogEvent like(LOG4RPG_pLogEvent_t) const;
   end-pi;
 
-//  LogEvent handle
+  //  LogEvent handle
   dcl-ds logEvent likeds(handle_t) based(i_pLogEvent);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return logEvent.logName;
+  return logEvent.logName;
 
 
 end-proc;
@@ -263,11 +263,11 @@ dcl-proc LogEvent_getPriority export;
     i_pLogEvent like(LOG4RPG_pLogEvent_t) const;
   end-pi;
 
-//  LogEvent handle
+  //  LogEvent handle
   dcl-ds logEvent likeds(handle_t) based(i_pLogEvent);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return logEvent.priority;
+  return logEvent.priority;
 
 
 end-proc;
@@ -286,11 +286,11 @@ dcl-proc LogEvent_getLevel export;
     i_pLogEvent like(LOG4RPG_pLogEvent_t) const;
   end-pi;
 
-//  LogEvent handle
+  //  LogEvent handle
   dcl-ds logEvent likeds(handle_t) based(i_pLogEvent);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return Level_toString(logEvent.priority);
+  return Level_toString(logEvent.priority);
 
 
 end-proc;
@@ -309,11 +309,11 @@ dcl-proc LogEvent_getTime export;
     i_pLogEvent like(LOG4RPG_pLogEvent_t) const;
   end-pi;
 
-//  LogEvent handle
+  //  LogEvent handle
   dcl-ds logEvent likeds(handle_t) based(i_pLogEvent);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return logEvent.time;
+  return logEvent.time;
 
 
 end-proc;
@@ -332,11 +332,11 @@ dcl-proc LogEvent_getCaller export;
     i_pLogEvent like(LOG4RPG_pLogEvent_t) const;
   end-pi;
 
-//  LogEvent handle
+  //  LogEvent handle
   dcl-ds logEvent likeds(handle_t) based(i_pLogEvent);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return logEvent.caller;
+  return logEvent.caller;
 
 
 end-proc;
@@ -355,15 +355,15 @@ dcl-proc LogEvent_resolveCallerPgmLibrary export;
     i_pLogEvent like(LOG4RPG_pLogEvent_t) const;
   end-pi;
 
-//  LogEvent handle
+  //  LogEvent handle
   dcl-ds logEvent likeds(handle_t) based(i_pLogEvent);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if logEvent.caller.pgm.lib = '';
-   logEvent.caller = getCallingProcedure();
-endif;
+  if logEvent.caller.pgm.lib = '';
+    logEvent.caller = getCallingProcedure();
+  endif;
 
-return logEvent.caller.pgm.lib;
+  return logEvent.caller.pgm.lib;
 
 
 end-proc;
@@ -382,11 +382,11 @@ dcl-proc LogEvent_getText export;
     i_pLogEvent like(LOG4RPG_pLogEvent_t) const;
   end-pi;
 
-//  LogEvent handle
+  //  LogEvent handle
   dcl-ds logEvent likeds(handle_t) based(i_pLogEvent);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return logEvent.text;
+  return logEvent.text;
 
 
 end-proc;
@@ -406,20 +406,20 @@ dcl-proc LogEvent_getTextPointer export;
     i_pLogEvent like(LOG4RPG_pLogEvent_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s pText pointer inz;
 
-//  helper fields
+  //  helper fields
   dcl-s size int(10) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-size = LogEvent_textLength(i_pLogEvent) + 1;
+  size = LogEvent_textLength(i_pLogEvent) + 1;
 
-pText = %alloc(size);
+  pText = %alloc(size);
 
-%str(pText: size) = LogEvent_getText(i_pLogEvent);
+  %str(pText: size) = LogEvent_getText(i_pLogEvent);
 
-return pText;
+  return pText;
 
 
 end-proc;
@@ -438,11 +438,11 @@ dcl-proc LogEvent_textLength export;
     i_pLogEvent like(LOG4RPG_pLogEvent_t) const;
   end-pi;
 
-//  LogEvent handle
+  //  LogEvent handle
   dcl-ds logEvent likeds(handle_t) based(i_pLogEvent);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return %len(logEvent.text);
+  return %len(logEvent.text);
 
 
 end-proc;
@@ -463,20 +463,20 @@ dcl-proc LogEvent_getFirstLineOfText export;
     i_width     uns(10) options(*nopass) const;
   end-pi;
 
-//  Parameter positions
+  //  Parameter positions
   dcl-c p_width 3;
 
-//  LogEvent handle
+  //  LogEvent handle
   dcl-ds logEvent likeds(handle_t) based(i_pLogEvent);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-logEvent.startPos = 1;
+  logEvent.startPos = 1;
 
-if (%parms() >= p_width);
-   return LogEvent_getNextLineOfText(i_pLogEvent: o_isText: i_width);
-else;
-   return LogEvent_getNextLineOfText(i_pLogEvent: o_isText);
-endif;
+  if (%parms() >= p_width);
+    return LogEvent_getNextLineOfText(i_pLogEvent: o_isText: i_width);
+  else;
+    return LogEvent_getNextLineOfText(i_pLogEvent: o_isText);
+  endif;
 
 
 
@@ -498,37 +498,37 @@ dcl-proc LogEvent_getNextLineOfText export;
     i_width     uns(10) options(*nopass) const;
   end-pi;
 
-//  Parameter positions
+  //  Parameter positions
   dcl-c p_width 3;
 
-//  Fields for optional parameters
+  //  Fields for optional parameters
   dcl-s width like(i_width) inz;
 
-//  Return value
+  //  Return value
   dcl-s text like(LOG4RPG_formattedText_t) inz;
 
-//  LogEvent handle
+  //  LogEvent handle
   dcl-ds logEvent likeds(handle_t) based(i_pLogEvent);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if (%parms() >= p_width);
-   width = i_width;
-else;
-   width = cLOG4RPG_MAX_TEXT_LENGTH;
-endif;
+  if (%parms() >= p_width);
+    width = i_width;
+  else;
+    width = cLOG4RPG_MAX_TEXT_LENGTH;
+  endif;
 
-if logEvent.startPos > 0;
-   o_isText = *on;
-   return f_wordWrap(logEvent.text
-                     : i_width
-                     : logEvent.startPos
-                     : cWORDWRAP_PARAGRAPH_TEXT +
-                       cWORDWRAP_PARAGRAPH_TRIMR);
-endif;
+  if logEvent.startPos > 0;
+    o_isText = *on;
+    return f_wordWrap(logEvent.text
+                      : i_width
+                      : logEvent.startPos
+                      : cWORDWRAP_PARAGRAPH_TEXT +
+                        cWORDWRAP_PARAGRAPH_TRIMR);
+  endif;
 
-o_isText = *off;
+  o_isText = *off;
 
-return '';
+  return '';
 
 
 end-proc;
@@ -547,24 +547,24 @@ dcl-proc LogEvent_delete export;
     io_pLogEvent like(LOG4RPG_pLogEvent_t);
   end-pi;
 
-//  LogEvent handle
+  //  LogEvent handle
   dcl-ds logEvent likeds(handle_t) based(io_pLogEvent);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-LogLog_verbose('Deleting log event of logger [' +
-                logEvent.logName + '] ...');
+  LogLog_verbose('Deleting log event of logger [' +
+                  logEvent.logName + '] ...');
 
-if not PropertyList_isNull(logEvent.hPropList);
-   PropertyList_delete(logEvent.hPropList);
-endif;
+  if not PropertyList_isNull(logEvent.hPropList);
+    PropertyList_delete(logEvent.hPropList);
+  endif;
 
-clear logEvent;
+  clear logEvent;
 
-dealloc(N) io_pLogEvent;
+  dealloc(N) io_pLogEvent;
 
-io_pLogEvent = LogEvent_null();
+  io_pLogEvent = LogEvent_null();
 
-return;
+  return;
 
 
 end-proc;
@@ -584,20 +584,20 @@ dcl-proc LogEvent_isNull export;
     i_pLogEvent like(LOG4RPG_pLogEvent_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isNull ind inz(*off);
 
-//  LogEvent handle
+  //  LogEvent handle
   dcl-ds logEvent likeds(handle_t) based(i_pLogEvent);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if i_pLogEvent = LogEvent_null();
-   isNull = *on;
-else;
-   isNull = *off;
-endif;
+  if i_pLogEvent = LogEvent_null();
+    isNull = *on;
+  else;
+    isNull = *off;
+  endif;
 
-return isNull;
+  return isNull;
 
 
 end-proc;
@@ -614,10 +614,9 @@ end-proc;
 dcl-proc LogEvent_null export;
   dcl-pi *n like(LOG4RPG_pLogEvent_t);
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return *NULL;
+  return *NULL;
 
 
 end-proc;
-

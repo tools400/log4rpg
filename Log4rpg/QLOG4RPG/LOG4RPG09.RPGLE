@@ -51,12 +51,12 @@
 // -----------------------------------------
 //  Type definitions
 // -----------------------------------------
-/copy QLOG4RPG,PLOG4RPG                      Public interface & type definitions
+/copy QLOG4RPG,PLOG4RPG Public interface & type definitions
 
 // -----------------------------------------
 //  Prototypes
 // -----------------------------------------
-/copy QBASICS1,PBASICS1                      Basic RPG Extensions
+/copy QBASICS1,PBASICS1 Basic RPG Extensions
 
 // -----------------------------------------
 //  Private prototypes
@@ -83,22 +83,22 @@ dcl-proc Level_toInt export;
   dcl-pi *n like(LOG4RPG_priority_t);
     i_level like(LOG4RPG_level_t) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-select;
-when i_level = cLOG4RPG_LEVEL_DEBUG;
-   return cLOG4RPG_PRIORITY_DEBUG;
-when i_level = cLOG4RPG_LEVEL_INFO;
-   return cLOG4RPG_PRIORITY_INFO;
-when i_level = cLOG4RPG_LEVEL_WARN;
-   return cLOG4RPG_PRIORITY_WARN;
-when i_level = cLOG4RPG_LEVEL_ERROR;
-   return cLOG4RPG_PRIORITY_ERROR;
-when i_level = cLOG4RPG_LEVEL_FATAL;
-   return cLOG4RPG_PRIORITY_FATAL;
-other;
-   return cLOG4RPG_PRIORITY_NONE;
-endsl;
+  select;
+  when i_level = cLOG4RPG_LEVEL_DEBUG;
+    return cLOG4RPG_PRIORITY_DEBUG;
+  when i_level = cLOG4RPG_LEVEL_INFO;
+    return cLOG4RPG_PRIORITY_INFO;
+  when i_level = cLOG4RPG_LEVEL_WARN;
+    return cLOG4RPG_PRIORITY_WARN;
+  when i_level = cLOG4RPG_LEVEL_ERROR;
+    return cLOG4RPG_PRIORITY_ERROR;
+  when i_level = cLOG4RPG_LEVEL_FATAL;
+    return cLOG4RPG_PRIORITY_FATAL;
+  other;
+    return cLOG4RPG_PRIORITY_NONE;
+  endsl;
 
 
 end-proc;
@@ -116,23 +116,22 @@ dcl-proc Level_toString export;
   dcl-pi *n like(LOG4RPG_level_t);
     i_priority like(LOG4RPG_priority_t) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-select;
-when i_priority = cLOG4RPG_PRIORITY_DEBUG;
-   return cLOG4RPG_LEVEL_DEBUG;
-when i_priority = cLOG4RPG_PRIORITY_INFO;
-   return cLOG4RPG_LEVEL_INFO;
-when i_priority = cLOG4RPG_PRIORITY_WARN;
-   return cLOG4RPG_LEVEL_WARN;
-when i_priority = cLOG4RPG_PRIORITY_ERROR;
-   return cLOG4RPG_LEVEL_ERROR;
-when i_priority = cLOG4RPG_PRIORITY_FATAL;
-   return cLOG4RPG_LEVEL_FATAL;
-other;
-   return '';
-endsl;
+  select;
+  when i_priority = cLOG4RPG_PRIORITY_DEBUG;
+    return cLOG4RPG_LEVEL_DEBUG;
+  when i_priority = cLOG4RPG_PRIORITY_INFO;
+    return cLOG4RPG_LEVEL_INFO;
+  when i_priority = cLOG4RPG_PRIORITY_WARN;
+    return cLOG4RPG_LEVEL_WARN;
+  when i_priority = cLOG4RPG_PRIORITY_ERROR;
+    return cLOG4RPG_LEVEL_ERROR;
+  when i_priority = cLOG4RPG_PRIORITY_FATAL;
+    return cLOG4RPG_LEVEL_FATAL;
+  other;
+    return '';
+  endsl;
 
 
 end-proc;
-

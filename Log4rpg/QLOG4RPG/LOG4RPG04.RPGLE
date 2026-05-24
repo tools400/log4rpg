@@ -51,7 +51,7 @@
 // -----------------------------------------
 //  Type definitions
 // -----------------------------------------
-/copy QLOG4RPG,PTYPES                        Private type definitions
+/copy QLOG4RPG,PTYPES Private type definitions
 
 dcl-ds handle_t qualified based(pDummy);
   pMap like(BasicMap_handle_t);
@@ -60,11 +60,11 @@ end-ds;
 // -----------------------------------------
 //  Prototypes
 // -----------------------------------------
-/copy QBASICS1,PBASICS1                      Basic RPG Extensions
-/copy QIFS,PIFS                              IFS Stream file support
+/copy QBASICS1,PBASICS1 Basic RPG Extensions
+/copy QIFS,PIFS IFS Stream file support
 
-/copy QLOG4RPG,PLOG4RPG10                    LogLog
-/copy QLOG4RPG,PLOG4RPG99                    Helpers
+/copy QLOG4RPG,PLOG4RPG10 LogLog
+/copy QLOG4RPG,PLOG4RPG99 Helpers
 
 // -----------------------------------------
 //  Private prototypes
@@ -92,28 +92,28 @@ dcl-proc AppenderList_new export;
   dcl-pi *n like(LOG4RPG_pAppenderList_t);
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-ds appList likeds(handle_t) based(pAppList);
 
-//  Helper fields
+  //  Helper fields
   dcl-ds tempAppList likeds(handle_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-LogLog_verbose('Creating appender list ...');
+  LogLog_verbose('Creating appender list ...');
 
-pAppList = AppenderList_null();
+  pAppList = AppenderList_null();
 
-// Initialize appender list handle
-clear tempAppList;
-tempAppList.pMap = BasicMap_new();
+  // Initialize appender list handle
+  clear tempAppList;
+  tempAppList.pMap = BasicMap_new();
 
-// Return properties list to caller
-pAppList = %alloc(%size(handle_t));
-appList = tempAppList;
+  // Return properties list to caller
+  pAppList = %alloc(%size(handle_t));
+  appList = tempAppList;
 
-LogLog_verbose('+ Allocated memory for appender list.');
+  LogLog_verbose('+ Allocated memory for appender list.');
 
-return pAppList;
+  return pAppList;
 
 
 end-proc;
@@ -133,11 +133,11 @@ dcl-proc AppenderList_getNumE export;
     i_pAppList like(LOG4RPG_pAppenderList_t) const;
   end-pi;
 
-//  Appender list handle
+  //  Appender list handle
   dcl-ds appList likeds(handle_t) based(i_pAppList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return BasicMap_getNumE(appList.pMap);
+  return BasicMap_getNumE(appList.pMap);
 
 
 end-proc;
@@ -158,18 +158,18 @@ dcl-proc AppenderList_put export;
     i_pAppender like(LOG4RPG_pAppender_t) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s pAppender like(i_pAppender);
 
-//  Appender list handle
+  //  Appender list handle
   dcl-ds appList likeds(handle_t) based(i_pAppList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-pAppender = i_pAppender;
+  pAppender = i_pAppender;
 
-return BasicMap_put(appList.pMap: Appender_getName(pAppender)
-                                : %addr(pAppender)
-                                : %len(pAppender ));
+  return BasicMap_put(appList.pMap: Appender_getName(pAppender)
+                                  : %addr(pAppender)
+                                  : %len(pAppender ));
 
 
 end-proc;
@@ -191,11 +191,11 @@ dcl-proc AppenderList_remove export;
     i_appName  like(LOG4RPG_appenderName_t) const;
   end-pi;
 
-//  Appender list handle
+  //  Appender list handle
   dcl-ds appList likeds(handle_t) based(i_pAppList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return BasicMap_remove(appList.pMap: i_appName);
+  return BasicMap_remove(appList.pMap: i_appName);
 
 
 end-proc;
@@ -216,17 +216,17 @@ dcl-proc AppenderList_get export;
     i_appName  like(LOG4RPG_appenderName_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s pAppender like(LOG4RPG_pAppender_t) inz;
 
-//  Appender list handle
+  //  Appender list handle
   dcl-ds appList likeds(handle_t) based(i_pAppList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-BasicMap_get(appList.pMap: i_appName: %addr(pAppender)
-                                    : %size(pAppender));
+  BasicMap_get(appList.pMap: i_appName: %addr(pAppender)
+                                      : %size(pAppender));
 
-return pAppender;
+  return pAppender;
 
 
 end-proc;
@@ -247,11 +247,11 @@ dcl-proc AppenderList_exist export;
     i_appName  like(LOG4RPG_appenderName_t) const;
   end-pi;
 
-//  Appender list handle
+  //  Appender list handle
   dcl-ds appList likeds(handle_t) based(i_pAppList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return BasicMap_containsKey(appList.pMap: i_appName);
+  return BasicMap_containsKey(appList.pMap: i_appName);
 
 
 end-proc;
@@ -266,21 +266,19 @@ end-proc;
 //   appIter       - Iterator for the appender list.
 //=========================================================================
 dcl-proc AppenderList_getIterator export;
+  dcl-pi *n likeds(LOG4RPG_AppenderListIterator_t);
+    i_pAppList like(LOG4RPG_pAppenderList_t) const;
+  end-pi;
 
-  dcl-ds AppenderList_getIteratorPI likeds(LOG4RPG_Appender: ListIterator_t);
-i_pAppList      const  like(LOG4RPG_pAppenderList_t );
-  end-ds;
+  //  Return value
+  dcl-ds appIter likeds(LOG4RPG_AppenderListIterator_t) inz;
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-//  Return value
-  dcl-ds appIter DS likeds(LOG4RPG_Appender: ListIterator_t) inz;
-  end-ds;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  clear appIter;
+  appIter.pAppList = i_pAppList;
+  appIter.lastApp  = 0;
 
-clear appIter;
-appIter.pAppList = i_pAppList;
-appIter.lastApp  = 0;
-
-return appIter;
+  return appIter;
 
 
 end-proc;
@@ -300,29 +298,29 @@ dcl-proc AppenderList_getFirst export;
     io_appIter likeds(LOG4RPG_AppenderListIterator_t);
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s pAppender like(LOG4RPG_pAppender_t) inz;
 
-//  Helper fields
+  //  Helper fields
   dcl-s appName like(LOG4RPG_appenderName_t) inz;
 
-//  Appender list handle
+  //  Appender list handle
   dcl-ds appList likeds(handle_t) based(io_appIter.pAppList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-pAppender = Appender_null();
+  pAppender = Appender_null();
 
-if AppenderList_getNumE(io_appIter.pAppList) = 0;
-   return pAppender;
-endif;
+  if AppenderList_getNumE(io_appIter.pAppList) = 0;
+    return pAppender;
+  endif;
 
-io_appIter.lastApp = 1;
+  io_appIter.lastApp = 1;
 
-appName = BasicMap_getKeyByIndex(appList.pMap
-                                 : io_appIter.lastApp);
-pAppender = AppenderList_get(io_appIter.pAppList: appName);
+  appName = BasicMap_getKeyByIndex(appList.pMap
+                                   : io_appIter.lastApp);
+  pAppender = AppenderList_get(io_appIter.pAppList: appName);
 
-return pAppender;
+  return pAppender;
 
 
 end-proc;
@@ -342,29 +340,29 @@ dcl-proc AppenderList_getNext export;
     io_appIter likeds(LOG4RPG_AppenderListIterator_t);
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s pAppender like(LOG4RPG_pAppender_t) inz;
 
-//  Helper fields
+  //  Helper fields
   dcl-s appName like(LOG4RPG_appenderName_t) inz;
 
-//  Appender list handle
+  //  Appender list handle
   dcl-ds appList likeds(handle_t) based(io_appIter.pAppList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-pAppender = Appender_null();
+  pAppender = Appender_null();
 
-if AppenderList_getNumE(io_appIter.pAppList) <= io_appIter.lastApp;
-   return pAppender;
-endif;
+  if AppenderList_getNumE(io_appIter.pAppList) <= io_appIter.lastApp;
+    return pAppender;
+  endif;
 
-io_appIter.lastApp = io_appIter.lastApp + 1;
+  io_appIter.lastApp = io_appIter.lastApp + 1;
 
-appName = BasicMap_getKeyByIndex(appList.pMap
-                                 : io_appIter.lastApp);
-pAppender = AppenderList_get(io_appIter.pAppList: appName);
+  appName = BasicMap_getKeyByIndex(appList.pMap
+                                   : io_appIter.lastApp);
+  pAppender = AppenderList_get(io_appIter.pAppList: appName);
 
-return pAppender;
+  return pAppender;
 
 
 end-proc;
@@ -383,52 +381,51 @@ dcl-proc AppenderList_delete export;
     io_pAppList like(LOG4RPG_pAppenderList_t);
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isDeleted ind inz(*off);
 
-//  Helper fields
+  //  Helper fields
   dcl-s name like(LOG4RPG_appenderName_t) inz;
-  dcl-ds appIter DS likeds(LOG4RPG_Appender: ListIterator_t) inz;
-  end-ds;
+  dcl-ds appIter likeds(LOG4RPG_AppenderListIterator_t) inz;
   dcl-s pAppender like(LOG4RPG_pAppender_t) inz;
 
-//  Appender list handle
+  //  Appender list handle
   dcl-ds appList likeds(handle_t) based(io_pAppList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if BasicMap_isNull(appList.pMap);
-   return *on;
-endif;
+  if BasicMap_isNull(appList.pMap);
+    return *on;
+  endif;
 
-LogLog_verbose('Deleting appender list ...');
+  LogLog_verbose('Deleting appender list ...');
 
-p_assert(AppenderList_getNumE(io_pAppList) = 0
-         : 'All appender should have been removed from this +
-            appender list by the logger or the repository.');
+  p_assert(AppenderList_getNumE(io_pAppList) = 0
+           : 'All appender should have been removed from this +
+              appender list by the logger or the repository.');
 
-appIter = AppenderList_getIterator(io_pAppList);
+  appIter = AppenderList_getIterator(io_pAppList);
 
-dow AppenderList_getNumE(io_pAppList) > 0;
-   pAppender = AppenderList_getFirst(appIter);
-   name = Appender_getName(pAppender);
-   AppenderList_remove(io_pAppList: name);
-   Appender_delete(pAppender);
-enddo;
+  dow AppenderList_getNumE(io_pAppList) > 0;
+    pAppender = AppenderList_getFirst(appIter);
+    name = Appender_getName(pAppender);
+    AppenderList_remove(io_pAppList: name);
+    Appender_delete(pAppender);
+  enddo;
 
-if BasicMap_delete(appList.pMap) = 0;
-   isDeleted = *on;
-else;
-   isDeleted = *off;
-endif;
+  if BasicMap_delete(appList.pMap) = 0;
+    isDeleted = *on;
+  else;
+    isDeleted = *off;
+  endif;
 
-clear appList;
-dealloc(N) io_pAppList;
+  clear appList;
+  dealloc(N) io_pAppList;
 
-io_pAppList = AppenderList_null();
+  io_pAppList = AppenderList_null();
 
-LogLog_verbose('- Freed memory of appender list.');
+  LogLog_verbose('- Freed memory of appender list.');
 
-return isDeleted;
+  return isDeleted;
 
 
 end-proc;
@@ -448,15 +445,15 @@ dcl-proc AppenderList_isNull export;
     i_pAppList like(LOG4RPG_pAppenderList_t) const;
   end-pi;
 
-//  Appender list handle
+  //  Appender list handle
   dcl-ds appList likeds(handle_t) based(i_pAppList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if i_pAppList = AppenderList_null();
-   return *on;
-else;
-   return BasicMap_isNull(appList.pMap);
-endif;
+  if i_pAppList = AppenderList_null();
+    return *on;
+  else;
+    return BasicMap_isNull(appList.pMap);
+  endif;
 
 
 end-proc;
@@ -473,10 +470,9 @@ end-proc;
 dcl-proc AppenderList_null export;
   dcl-pi *n like(LOG4RPG_pAppenderList_t);
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return BasicMap_null();
+  return BasicMap_null();
 
 
 end-proc;
-

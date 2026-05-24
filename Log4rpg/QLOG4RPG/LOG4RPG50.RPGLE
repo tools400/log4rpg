@@ -97,7 +97,7 @@
 // -----------------------------------------
 //  Type definitions
 // -----------------------------------------
-/copy QLOG4RPG,PLOG4RPG                     Public interface & type definitions
+/copy QLOG4RPG,PLOG4RPG Public interface & type definitions
 
 dcl-ds handle_t qualified based(pDummy);
   pSuper        like(LOG4RPG_pAppender_t);
@@ -120,13 +120,13 @@ end-ds;
 // -----------------------------------------
 //  Prototypes
 // -----------------------------------------
-/copy QIFS,PIFS                             IFS Stream File Support
+/copy QIFS,PIFS IFS Stream File Support
 
-/copy QLOG4RPG,PLOG4RPG07                   PropertyList
-/copy QLOG4RPG,PLOG4RPG10                   LogLog
-/copy QLOG4RPG,PLOG4RPG97                   Synchronisation
-/copy QLOG4RPG,PLOG4RPG98                   OptionConverter
-/copy QLOG4RPG,PLOG4RPG99                   Helper
+/copy QLOG4RPG,PLOG4RPG07 PropertyList
+/copy QLOG4RPG,PLOG4RPG10 LogLog
+/copy QLOG4RPG,PLOG4RPG97 Synchronisation
+/copy QLOG4RPG,PLOG4RPG98 OptionConverter
+/copy QLOG4RPG,PLOG4RPG99 Helper
 
 // -----------------------------------------
 //  Private prototypes
@@ -200,11 +200,9 @@ end-pr;
 // -----------------------------------------
 //  Global constants
 // -----------------------------------------
-dcl-c cTHIS_CLASS;
-     D                                            'DailyRollingFileAppender')
-//
-dcl-c cDEFAULT_WRITE_HEADER
-      const('1');
+dcl-c cTHIS_CLASS 'DailyRollingFileAppender';
+
+dcl-c cDEFAULT_WRITE_HEADER '1';
 dcl-c cDEFAULT_WRITE_FOOTER '1';
 dcl-c cDEFAULT_SHARE '0';
 dcl-c cDEFAULT_SYNC_OBJ_NAME 'LOG4RPG50';
@@ -254,48 +252,48 @@ dcl-proc DailyRollingFileAppender_new export;
     i_prefix    like(LOG4RPG_prefix_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isDone ind inz(*off);
 
-//  Helper fields
+  //  Helper fields
   dcl-ds tempHandle likeds(handle_t) inz;
   dcl-ds emptyFileID likeds(ifs_fileID_t) inz;
 
-//  Appender handle
+  //  Appender handle
   dcl-ds handle likeds(handle_t) based(io_pHandle);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-clear tempHandle;
+  clear tempHandle;
 
-// Initialize handle
-tempHandle.pSuper          = i_pSuper;   // Handle of the super class 'Appender'
-tempHandle.isOpen          = *off;
-tempHandle.hFile           = 0;
-tempHandle.path            = 'log4rpg.log';
-tempHandle.datePattern     = '.yyyy-MM-dd';
-tempHandle.dateValue       = '';
-tempHandle.writeHeader     = cDEFAULT_WRITE_HEADER;
-tempHandle.writeFooter     = cDEFAULT_WRITE_FOOTER;
-tempHandle.share           = cDEFAULT_SHARE;
-tempHandle.fileID          = emptyFileID;
-tempHandle.qSyncObj.name   = cDEFAULT_SYNC_OBJ_NAME;
-tempHandle.qSyncObj.lib    = cDEFAULT_SYNC_OBJ_LIB;
-tempHandle.isSyncLogMode   = cDEFAULT_SYNC_LOG_MODE;
-tempHandle.syncText        = cDEFAULT_SYNC_TEXT;
-tempHandle.ccsid           = cDEFAULT_CCSID;
-tempHandle.lastRnmErr      = *LOVAL;
+  // Initialize handle
+  tempHandle.pSuper          = i_pSuper;   // Handle of the super class 'Appender'
+  tempHandle.isOpen          = *off;
+  tempHandle.hFile           = 0;
+  tempHandle.path            = 'log4rpg.log';
+  tempHandle.datePattern     = '.yyyy-MM-dd';
+  tempHandle.dateValue       = '';
+  tempHandle.writeHeader     = cDEFAULT_WRITE_HEADER;
+  tempHandle.writeFooter     = cDEFAULT_WRITE_FOOTER;
+  tempHandle.share           = cDEFAULT_SHARE;
+  tempHandle.fileID          = emptyFileID;
+  tempHandle.qSyncObj.name   = cDEFAULT_SYNC_OBJ_NAME;
+  tempHandle.qSyncObj.lib    = cDEFAULT_SYNC_OBJ_LIB;
+  tempHandle.isSyncLogMode   = cDEFAULT_SYNC_LOG_MODE;
+  tempHandle.syncText        = cDEFAULT_SYNC_TEXT;
+  tempHandle.ccsid           = cDEFAULT_CCSID;
+  tempHandle.lastRnmErr      = *LOVAL;
 
-// Initialize handle from configuration properties
-if (i_pPropList <> *NULL) and not PropertyList_isNull(i_pPropList);
-   loadConfiguration(tempHandle: i_pPropList: i_prefix);
-endif;
+  // Initialize handle from configuration properties
+  if (i_pPropList <> *NULL) and not PropertyList_isNull(i_pPropList);
+    loadConfiguration(tempHandle: i_pPropList: i_prefix);
+  endif;
 
-io_pHandle = %alloc(%size(tempHandle));
-handle = tempHandle;
+  io_pHandle = %alloc(%size(tempHandle));
+  handle = tempHandle;
 
-LogLog_debug('Loaded instance of [' + cTHIS_CLASS + '].');
+  LogLog_debug('Loaded instance of [' + cTHIS_CLASS + '].');
 
-return isDone;
+  return isDone;
 
 
 end-proc;
@@ -316,11 +314,11 @@ dcl-proc DailyRollingFileAppender_requiresLayout export;
     i_pHandle pointer const;
   end-pi;
 
-//  Appender handle
+  //  Appender handle
   dcl-ds handle likeds(handle_t) based(io_pHandle);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return *on;
+  return *on;
 
 
 end-proc;
@@ -342,10 +340,10 @@ dcl-proc DailyRollingFileAppender_doAppend export;
     i_pLogEvent like(LOG4RPG_pLogEvent_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isDone ind inz(*off);
 
-//  Helper fields
+  //  Helper fields
   dcl-s archive like(LOG4RPG_path_t) inz;
   dcl-s bufLength int(10) inz;
   dcl-s lineLength int(10) inz;
@@ -356,39 +354,39 @@ dcl-proc DailyRollingFileAppender_doAppend export;
   dcl-ds ticket likeds(LOG4RPG_syncTicket_t) inz;
   dcl-ds msg likeds(msg_t) inz;
 
-//  Appender handle
+  //  Appender handle
   dcl-ds handle likeds(handle_t) based(i_pHandle);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return if there is no text
-if LogEvent_textLength(i_pLogEvent) = 0;
-   return *on;
-endif;
+  // Return if there is no text
+  if LogEvent_textLength(i_pLogEvent) = 0;
+    return *on;
+  endif;
 
-// Open the appender for output is it is not yet open
-if not handle.isOpen;
-   if not openAppender(i_pHandle);
+  // Open the appender for output is it is not yet open
+  if not handle.isOpen;
+    if not openAppender(i_pHandle);
       return *off;
-   endif;
-endif;
+    endif;
+  endif;
 
-// Check if a new file must be started.
-if (not checkAndHandleRenameError(i_pHandle) and
-    isNewFileCondition(handle));
+  // Check if a new file must be started.
+  if (not checkAndHandleRenameError(i_pHandle) and
+      isNewFileCondition(handle));
 
-   dou '1';
+    dou '1';
 
       isRenameError = *off;
 
       // Start synchronisation with concurrent jobs
       if (handle.share);
-         if (not Synchronisation_start(handle.qSyncObj.name
-                                       : handle.qSyncObj.lib
-                                       : ticket: msg));
-            LogLog_errorMsg(msg);
-            isRenameError = *on;
-            leave;
-         endif;
+        if (not Synchronisation_start(handle.qSyncObj.name
+                                      : handle.qSyncObj.lib
+                                      : ticket: msg));
+          LogLog_errorMsg(msg);
+          isRenameError = *on;
+          leave;
+        endif;
       endif;
 
       // Determine, whether this job has to create a new file or not.
@@ -396,68 +394,68 @@ if (not checkAndHandleRenameError(i_pHandle) and
       // has to switch to the new file.
       if (not handle.share or
           f_getIfsFileID(handle.path) = handle.fileID);
-         isNewFile = *on;
+        isNewFile = *on;
       else;
-         isNewFile = *off;
+        isNewFile = *off;
       endif;
 
       if handle.isOpen;
-         if (isNewFile);
-            appendFooter(i_pHandle);
-         endif;
-         closeAppender(i_pHandle);
+        if (isNewFile);
+          appendFooter(i_pHandle);
+        endif;
+        closeAppender(i_pHandle);
       endif;
 
       if (isNewFile and f_isIfsFile(handle.path: *omit));
-         archive =%trimR(f_rtvIfsFileFromPath(getArchivePath(handle)));
-         if (f_renameIfsFile(handle.path: archive: msg) <> 0);
-            LogLog_errorMsg(msg);
-            isRenameError = *on;
-         endif;
+        archive =%trimR(f_rtvIfsFileFromPath(getArchivePath(handle)));
+        if (f_renameIfsFile(handle.path: archive: msg) <> 0);
+          LogLog_errorMsg(msg);
+          isRenameError = *on;
+        endif;
       endif;
 
       openAppender(i_pHandle);
 
       // End synchronisation
       if (handle.share);
-         Synchronisation_end(ticket);
+        Synchronisation_end(ticket);
       endif;
 
-   enddo;
+    enddo;
 
-   if (isRenameError);
+    if (isRenameError);
       setRenameError(i_pHandle);
-   else;
+    else;
       clearRenameError(i_pHandle);
-   endif;
+    endif;
 
-   if (not handle.isOpen);
+    if (not handle.isOpen);
       return *off;
-   endif;
+    endif;
 
-endif;
+  endif;
 
-// Write to file. Asking the LogEvent to do wordWrap.
-lineLength = cLOG4RPG_MAX_TEXT_LENGTH - %len(cIFS_EOL_CRLF);
-text = LogEvent_getFirstLineOfText(i_pLogEvent: isText: lineLength);
-dow isText;
-   text = text + cIFS_EOL_CRLF;
-   bufLength = %len(text);
-   if f_writeLineIfsFile(handle.hFile: %addr(text)+2
-                                     : bufLength
-                                     : ''
-                                     : msg            ) <> bufLength;
+  // Write to file. Asking the LogEvent to do wordWrap.
+  lineLength = cLOG4RPG_MAX_TEXT_LENGTH - %len(cIFS_EOL_CRLF);
+  text = LogEvent_getFirstLineOfText(i_pLogEvent: isText: lineLength);
+  dow isText;
+    text = text + cIFS_EOL_CRLF;
+    bufLength = %len(text);
+    if f_writeLineIfsFile(handle.hFile: %addr(text)+2
+                                      : bufLength
+                                      : ''
+                                      : msg            ) <> bufLength;
       LogLog_error('Failed to write logEevent to file [' +
                    handle.path + ']');
       LogLog_errorMsg(msg);
       isDone = *off;
-   else;
+    else;
       isDone = *on;
-   endif;
-   text = LogEvent_getNextLineOfText(i_pLogEvent: isText: lineLength);
-enddo;
+    endif;
+    text = LogEvent_getNextLineOfText(i_pLogEvent: isText: lineLength);
+  enddo;
 
-return isDone;
+  return isDone;
 
 
 end-proc;
@@ -482,13 +480,13 @@ dcl-proc DailyRollingFileAppender_setProperties export;
     i_prefix    like(LOG4RPG_prefix_t) const;
   end-pi;
 
-//  DailyRollingFileAppender handle
+  //  DailyRollingFileAppender handle
   dcl-ds handle likeds(handle_t) based(i_pHandle);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-loadConfiguration(handle: i_pPropList: i_prefix);
+  loadConfiguration(handle: i_pPropList: i_prefix);
 
-return;
+  return;
 
 
 end-proc;
@@ -508,29 +506,29 @@ dcl-proc DailyRollingFileAppender_delete export;
     io_pHandle pointer;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isDone ind inz(*off);
 
-//  Appender handle
+  //  Appender handle
   dcl-ds handle likeds(handle_t) based(io_pHandle);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Close file if it is left open
-if handle.isOpen;
-   closeAppender(io_pHandle);
-endif;
+  // Close file if it is left open
+  if handle.isOpen;
+    closeAppender(io_pHandle);
+  endif;
 
-// Clear handle data
-clear handle;
+  // Clear handle data
+  clear handle;
 
-// Free handle memory
-dealloc(N) io_pHandle;
+  // Free handle memory
+  dealloc(N) io_pHandle;
 
-LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
+  LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
 
-isDone = *on;
+  isDone = *on;
 
-return isDone;
+  return isDone;
 
 
 end-proc;
@@ -544,60 +542,60 @@ dcl-proc openAppender;
     i_pHandle pointer const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s isNewFile ind inz(*off);
   dcl-s crtTime timestamp inz;
   dcl-s SHARE_MODE int(10) inz;
   dcl-ds msg likeds(msg_t) inz;
 
-//  Appender handle
+  //  Appender handle
   dcl-ds handle likeds(handle_t) based(i_pHandle);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Set sync logging mode. Enables or disables the
-// logging of the sync lock holder.
-Synchronisation_setLogMode(handle.isSyncLogMode);
-Synchronisation_setObjectDesc(handle.syncText);
+  // Set sync logging mode. Enables or disables the
+  // logging of the sync lock holder.
+  Synchronisation_setLogMode(handle.isSyncLogMode);
+  Synchronisation_setObjectDesc(handle.syncText);
 
-// Check, whether the  file already exists
-isNewFile = not f_isIfsFile(handle.path: *omit);
+  // Check, whether the  file already exists
+  isNewFile = not f_isIfsFile(handle.path: *omit);
 
-// Open new instance of file
-if not handle.share;
-   SHARE_MODE = O_SHARE_RDONLY;
-else;
-   SHARE_MODE = O_SHARE_RDWR;
-endif;
+  // Open new instance of file
+  if not handle.share;
+    SHARE_MODE = O_SHARE_RDONLY;
+  else;
+    SHARE_MODE = O_SHARE_RDWR;
+  endif;
 
-handle.hFile = f_openIfsFile(handle.path: O_CREAT + O_APPEND
-                                                  + O_TEXTDATA
-                                                  + O_TEXT_CREAT
-                                                  + SHARE_MODE
-                                                  + O_WRONLY
-                                                  + O_CCSID
-                                        : handle.ccsid
-                                        : *omit: msg);
-if handle.hFile = cIFS_ERROR;
-   LogLog_errorMsg(msg);
-   return *off;
-endif;
+  handle.hFile = f_openIfsFile(handle.path: O_CREAT + O_APPEND
+                                                    + O_TEXTDATA
+                                                    + O_TEXT_CREAT
+                                                    + SHARE_MODE
+                                                    + O_WRONLY
+                                                    + O_CCSID
+                                          : handle.ccsid
+                                          : *omit: msg);
+  if handle.hFile = cIFS_ERROR;
+    LogLog_errorMsg(msg);
+    return *off;
+  endif;
 
-// Set end of livetime of file
-crtTime = f_getIfsFileCrtTime(handle.path: *omit);
-handle.dateValue = replaceVariables(handle.datePattern: crtTime);
+  // Set end of livetime of file
+  crtTime = f_getIfsFileCrtTime(handle.path: *omit);
+  handle.dateValue = replaceVariables(handle.datePattern: crtTime);
 
-// Mark file as "open"
-handle.isOpen = *on;
+  // Mark file as "open"
+  handle.isOpen = *on;
 
-// Remember the unique file ID
-handle.fileID = f_getIfsFileIDH(handle.hFile);
+  // Remember the unique file ID
+  handle.fileID = f_getIfsFileIDH(handle.hFile);
 
-// Write header to file
-if isNewFile;
-   appendHeader(i_pHandle);
-endif;
+  // Write header to file
+  if isNewFile;
+    appendHeader(i_pHandle);
+  endif;
 
-return *on;
+  return *on;
 
 
 end-proc;
@@ -611,22 +609,22 @@ dcl-proc closeAppender;
     i_pHandle pointer const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isDone ind inz(*off);
 
-//  Appender handle
+  //  Appender handle
   dcl-ds handle likeds(handle_t) based(i_pHandle);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if f_closeIfsFile(handle.hFile) = 0;
-   handle.isOpen = *off;
-   handle.hFile  = 0;
-   isDone = *on;
-else;
-   isDone = *off;
-endif;
+  if f_closeIfsFile(handle.hFile) = 0;
+    handle.isOpen = *off;
+    handle.hFile  = 0;
+    isDone = *on;
+  else;
+    isDone = *off;
+  endif;
 
-return isDone;
+  return isDone;
 
 
 end-proc;
@@ -640,31 +638,31 @@ dcl-proc appendHeader;
     i_pHandle pointer const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isDone ind inz(*off);
 
-//  Helper fields
+  //  Helper fields
   dcl-s header like(LOG4RPG_header_t) inz;
   dcl-s pLayout like(LOG4RPG_pLayout_t) inz;
   dcl-ds msg likeds(msg_t) inz;
 
-//  Appender handle
+  //  Appender handle
   dcl-ds handle likeds(handle_t) based(i_pHandle);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if not handle.writeHeader;
-   return;
-endif;
+  if not handle.writeHeader;
+    return;
+  endif;
 
-// Get layout to write footer string of layout
-pLayout = Appender_getLayout(handle.pSuper);
+  // Get layout to write footer string of layout
+  pLayout = Appender_getLayout(handle.pSuper);
 
-if not Layout_isNull(pLayout);
-   header = Layout_getHeader(pLayout);
-   append(i_pHandle: header);
-endif;
+  if not Layout_isNull(pLayout);
+    header = Layout_getHeader(pLayout);
+    append(i_pHandle: header);
+  endif;
 
-return;
+  return;
 
 
 end-proc;
@@ -678,31 +676,31 @@ dcl-proc appendFooter;
     i_pHandle pointer const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isDone ind inz(*off);
 
-//  Helper fields
+  //  Helper fields
   dcl-s footer like(LOG4RPG_footer_t) inz;
   dcl-s pLayout like(LOG4RPG_pLayout_t) inz;
   dcl-ds msg likeds(msg_t) inz;
 
-//  Appender handle
+  //  Appender handle
   dcl-ds handle likeds(handle_t) based(i_pHandle);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if not handle.writeFooter;
-   return;
-endif;
+  if not handle.writeFooter;
+    return;
+  endif;
 
-// Get layout to write footer string of layout
-pLayout = Appender_getLayout(handle.pSuper);
+  // Get layout to write footer string of layout
+  pLayout = Appender_getLayout(handle.pSuper);
 
-if not Layout_isNull(pLayout);
-   footer = Layout_getFooter(pLayout);
-   append(i_pHandle: footer);
-endif;
+  if not Layout_isNull(pLayout);
+    footer = Layout_getFooter(pLayout);
+    append(i_pHandle: footer);
+  endif;
 
-return;
+  return;
 
 
 end-proc;
@@ -717,43 +715,43 @@ dcl-proc append;
     i_text    like(LOG4RPG_formattedText_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isDone ind inz(*off);
 
-//  Helper fields
+  //  Helper fields
   dcl-s text like(i_text) inz;
   dcl-s bufLength int(10) inz;
   dcl-s startPos uns(10) inz;
   dcl-s pLayout like(LOG4RPG_pLayout_t) inz;
   dcl-ds msg likeds(msg_t) inz;
 
-//  Appender handle
+  //  Appender handle
   dcl-ds handle likeds(handle_t) based(i_pHandle);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if i_text = '';
-   return;
-endif;
+  if i_text = '';
+    return;
+  endif;
 
-startPos = 1;
-dow startPos > 0;
-   text = f_wordWrap(i_text
-                     : %len(i_text)
-                     : startPos
-                     : cWORDWRAP_PARAGRAPH_TEXT +
-                       cWORDWRAP_PARAGRAPH_TRIMR);
-   bufLength = %len(text);
-   if f_writeLineIfsFile(handle.hFile: text
-                                     : bufLength
-                                     : cIFS_EOL_CRLF
-                                     : msg) <> bufLength;
+  startPos = 1;
+  dow startPos > 0;
+    text = f_wordWrap(i_text
+                      : %len(i_text)
+                      : startPos
+                      : cWORDWRAP_PARAGRAPH_TEXT +
+                        cWORDWRAP_PARAGRAPH_TRIMR);
+    bufLength = %len(text);
+    if f_writeLineIfsFile(handle.hFile: text
+                                      : bufLength
+                                      : cIFS_EOL_CRLF
+                                      : msg) <> bufLength;
       LogLog_error('Failed to write text to file [' +
                     handle.path + ']');
       LogLog_errorMsg(msg);
-   endif;
-enddo;
+    endif;
+  enddo;
 
-return;
+  return;
 
 
 end-proc;
@@ -767,23 +765,23 @@ dcl-proc isNewFileCondition;
     i_handle likeds(handle_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isNewFile ind inz(*off);
 
-//  Helper fields
+  //  Helper fields
   dcl-s cmpDateValue like(i_handle.dateValue) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-cmpDateValue = replaceVariables(i_handle.datePattern: %timestamp());
+  cmpDateValue = replaceVariables(i_handle.datePattern: %timestamp());
 
-if i_handle.dateValue <> cmpDateValue or
-   not f_isIfsFile(i_handle.path: *omit);
-   isNewFile = *on;
-else;
-   isNewFile = *off;
-endif;
+  if i_handle.dateValue <> cmpDateValue or
+     not f_isIfsFile(i_handle.path: *omit);
+    isNewFile = *on;
+  else;
+    isNewFile = *off;
+  endif;
 
-return isNewFile;
+  return isNewFile;
 
 
 end-proc;
@@ -798,39 +796,39 @@ dcl-proc replaceVariables;
     i_time   timestamp const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s string like(handle_t.datePattern) inz;
 
-//  Helper fields
+  //  Helper fields
   dcl-s timestamp timestamp inz;
   dcl-s days zoned(2) inz;
   dcl-s months zoned(2) inz;
   dcl-s years zoned(4) inz;
   dcl-s minutes zoned(2) inz;
   dcl-s hours zoned(2) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-timestamp = i_time;
-days    = %subdt(timestamp: *DAYS    );
-months  = %subdt(timestamp: *MONTHS  );
-years   = %subdt(timestamp: *YEARS   );
-minutes = %subdt(timestamp: *MINUTES );
-hours   = %subdt(timestamp: *HOURS   );
+  timestamp = i_time;
+  days    = %subdt(timestamp: *DAYS    );
+  months  = %subdt(timestamp: *MONTHS  );
+  years   = %subdt(timestamp: *YEARS   );
+  minutes = %subdt(timestamp: *MINUTES );
+  hours   = %subdt(timestamp: *HOURS   );
 
-string = i_string;
+  string = i_string;
 
-string = f_replace(cDATE_PATTERN_DAYS
-                   : %editc(days   : 'X'): string);
-string = f_replace(cDATE_PATTERN_MONTHS
-                   : %editc(months : 'X'): string);
-string = f_replace(cDATE_PATTERN_YEARS
-                   : %editc(years  : 'X'): string);
-string = f_replace(cDATE_PATTERN_MINUTES
-                   : %editc(minutes: 'X'): string);
-string = f_replace(cDATE_PATTERN_HOURS
-                   : %editc(hours  : 'X'): string);
+  string = f_replace(cDATE_PATTERN_DAYS
+                     : %editc(days   : 'X'): string);
+  string = f_replace(cDATE_PATTERN_MONTHS
+                     : %editc(months : 'X'): string);
+  string = f_replace(cDATE_PATTERN_YEARS
+                     : %editc(years  : 'X'): string);
+  string = f_replace(cDATE_PATTERN_MINUTES
+                     : %editc(minutes: 'X'): string);
+  string = f_replace(cDATE_PATTERN_HOURS
+                     : %editc(hours  : 'X'): string);
 
-return string;
+  return string;
 
 
 end-proc;
@@ -845,22 +843,22 @@ dcl-proc checkAndHandleRenameError;
     i_pHandle pointer const;
   end-pi;
 
-//  Appender handle
+  //  Appender handle
   dcl-ds handle likeds(handle_t) based(i_pHandle);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if (handle.lastRnmErr = *LOVAL);
-   return *off;
-endif;
+  if (handle.lastRnmErr = *LOVAL);
+    return *off;
+  endif;
 
-if (%diff(%timestamp(): handle.lastRnmErr: *DAYS) > 1 or
-    %diff(%timestamp(): handle.lastRnmErr: *SECONDS) > 600);
-   // try again
-   clearRenameError(i_pHandle);
-   return *off;
-endif;
+  if (%diff(%timestamp(): handle.lastRnmErr: *DAYS) > 1 or
+      %diff(%timestamp(): handle.lastRnmErr: *SECONDS) > 600);
+    // try again
+    clearRenameError(i_pHandle);
+    return *off;
+  endif;
 
-return *on;
+  return *on;
 
 end-proc;
 
@@ -873,13 +871,13 @@ dcl-proc setRenameError;
     i_pHandle pointer const;
   end-pi;
 
-//  Appender handle
+  //  Appender handle
   dcl-ds handle likeds(handle_t) based(i_pHandle);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if (handle.lastRnmErr = *LOVAL);
-   handle.lastRnmErr = %timestamp();
-endif;
+  if (handle.lastRnmErr = *LOVAL);
+    handle.lastRnmErr = %timestamp();
+  endif;
 
 end-proc;
 
@@ -892,11 +890,11 @@ dcl-proc clearRenameError;
     i_pHandle pointer const;
   end-pi;
 
-//  Appender handle
+  //  Appender handle
   dcl-ds handle likeds(handle_t) based(i_pHandle);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-handle.lastRnmErr = *LOVAL;
+  handle.lastRnmErr = *LOVAL;
 
 end-proc;
 
@@ -911,70 +909,69 @@ dcl-proc loadConfiguration;
     i_prefix    like(LOG4RPG_prefix_t) const;
   end-pi;
 
-//  Local fields
+  //  Local fields
   dcl-s parameter like(property.key) inz;
   dcl-s prefix like(i_prefix) inz;
   dcl-ds property likeds(LOG4RPG_property_t) inz;
-  dcl-ds propIter DS likeds(LOG4RPG_Property: ListIterator_t) inz;
-  end-ds;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  dcl-ds propIter likeds(LOG4RPG_PropertyListIterator_t) inz;
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-prefix = f_lcase(i_prefix);
+  prefix = f_lcase(i_prefix);
 
-propIter = PropertyList_getIterator(i_pPropList);
+  propIter = PropertyList_getIterator(i_pPropList);
 
-property = PropertyList_getFirst(propIter);
+  property = PropertyList_getFirst(propIter);
 
-dow property.key <> '';
+  dow property.key <> '';
 
-   if (prefix = '') or (f_startsWith(prefix: property.key) and
-                        %len(property.key) > %len(prefix));
+    if (prefix = '') or (f_startsWith(prefix: property.key) and
+                         %len(property.key) > %len(prefix));
 
       parameter = f_lcase(%subst(property.key: %len(prefix) + 1));
 
       select;
       when parameter = cPARAMETER_PATH;
-         io_handle.path = property.value;
+        io_handle.path = property.value;
       when parameter = cPARAMETER_DATE_PATTERN;
-         io_handle.datePattern = property.value;
+        io_handle.datePattern = property.value;
       when parameter = cPARAMETER_WRITE_HEADER;
-         io_handle.writeHeader =
-            OptionConverter_toBoolean(
-               property.value: cDEFAULT_WRITE_HEADER);
+        io_handle.writeHeader =
+           OptionConverter_toBoolean(
+              property.value: cDEFAULT_WRITE_HEADER);
       when parameter = cPARAMETER_WRITE_FOOTER;
-         io_handle.writeFooter =
-            OptionConverter_toBoolean(
-               property.value: cDEFAULT_WRITE_FOOTER);
+        io_handle.writeFooter =
+           OptionConverter_toBoolean(
+              property.value: cDEFAULT_WRITE_FOOTER);
       when parameter = cPARAMETER_SHARE;
-         io_handle.share =
-            OptionConverter_toBoolean(
-               property.value: cDEFAULT_SHARE);
+        io_handle.share =
+           OptionConverter_toBoolean(
+              property.value: cDEFAULT_SHARE);
       when parameter = cPARAMETER_SYNC_OBJ;
-         io_handle.qSyncObj = getObject(property.value);
+        io_handle.qSyncObj = getObject(property.value);
       when parameter = cPARAMETER_SYNC_LOG_MODE;
-         io_handle.isSyncLogMode =
-            OptionConverter_toBoolean(
-               property.value: cDEFAULT_SYNC_LOG_MODE);
+        io_handle.isSyncLogMode =
+           OptionConverter_toBoolean(
+              property.value: cDEFAULT_SYNC_LOG_MODE);
       when parameter = cPARAMETER_SYNC_TEXT;
-         io_handle.syncText = property.value;
+        io_handle.syncText = property.value;
       when parameter = cPARAMETER_CCSID;
-         io_handle.ccsid =
-            OptionConverter_toInt(
-               property.value: cDEFAULT_CCSID);
+        io_handle.ccsid =
+           OptionConverter_toInt(
+              property.value: cDEFAULT_CCSID);
       when Appender_knowsProperty(parameter);
-         // Ignore all parameters known by super Appender class
+      // Ignore all parameters known by super Appender class
       other;
-         LogLog_warning('No such property ['     +
-                         property.key            +
-                        '] in [' + cTHIS_CLASS + ']');
+        LogLog_warning('No such property ['     +
+                        property.key            +
+                       '] in [' + cTHIS_CLASS + ']');
       endsl;
 
-   endif;
+    endif;
 
-   property = PropertyList_getNext(propIter);
-enddo;
+    property = PropertyList_getNext(propIter);
+  enddo;
 
-return;
+  return;
 
 
 end-proc;
@@ -988,52 +985,51 @@ dcl-proc getArchivePath;
     i_handle likeds(handle_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s archive like(LOG4RPG_path_t) inz;
 
-//  Local fields
+  //  Local fields
   dcl-s start int(10) inz;
   dcl-s dir like(LOG4RPG_path_t) inz;
   dcl-s file like(LOG4RPG_path_t) inz;
   dcl-s extension int(10) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-dou not f_isIfsFile(archive);
+  dou not f_isIfsFile(archive);
 
-   dir  = %trimR(f_rtvIfsDirFromPath(i_handle.path));
-   file = %trimR(f_rtvIfsFileFromPath(i_handle.path));
+    dir  = %trimR(f_rtvIfsDirFromPath(i_handle.path));
+    file = %trimR(f_rtvIfsFileFromPath(i_handle.path));
 
-   select;
+    select;
 
-      // Append date pattern to file name.
-   when f_left(i_handle.dateValue: 1) = '.';
+    // Append date pattern to file name.
+    when f_left(i_handle.dateValue: 1) = '.';
       file = file + i_handle.dateValue;
 
-      // Insert date pattern before '.' of file name
-   when f_right(i_handle.dateValue: 1) = '.';
+    // Insert date pattern before '.' of file name
+    when f_right(i_handle.dateValue: 1) = '.';
       start = f_scanR('.': file);
       if start > 0;
-         file = %replace(i_handle.dateValue: file: start: 1);
+        file = %replace(i_handle.dateValue: file: start: 1);
       else;
-         // Append date pattern if the is no '.' in file name
-         file = file + i_handle.dateValue;
+        // Append date pattern if the is no '.' in file name
+        file = file + i_handle.dateValue;
       endif;
 
-      // Append date pattern to file name
-   other;
+    // Append date pattern to file name
+    other;
       file = file + i_handle.dateValue;
-   endsl;
+    endsl;
 
-   if extension = 0;
+    if extension = 0;
       archive = dir + file;
-   else;
+    else;
       archive = dir + file + '(' + %char(extension) + ')';
-   endif;
-   extension = extension + 1;
-enddo;
+    endif;
+    extension = extension + 1;
+  enddo;
 
-return archive;
+  return archive;
 
 
 end-proc;
-

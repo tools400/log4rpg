@@ -269,7 +269,7 @@ end-ds;
 // ------------------------------------
 //  Exported prototypes
 // ------------------------------------
-/copy QLOG4RPG,PLOG4RPG00                    Logger Stub
+/copy QLOG4RPG,PLOG4RPG00 Logger Stub
 
 // ------------------------------------
 //  Internal prototypes
@@ -1499,4 +1499,3 @@ dcl-proc getProcPtrByName;
 
 
 end-proc;
-

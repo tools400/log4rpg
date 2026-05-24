@@ -60,17 +60,17 @@ end-ds;
 // -----------------------------------------
 //  Prototypes
 // -----------------------------------------
-/copy QLOG4RPG,CEELIB                        CEE-Procedures
-/copy QBASICS1,PBASICS1                      Basic RPG Extensions
+/copy QLOG4RPG,CEELIB CEE-Procedures
+/copy QBASICS1,PBASICS1 Basic RPG Extensions
 
-/copy QLOG4RPG,PLOG4RPG07                    PropertyList
-/copy QLOG4RPG,PLOG4RPG10                    LogLog
-/copy QLOG4RPG,PLOG4RPG12                    ClassLoader
-/copy QLOG4RPG,PLOG4RPG13                    Repository
-/copy QLOG4RPG,PLOG4RPG16                    LogEvent
+/copy QLOG4RPG,PLOG4RPG07 PropertyList
+/copy QLOG4RPG,PLOG4RPG10 LogLog
+/copy QLOG4RPG,PLOG4RPG12 ClassLoader
+/copy QLOG4RPG,PLOG4RPG13 Repository
+/copy QLOG4RPG,PLOG4RPG16 LogEvent
 
 /define DEFINE_PROCPTR
-/copy QLOG4RPG,PFILTER                       Filter implementation
+/copy QLOG4RPG,PFILTER Filter implementation
 /undefine DEFINE_PROCPTR
 
 // -----------------------------------------
@@ -115,78 +115,78 @@ dcl-proc Filter_new export;
     i_pPropString pointer options(*nopass: *omit: *string) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-ds filter likeds(handle_t) based(pFilter);
 
-//  Paremeter positions
+  //  Paremeter positions
   dcl-c p_pPropString 3;
 
-//  Fields for optional parameters
+  //  Fields for optional parameters
   dcl-s pPropString like(i_pPropString) inz;
 
-//  Helper fields
+  //  Helper fields
   dcl-s isPresent int(10) inz;
   dcl-s pPropList like(LOG4RPG_pPropertyList_t) inz;
   dcl-ds tempFilter likeds(handle_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-initializeModule();
+  initializeModule();
 
-LogLog_debug('Creating filter [' + i_fltName + '] ...');
+  LogLog_debug('Creating filter [' + i_fltName + '] ...');
 
-pFilter = Filter_null();
+  pFilter = Filter_null();
 
-// Get optional parameters ...
-// ... property string
-if %parms() >= p_pPropString;
-   CEETSTA(isPresent: p_pPropString: *omit);
-else;
-   isPresent = 0;
-endif;
+  // Get optional parameters ...
+  // ... property string
+  if %parms() >= p_pPropString;
+    CEETSTA(isPresent: p_pPropString: *omit);
+  else;
+    isPresent = 0;
+  endif;
 
-if isPresent = 1;
-   pPropString = i_pPropString;
-else;
-   pPropString = *NULL;
-endif;
+  if isPresent = 1;
+    pPropString = i_pPropString;
+  else;
+    pPropString = *NULL;
+  endif;
 
-// Initialize filter
-tempFilter.name    = i_fltName;
-if not ClassLoader_resolveFilter(i_fltImpl: tempFilter.filterImpl);
-   return pFilter;
-endif;
-tempFilter.pNextFilter = Filter_null();
+  // Initialize filter
+  tempFilter.name    = i_fltName;
+  if not ClassLoader_resolveFilter(i_fltImpl: tempFilter.filterImpl);
+    return pFilter;
+  endif;
+  tempFilter.pNextFilter = Filter_null();
 
-// Create properties list
-if pPropString <> *NULL;
-   pPropList = PropertyList_new(pPropString);
-else;
-   pPropList = PropertyList_null();
-endif;
+  // Create properties list
+  if pPropString <> *NULL;
+    pPropList = PropertyList_new(pPropString);
+  else;
+    pPropList = PropertyList_null();
+  endif;
 
-// Create filter handle
-pFilter  = %alloc(%size(handle_t));
-filter   = tempFilter;
+  // Create filter handle
+  pFilter  = %alloc(%size(handle_t));
+  filter   = tempFilter;
 
-// Instanciate filter implementation object
-g_pFilter_new = filter.filterImpl.procNew.procptr;
-SrvPgmFilter_new(pFilter
-                 : filter.filterImpl.pHandle
-                 : pPropList
-                 : '');
+  // Instanciate filter implementation object
+  g_pFilter_new = filter.filterImpl.procNew.procptr;
+  SrvPgmFilter_new(pFilter
+                   : filter.filterImpl.pHandle
+                   : pPropList
+                   : '');
 
-// Destroy properties list
-if not PropertyList_isNull(pPropList);
-   PropertyList_delete(pPropList);
-endif;
+  // Destroy properties list
+  if not PropertyList_isNull(pPropList);
+    PropertyList_delete(pPropList);
+  endif;
 
-// Add filter to the repository
-Repository_addFilter(pFilter);
+  // Add filter to the repository
+  Repository_addFilter(pFilter);
 
-LogLog_verbose('+ Allocated memory for filter [' +
-                  filter.name + '].');
+  LogLog_verbose('+ Allocated memory for filter [' +
+                    filter.name + '].');
 
-return pFilter;
+  return pFilter;
 
 
 end-proc;
@@ -209,25 +209,25 @@ dcl-proc Filter_decide export;
     i_pLogEvent like(LOG4RPG_pLogEvent_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s decision int(10) inz;
 
-//  Helper fields
+  //  Helper fields
 
-//  Filter handle
+  //  Filter handle
   dcl-ds filter likeds(handle_t) based(i_pFilter);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-LogLog_verbose('-> Filtering log event of logger [' +
-                   LogEvent_getLoggerName(i_pLogEvent) + ']...');
+  LogLog_verbose('-> Filtering log event of logger [' +
+                     LogEvent_getLoggerName(i_pLogEvent) + ']...');
 
-g_pFilter_decide = filter.filterImpl.procDecide.procptr;
-decision = SrvPgmFilter_decide(filter.filterImpl.pHandle
-                               : i_pLogEvent);
+  g_pFilter_decide = filter.filterImpl.procDecide.procptr;
+  decision = SrvPgmFilter_decide(filter.filterImpl.pHandle
+                                 : i_pLogEvent);
 
-LogLog_verbose('-> Decision: ' + %char(decision));
+  LogLog_verbose('-> Decision: ' + %char(decision));
 
-return decision;
+  return decision;
 
 
 end-proc;
@@ -246,11 +246,11 @@ dcl-proc Filter_getName export;
     i_pFilter like(LOG4RPG_pFilter_t) const;
   end-pi;
 
-//  Filter handle
+  //  Filter handle
   dcl-ds filter likeds(handle_t) based(i_pFilter);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return filter.name;
+  return filter.name;
 
 
 end-proc;
@@ -269,11 +269,11 @@ dcl-proc Filter_getNext export;
     i_pFilter like(LOG4RPG_pFilter_t) const;
   end-pi;
 
-//  Filter handle
+  //  Filter handle
   dcl-ds filter likeds(handle_t) based(i_pFilter);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return filter.pNextFilter;
+  return filter.pNextFilter;
 
 
 end-proc;
@@ -294,13 +294,13 @@ dcl-proc Filter_setNext export;
     i_pNextFilter like(LOG4RPG_pFilter_t) const;
   end-pi;
 
-//  Filter handle
+  //  Filter handle
   dcl-ds filter likeds(handle_t) based(i_pFilter);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-filter.pNextFilter = i_pNextFilter;
+  filter.pNextFilter = i_pNextFilter;
 
-return;
+  return;
 
 
 end-proc;
@@ -323,17 +323,17 @@ dcl-proc Filter_setProperties export;
     i_prefix    like(LOG4RPG_prefix_t) const;
   end-pi;
 
-//  Filter handle
+  //  Filter handle
   dcl-ds filter likeds(handle_t) based(i_pFilter);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-g_pFilter_setProperties =
-      filter.filterImpl.procSetProperties.procptr;
-SrvPgmFilter_setProperties(filter.filterImpl.pHandle
-                           : i_pPropList
-                           : i_prefix);
+  g_pFilter_setProperties =
+        filter.filterImpl.procSetProperties.procptr;
+  SrvPgmFilter_setProperties(filter.filterImpl.pHandle
+                             : i_pPropList
+                             : i_prefix);
 
-return;
+  return;
 
 
 end-proc;
@@ -353,40 +353,40 @@ dcl-proc Filter_delete export;
     io_pFilter like(LOG4RPG_pFilter_t);
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isDeleted ind inz(*off);
 
-//  Helper fields
+  //  Helper fields
   dcl-s name like(filter.name) inz;
 
-//  Filter handle
+  //  Filter handle
   dcl-ds filter likeds(handle_t) based(io_pFilter);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-initializeModule();
+  initializeModule();
 
-if not Repository_existFilter(filter.name);
-   io_pFilter = Filter_null();
-   return *on;
-endif;
+  if not Repository_existFilter(filter.name);
+    io_pFilter = Filter_null();
+    return *on;
+  endif;
 
-LogLog_verbose('Deleting filter [' + filter.name + '] ...');
+  LogLog_verbose('Deleting filter [' + filter.name + '] ...');
 
-name = filter.name;
+  name = filter.name;
 
-// Remove filter from repository
-Repository_removeFilter(filter.name);
+  // Remove filter from repository
+  Repository_removeFilter(filter.name);
 
-// Delete filter
-g_pFilter_delete = filter.filterImpl.procDelete.procptr;
-isDeleted = SrvPgmFilter_delete(filter.filterImpl.pHandle);
+  // Delete filter
+  g_pFilter_delete = filter.filterImpl.procDelete.procptr;
+  isDeleted = SrvPgmFilter_delete(filter.filterImpl.pHandle);
 
-dealloc(N) io_pFilter;
-io_pFilter = Filter_null();
+  dealloc(N) io_pFilter;
+  io_pFilter = Filter_null();
 
-LogLog_verbose('- Freed memory of filter [' + name + '].');
+  LogLog_verbose('- Freed memory of filter [' + name + '].');
 
-return isDeleted;
+  return isDeleted;
 
 
 end-proc;
@@ -406,15 +406,15 @@ dcl-proc Filter_knowsProperty export;
   dcl-pi *n ind;
     i_parameter like(LOG4RPG_Property_key_t) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-select;
-when i_parameter = cPARAMETER_NEXT_FILTER or
-     f_startsWith(cPARAMETER_NEXT_FILTER + '.': i_parameter);
-   return *on;
-other;
-   return *off;
-endsl;
+  select;
+  when i_parameter = cPARAMETER_NEXT_FILTER or
+       f_startsWith(cPARAMETER_NEXT_FILTER + '.': i_parameter);
+    return *on;
+  other;
+    return *off;
+  endsl;
 
 
 end-proc;
@@ -434,20 +434,20 @@ dcl-proc Filter_isNull export;
     i_pFilter like(LOG4RPG_pFilter_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isNull ind inz(*off);
 
-//  Filter handle
+  //  Filter handle
   dcl-ds filter likeds(handle_t) based(i_pFilter);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if i_pFilter = Filter_null();
-   isNull = *on;
-else;
-   isNull = *off;
-endif;
+  if i_pFilter = Filter_null();
+    isNull = *on;
+  else;
+    isNull = *off;
+  endif;
 
-return isNull;
+  return isNull;
 
 
 end-proc;
@@ -464,9 +464,9 @@ end-proc;
 dcl-proc Filter_null export;
   dcl-pi *n like(LOG4RPG_pFilter_t);
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return *NULL;
+  return *NULL;
 
 
 end-proc;
@@ -479,23 +479,22 @@ dcl-proc initializeModule;
   dcl-pi *n;
   end-pi;
 
-//  Return value
-//
-//  Helper fields
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  //  Return value
+  //
+  //  Helper fields
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if g_isInit;
-   return;
-endif;
+  if g_isInit;
+    return;
+  endif;
 
-Loglog_verbose('Initializing module ' + sds.modContProc + '...');
+  Loglog_verbose('Initializing module ' + sds.modContProc + '...');
 
-Repository_initialize();
+  Repository_initialize();
 
-g_isInit = *on;
+  g_isInit = *on;
 
-return;
+  return;
 
 
 end-proc;
-

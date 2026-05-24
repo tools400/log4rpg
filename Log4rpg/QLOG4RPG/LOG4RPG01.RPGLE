@@ -102,25 +102,25 @@
 // -----------------------------------------
 //  Exported functions
 // -----------------------------------------
-/copy QLOG4RPG,PLOG4RPG                      Public interface & type definitions
-/copy QLOG4RPG,PLOG4RPG01                    Logger
+/copy QLOG4RPG,PLOG4RPG Public interface & type definitions
+/copy QLOG4RPG,PLOG4RPG01 Logger
 
 // -----------------------------------------
 //  Type definitions
 // -----------------------------------------
-/copy QLOG4RPG,PTYPES                        Private type definitions
+/copy QLOG4RPG,PTYPES Private type definitions
 
 // -----------------------------------------
 //  Prototypes
 // -----------------------------------------
-/copy QBASICS1,PBASICS1                      Basic RPG Extensions
-/copy QLOG4RPG,PLOG4RPG04                    AppenderList
-/copy QLOG4RPG,PLOG4RPG08                    Configurator
-/copy QLOG4RPG,PLOG4RPG09                    Level
-/copy QLOG4RPG,PLOG4RPG10                    LogLog
-/copy QLOG4RPG,PLOG4RPG13                    Repository
-/copy QLOG4RPG,PLOG4RPG16                    LogEvent
-/copy QLOG4RPG,PLOG4RPG99                    Helpers
+/copy QBASICS1,PBASICS1 Basic RPG Extensions
+/copy QLOG4RPG,PLOG4RPG04 AppenderList
+/copy QLOG4RPG,PLOG4RPG08 Configurator
+/copy QLOG4RPG,PLOG4RPG09 Level
+/copy QLOG4RPG,PLOG4RPG10 LogLog
+/copy QLOG4RPG,PLOG4RPG13 Repository
+/copy QLOG4RPG,PLOG4RPG16 LogEvent
+/copy QLOG4RPG,PLOG4RPG99 Helpers
 
 // -----------------------------------------
 //  Private prototypes
@@ -220,17 +220,17 @@ dcl-proc Logger_setLogging export;
   dcl-pi *n ind;
     i_isLogging ind const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if i_isLogging;
-   g_isLogging = *on;
-   LogLog_verbose('LOG4RPG is enabled now.');
-else;
-   g_isLogging = *off;
-   LogLog_verbose('LOG4RPG is disabled now.');
-endif;
+  if i_isLogging;
+    g_isLogging = *on;
+    LogLog_verbose('LOG4RPG is enabled now.');
+  else;
+    g_isLogging = *off;
+    LogLog_verbose('LOG4RPG is disabled now.');
+  endif;
 
-return g_isLogging;
+  return g_isLogging;
 
 
 end-proc;
@@ -247,13 +247,13 @@ end-proc;
 dcl-proc Logger_isLogging export;
   dcl-pi *n ind;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if g_isLogging;
-   return *on;
-else;
-   return *off;
-endif;
+  if g_isLogging;
+    return *on;
+  else;
+    return *off;
+  endif;
 
 
 end-proc;
@@ -272,11 +272,11 @@ dcl-proc Logger_getRootLogger export;
   dcl-pi *n like(LOG4RPG_hLogger_t);
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s hLogger like(LOG4RPG_hLogger_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return Logger_getLogger(cROOT_LOGGER);
+  return Logger_getLogger(cROOT_LOGGER);
 
 
 end-proc;
@@ -296,22 +296,22 @@ dcl-proc Logger_getLogger export;
     i_logName like(LOG4RPG_loggerName_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s hLogger like(LOG4RPG_hLogger_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logging is disabled.
-if not Logger_isLogging();
-   return Logger_null();
-endif;
+  // Return to caller if logging is disabled.
+  if not Logger_isLogging();
+    return Logger_null();
+  endif;
 
-initializeModule();
+  initializeModule();
 
-Configurator_checkAndReloadPropertiesConfiguration();
+  Configurator_checkAndReloadPropertiesConfiguration();
 
-hLogger = Repository_getLogger(translateLoggerName(i_logName));
+  hLogger = Repository_getLogger(translateLoggerName(i_logName));
 
-return hLogger;
+  return hLogger;
 
 
 end-proc;
@@ -333,27 +333,27 @@ dcl-proc Logger_debug export;
     i_text    like(LOG4RPG_text_t) const;
   end-pi;
 
-//  Caller
+  //  Caller
   dcl-ds caller likeds(LOG4RPG_caller_t) inz;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logging is disabled.
-if (not Logger_isDebugEnabled(i_hLogger));
-   return;
-endif;
+  // Return to caller if logging is disabled.
+  if (not Logger_isDebugEnabled(i_hLogger));
+    return;
+  endif;
 
-caller.procedure = f_caller(caller.module.name
-                            : caller.pgm.name
-                            : caller.stmtID
-                            : g_stubOfs);
-logLoggingEvent(i_hLogger: cLOG4RPG_PRIORITY_DEBUG
-                : i_text
-                : caller);
+  caller.procedure = f_caller(caller.module.name
+                              : caller.pgm.name
+                              : caller.stmtID
+                              : g_stubOfs);
+  logLoggingEvent(i_hLogger: cLOG4RPG_PRIORITY_DEBUG
+                  : i_text
+                  : caller);
 
-return;
+  return;
 
 
 end-proc;
@@ -375,31 +375,31 @@ dcl-proc Logger_debugMsg export;
     i_msg     likeds(LOG4RPG_msg_t) const;
   end-pi;
 
-//  Caller
+  //  Caller
   dcl-ds caller likeds(LOG4RPG_caller_t) inz;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
 
-//  Error message
+  //  Error message
   dcl-ds errMsg likeds(msg_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logging is disabled.
-if (not Logger_isDebugEnabled(i_hLogger));
-   return;
-endif;
+  // Return to caller if logging is disabled.
+  if (not Logger_isDebugEnabled(i_hLogger));
+    return;
+  endif;
 
-caller.procedure = f_caller(caller.module.name
-                            : caller.pgm.name
-                            : caller.stmtID
-                            : g_stubOfs);
-logLoggingEvent(i_hLogger: cLOG4RPG_PRIORITY_DEBUG
-                : %trimR(f_rtvMsgText(i_msg: errMsg))
-                : caller
-                : errMsg);
+  caller.procedure = f_caller(caller.module.name
+                              : caller.pgm.name
+                              : caller.stmtID
+                              : g_stubOfs);
+  logLoggingEvent(i_hLogger: cLOG4RPG_PRIORITY_DEBUG
+                  : %trimR(f_rtvMsgText(i_msg: errMsg))
+                  : caller
+                  : errMsg);
 
-return;
+  return;
 
 
 end-proc;
@@ -419,22 +419,22 @@ dcl-proc Logger_isDebugEnabled export;
     i_hLogger like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isEnabled ind inz(*off);
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logging is disabled.
-if (not isLoggingEnabled(i_hLogger));
-   return *off;
-endif;
+  // Return to caller if logging is disabled.
+  if (not isLoggingEnabled(i_hLogger));
+    return *off;
+  endif;
 
-isEnabled =
-   cLOG4RPG_PRIORITY_DEBUG >= getPriorityFromHierarchy(i_hLogger);
+  isEnabled =
+     cLOG4RPG_PRIORITY_DEBUG >= getPriorityFromHierarchy(i_hLogger);
 
-return isEnabled;
+  return isEnabled;
 
 
 end-proc;
@@ -456,27 +456,27 @@ dcl-proc Logger_info export;
     i_text    like(LOG4RPG_text_t) const;
   end-pi;
 
-//  Caller
+  //  Caller
   dcl-ds caller likeds(LOG4RPG_caller_t) inz;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logging is disabled.
-if (not Logger_isInfoEnabled(i_hLogger));
-   return;
-endif;
+  // Return to caller if logging is disabled.
+  if (not Logger_isInfoEnabled(i_hLogger));
+    return;
+  endif;
 
-caller.procedure = f_caller(caller.module.name
-                            : caller.pgm.name
-                            : caller.stmtID
-                            : g_stubOfs);
-logLoggingEvent(i_hLogger: cLOG4RPG_PRIORITY_INFO
-                : i_text
-                : caller);
+  caller.procedure = f_caller(caller.module.name
+                              : caller.pgm.name
+                              : caller.stmtID
+                              : g_stubOfs);
+  logLoggingEvent(i_hLogger: cLOG4RPG_PRIORITY_INFO
+                  : i_text
+                  : caller);
 
-return;
+  return;
 
 
 end-proc;
@@ -498,31 +498,31 @@ dcl-proc Logger_infoMsg export;
     i_msg     likeds(LOG4RPG_msg_t) const;
   end-pi;
 
-//  Caller
+  //  Caller
   dcl-ds caller likeds(LOG4RPG_caller_t) inz;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
 
-//  Error message
+  //  Error message
   dcl-ds errMsg likeds(msg_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logging is disabled.
-if (not Logger_isInfoEnabled(i_hLogger));
-   return;
-endif;
+  // Return to caller if logging is disabled.
+  if (not Logger_isInfoEnabled(i_hLogger));
+    return;
+  endif;
 
-caller.procedure = f_caller(caller.module.name
-                            : caller.pgm.name
-                            : caller.stmtID
-                            : g_stubOfs);
-logLoggingEvent(i_hLogger: cLOG4RPG_PRIORITY_INFO
-                : %trimR(f_rtvMsgText(i_msg: *omit))
-                : caller
-                : errMsg);
+  caller.procedure = f_caller(caller.module.name
+                              : caller.pgm.name
+                              : caller.stmtID
+                              : g_stubOfs);
+  logLoggingEvent(i_hLogger: cLOG4RPG_PRIORITY_INFO
+                  : %trimR(f_rtvMsgText(i_msg: *omit))
+                  : caller
+                  : errMsg);
 
-return;
+  return;
 
 
 end-proc;
@@ -543,22 +543,22 @@ dcl-proc Logger_isInfoEnabled export;
     i_hLogger like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isEnabled ind inz(*off);
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logging is disabled.
-if (not isLoggingEnabled(i_hLogger));
-   return *off;
-endif;
+  // Return to caller if logging is disabled.
+  if (not isLoggingEnabled(i_hLogger));
+    return *off;
+  endif;
 
-isEnabled =
-   cLOG4RPG_PRIORITY_INFO >= getPriorityFromHierarchy(i_hLogger);
+  isEnabled =
+     cLOG4RPG_PRIORITY_INFO >= getPriorityFromHierarchy(i_hLogger);
 
-return isEnabled;
+  return isEnabled;
 
 
 end-proc;
@@ -580,27 +580,27 @@ dcl-proc Logger_warn export;
     i_text    like(LOG4RPG_text_t) const;
   end-pi;
 
-//  Caller
+  //  Caller
   dcl-ds caller likeds(LOG4RPG_caller_t) inz;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logging is disabled.
-if (not Logger_isWarnEnabled(i_hLogger));
-   return;
-endif;
+  // Return to caller if logging is disabled.
+  if (not Logger_isWarnEnabled(i_hLogger));
+    return;
+  endif;
 
-caller.procedure = f_caller(caller.module.name
-                            : caller.pgm.name
-                            : caller.stmtID
-                            : g_stubOfs);
-logLoggingEvent(i_hLogger: cLOG4RPG_PRIORITY_WARN
-                : i_text
-                : caller);
+  caller.procedure = f_caller(caller.module.name
+                              : caller.pgm.name
+                              : caller.stmtID
+                              : g_stubOfs);
+  logLoggingEvent(i_hLogger: cLOG4RPG_PRIORITY_WARN
+                  : i_text
+                  : caller);
 
-return;
+  return;
 
 
 end-proc;
@@ -622,31 +622,31 @@ dcl-proc Logger_warnMsg export;
     i_msg     likeds(LOG4RPG_msg_t) const;
   end-pi;
 
-//  Caller
+  //  Caller
   dcl-ds caller likeds(LOG4RPG_caller_t) inz;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
 
-//  Error message
+  //  Error message
   dcl-ds errMsg likeds(msg_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logging is disabled.
-if (not Logger_isWarnEnabled(i_hLogger));
-   return;
-endif;
+  // Return to caller if logging is disabled.
+  if (not Logger_isWarnEnabled(i_hLogger));
+    return;
+  endif;
 
-caller.procedure = f_caller(caller.module.name
-                            : caller.pgm.name
-                            : caller.stmtID
-                            : g_stubOfs);
-logLoggingEvent(i_hLogger: cLOG4RPG_PRIORITY_WARN
-                : %trimR(f_rtvMsgText(i_msg: *omit))
-                : caller
-                : errMsg);
+  caller.procedure = f_caller(caller.module.name
+                              : caller.pgm.name
+                              : caller.stmtID
+                              : g_stubOfs);
+  logLoggingEvent(i_hLogger: cLOG4RPG_PRIORITY_WARN
+                  : %trimR(f_rtvMsgText(i_msg: *omit))
+                  : caller
+                  : errMsg);
 
-return;
+  return;
 
 
 end-proc;
@@ -667,22 +667,22 @@ dcl-proc Logger_isWarnEnabled export;
     i_hLogger like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isEnabled ind inz(*off);
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logging is disabled.
-if (not isLoggingEnabled(i_hLogger));
-   return *off;
-endif;
+  // Return to caller if logging is disabled.
+  if (not isLoggingEnabled(i_hLogger));
+    return *off;
+  endif;
 
-isEnabled =
-   cLOG4RPG_PRIORITY_WARN >= getPriorityFromHierarchy(i_hLogger);
+  isEnabled =
+     cLOG4RPG_PRIORITY_WARN >= getPriorityFromHierarchy(i_hLogger);
 
-return isEnabled;
+  return isEnabled;
 
 
 end-proc;
@@ -704,27 +704,27 @@ dcl-proc Logger_error export;
     i_text    like(LOG4RPG_text_t) const;
   end-pi;
 
-//  Caller
+  //  Caller
   dcl-ds caller likeds(LOG4RPG_caller_t) inz;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logging is disabled.
-if (not Logger_isErrorEnabled(i_hLogger));
-   return;
-endif;
+  // Return to caller if logging is disabled.
+  if (not Logger_isErrorEnabled(i_hLogger));
+    return;
+  endif;
 
-caller.procedure = f_caller(caller.module.name
-                            : caller.pgm.name
-                            : caller.stmtID
-                            : g_stubOfs);
-logLoggingEvent(i_hLogger: cLOG4RPG_PRIORITY_ERROR
-                : i_text
-                : caller);
+  caller.procedure = f_caller(caller.module.name
+                              : caller.pgm.name
+                              : caller.stmtID
+                              : g_stubOfs);
+  logLoggingEvent(i_hLogger: cLOG4RPG_PRIORITY_ERROR
+                  : i_text
+                  : caller);
 
-return;
+  return;
 
 
 end-proc;
@@ -746,31 +746,31 @@ dcl-proc Logger_errorMsg export;
     i_msg     likeds(LOG4RPG_msg_t) const;
   end-pi;
 
-//  Caller
+  //  Caller
   dcl-ds caller likeds(LOG4RPG_caller_t) inz;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
 
-//  Error message
+  //  Error message
   dcl-ds errMsg likeds(msg_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logging is disabled.
-if (not Logger_isErrorEnabled(i_hLogger));
-   return;
-endif;
+  // Return to caller if logging is disabled.
+  if (not Logger_isErrorEnabled(i_hLogger));
+    return;
+  endif;
 
-caller.procedure = f_caller(caller.module.name
-                            : caller.pgm.name
-                            : caller.stmtID
-                            : g_stubOfs);
-logLoggingEvent(i_hLogger: cLOG4RPG_PRIORITY_ERROR
-                : %trimR(f_rtvMsgText(i_msg: *omit))
-                : caller
-                : errMsg);
+  caller.procedure = f_caller(caller.module.name
+                              : caller.pgm.name
+                              : caller.stmtID
+                              : g_stubOfs);
+  logLoggingEvent(i_hLogger: cLOG4RPG_PRIORITY_ERROR
+                  : %trimR(f_rtvMsgText(i_msg: *omit))
+                  : caller
+                  : errMsg);
 
-return;
+  return;
 
 
 end-proc;
@@ -791,22 +791,22 @@ dcl-proc Logger_isErrorEnabled export;
     i_hLogger like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isEnabled ind inz(*off);
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logging is disabled.
-if (not isLoggingEnabled(i_hLogger));
-   return *off;
-endif;
+  // Return to caller if logging is disabled.
+  if (not isLoggingEnabled(i_hLogger));
+    return *off;
+  endif;
 
-isEnabled =
-   cLOG4RPG_PRIORITY_ERROR >= getPriorityFromHierarchy(i_hLogger);
+  isEnabled =
+     cLOG4RPG_PRIORITY_ERROR >= getPriorityFromHierarchy(i_hLogger);
 
-return isEnabled;
+  return isEnabled;
 
 
 end-proc;
@@ -828,27 +828,27 @@ dcl-proc Logger_fatal export;
     i_text    like(LOG4RPG_text_t) const;
   end-pi;
 
-//  Caller
+  //  Caller
   dcl-ds caller likeds(LOG4RPG_caller_t) inz;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logging is disabled.
-if (not Logger_isFatalEnabled(i_hLogger));
-   return;
-endif;
+  // Return to caller if logging is disabled.
+  if (not Logger_isFatalEnabled(i_hLogger));
+    return;
+  endif;
 
-caller.procedure = f_caller(caller.module.name
-                            : caller.pgm.name
-                            : caller.stmtID
-                            : g_stubOfs);
-logLoggingEvent(i_hLogger: cLOG4RPG_PRIORITY_FATAL
-                : i_text
-                : caller);
+  caller.procedure = f_caller(caller.module.name
+                              : caller.pgm.name
+                              : caller.stmtID
+                              : g_stubOfs);
+  logLoggingEvent(i_hLogger: cLOG4RPG_PRIORITY_FATAL
+                  : i_text
+                  : caller);
 
-return;
+  return;
 
 
 end-proc;
@@ -870,31 +870,31 @@ dcl-proc Logger_fatalMsg export;
     i_msg     likeds(LOG4RPG_msg_t) const;
   end-pi;
 
-//  Caller
+  //  Caller
   dcl-ds caller likeds(LOG4RPG_caller_t) inz;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
 
-//  Error message
+  //  Error message
   dcl-ds errMsg likeds(msg_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logging is disabled.
-if (not Logger_isFatalEnabled(i_hLogger));
-   return;
-endif;
+  // Return to caller if logging is disabled.
+  if (not Logger_isFatalEnabled(i_hLogger));
+    return;
+  endif;
 
-caller.procedure = f_caller(caller.module.name
-                            : caller.pgm.name
-                            : caller.stmtID
-                            : g_stubOfs);
-logLoggingEvent(i_hLogger: cLOG4RPG_PRIORITY_FATAL
-                : %trimR(f_rtvMsgText(i_msg: *omit))
-                : caller
-                : errMsg);
+  caller.procedure = f_caller(caller.module.name
+                              : caller.pgm.name
+                              : caller.stmtID
+                              : g_stubOfs);
+  logLoggingEvent(i_hLogger: cLOG4RPG_PRIORITY_FATAL
+                  : %trimR(f_rtvMsgText(i_msg: *omit))
+                  : caller
+                  : errMsg);
 
-return;
+  return;
 
 
 end-proc;
@@ -915,22 +915,22 @@ dcl-proc Logger_isFatalEnabled export;
     i_hLogger like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isEnabled ind inz(*off);
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logging is disabled.
-if (not isLoggingEnabled(i_hLogger));
-   return *off;
-endif;
+  // Return to caller if logging is disabled.
+  if (not isLoggingEnabled(i_hLogger));
+    return *off;
+  endif;
 
-isEnabled =
-   cLOG4RPG_PRIORITY_FATAL >= getPriorityFromHierarchy(i_hLogger);
+  isEnabled =
+     cLOG4RPG_PRIORITY_FATAL >= getPriorityFromHierarchy(i_hLogger);
 
-return isEnabled;
+  return isEnabled;
 
 
 end-proc;
@@ -953,40 +953,40 @@ dcl-proc Logger_forcedLog export;
     i_text    like(LOG4RPG_text_t) const;
   end-pi;
 
-//  Caller
+  //  Caller
   dcl-ds caller likeds(LOG4RPG_caller_t) inz;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logging is disabled.
-if not Logger_isLogging();
-   return;
-endif;
+  // Return to caller if logging is disabled.
+  if not Logger_isLogging();
+    return;
+  endif;
 
-// Return to caller if logger is NULL
-if Logger_isNull(i_hLogger);
-   return;
-endif;
+  // Return to caller if logger is NULL
+  if Logger_isNull(i_hLogger);
+    return;
+  endif;
 
-// Reload properties (if reloading has been enabled)
-Configurator_checkAndReloadPropertiesConfiguration();
+  // Reload properties (if reloading has been enabled)
+  Configurator_checkAndReloadPropertiesConfiguration();
 
-// Return to caller if logger does not exist
-if not Repository_existLogger(logger.name);
-   return;
-endif;
+  // Return to caller if logger does not exist
+  if not Repository_existLogger(logger.name);
+    return;
+  endif;
 
-caller.procedure = f_caller(caller.module.name
-                            : caller.pgm.name
-                            : caller.stmtID
-                            : g_stubOfs);
-logLoggingEvent(i_hLogger: Level_toInt(i_level)
-                : i_text
-                : caller);
+  caller.procedure = f_caller(caller.module.name
+                              : caller.pgm.name
+                              : caller.stmtID
+                              : g_stubOfs);
+  logLoggingEvent(i_hLogger: Level_toInt(i_level)
+                  : i_text
+                  : caller);
 
-return;
+  return;
 
 
 end-proc;
@@ -1009,42 +1009,42 @@ dcl-proc Logger_forcedLogMsg export;
     i_msg     likeds(LOG4RPG_msg_t) const;
   end-pi;
 
-//  Caller
+  //  Caller
   dcl-ds caller likeds(LOG4RPG_caller_t) inz;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
 
-//  Error message
+  //  Error message
   dcl-ds errMsg likeds(msg_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logging is disabled.
-if not Logger_isLogging();
-   return;
-endif;
+  // Return to caller if logging is disabled.
+  if not Logger_isLogging();
+    return;
+  endif;
 
-// Return to caller if logger is NULL
-if Logger_isNull(i_hLogger);
-   return;
-endif;
+  // Return to caller if logger is NULL
+  if Logger_isNull(i_hLogger);
+    return;
+  endif;
 
-Configurator_checkAndReloadPropertiesConfiguration();
+  Configurator_checkAndReloadPropertiesConfiguration();
 
-if not Repository_existLogger(logger.name);
-   return;
-endif;
+  if not Repository_existLogger(logger.name);
+    return;
+  endif;
 
-caller.procedure = f_caller(caller.module.name
-                            : caller.pgm.name
-                            : caller.stmtID
-                            : g_stubOfs);
-logLoggingEvent(i_hLogger: Level_toInt(i_level)
-                : %trimR(f_rtvMsgText(i_msg: *omit))
-                   : caller
-                   : errMsg);
+  caller.procedure = f_caller(caller.module.name
+                              : caller.pgm.name
+                              : caller.stmtID
+                              : g_stubOfs);
+  logLoggingEvent(i_hLogger: Level_toInt(i_level)
+                  : %trimR(f_rtvMsgText(i_msg: *omit))
+                     : caller
+                     : errMsg);
 
-return;
+  return;
 
 
 end-proc;
@@ -1064,16 +1064,16 @@ dcl-proc Logger_getName export;
     i_hLogger like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logging is disabled.
-if not Logger_isLogging();
-   return '';
-endif;
+  // Return to caller if logging is disabled.
+  if not Logger_isLogging();
+    return '';
+  endif;
 
-return Node_getName(i_hLogger);
+  return Node_getName(i_hLogger);
 
 
 end-proc;
@@ -1095,50 +1095,50 @@ dcl-proc Logger_addAppender export;
     i_pAppender like(LOG4RPG_pAppender_t) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s appName like(LOG4RPG_appenderName_t) inz;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logging is disabled.
-if not Logger_isLogging();
-   return;
-endif;
+  // Return to caller if logging is disabled.
+  if not Logger_isLogging();
+    return;
+  endif;
 
-// Return to caller if logger is NULL
-if Logger_isNull(i_hLogger);
-   return;
-endif;
+  // Return to caller if logger is NULL
+  if Logger_isNull(i_hLogger);
+    return;
+  endif;
 
-if Appender_isNull(i_pAppender);
-   LogLog_warning('Appender is NULL. Please check call from [' +
-                  f_caller() + '] to [' + f_this() + '].');
-   return;
-endif;
+  if Appender_isNull(i_pAppender);
+    LogLog_warning('Appender is NULL. Please check call from [' +
+                   f_caller() + '] to [' + f_this() + '].');
+    return;
+  endif;
 
-appName = Appender_getName(i_pAppender);
+  appName = Appender_getName(i_pAppender);
 
-if AppenderList_isNull(logger.pAppenderList);
-   logger.pAppenderList = AppenderList_new();
-endif;
+  if AppenderList_isNull(logger.pAppenderList);
+    logger.pAppenderList = AppenderList_new();
+  endif;
 
-if Appender_isNull(i_pAppender);
-   LogLog_warning('Appender [' + appName +
-                  '] does not exist in repository.');
-   return;
-endif;
+  if Appender_isNull(i_pAppender);
+    LogLog_warning('Appender [' + appName +
+                   '] does not exist in repository.');
+    return;
+  endif;
 
-if AppenderList_put(logger.pAppenderList: i_pAppender) = 0;
-   LogLog_debug('Appender [' + appName +
-                '] added to logger [' + logger.name + '].');
-else;
-   LogLog_error('Failed to add appender [' + appName +
-                '] to logger [' + logger.name + '].');
-endif;
+  if AppenderList_put(logger.pAppenderList: i_pAppender) = 0;
+    LogLog_debug('Appender [' + appName +
+                 '] added to logger [' + logger.name + '].');
+  else;
+    LogLog_error('Failed to add appender [' + appName +
+                 '] to logger [' + logger.name + '].');
+  endif;
 
-return;
+  return;
 
 
 end-proc;
@@ -1160,32 +1160,32 @@ dcl-proc Logger_removeAppender export;
     i_appName like(LOG4RPG_appenderName_t) const;
   end-pi;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logging is disabled.
-if not Logger_isLogging();
-   if not Repository_isShutdown();
+  // Return to caller if logging is disabled.
+  if not Logger_isLogging();
+    if not Repository_isShutdown();
       return;
-   endif;
-endif;
+    endif;
+  endif;
 
-// Return to caller if logger is NULL
-if Logger_isNull(i_hLogger);
-   return;
-endif;
+  // Return to caller if logger is NULL
+  if Logger_isNull(i_hLogger);
+    return;
+  endif;
 
-if AppenderList_isNull(logger.pAppenderList);
-   return;
-endif;
+  if AppenderList_isNull(logger.pAppenderList);
+    return;
+  endif;
 
-AppenderList_remove(logger.pAppenderList: i_appName);
+  AppenderList_remove(logger.pAppenderList: i_appName);
 
-LogLog_verbose('Appender [' + i_appName +
-               '] removed from logger [' + logger.name + '].');
+  LogLog_verbose('Appender [' + i_appName +
+                 '] removed from logger [' + logger.name + '].');
 
-return;
+  return;
 
 
 end-proc;
@@ -1205,37 +1205,36 @@ dcl-proc Logger_removeAllAppenders export;
     i_hLogger like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Helper fields
-  dcl-ds appIter DS likeds(LOG4RPG_Appender: ListIterator_t) inz;
-  end-ds;
+  //  Helper fields
+  dcl-ds appIter likeds(LOG4RPG_PropertyListIterator_t) inz;
   dcl-s pAppender like(LOG4RPG_pAppender_t) inz;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logging is disabled.
-if not Logger_isLogging();
-   return;
-endif;
+  // Return to caller if logging is disabled.
+  if not Logger_isLogging();
+    return;
+  endif;
 
-// Return to caller if logger is NULL
-if Logger_isNull(i_hLogger);
-   return;
-endif;
+  // Return to caller if logger is NULL
+  if Logger_isNull(i_hLogger);
+    return;
+  endif;
 
-if AppenderList_isNull(logger.pAppenderList);
-   return;
-endif;
+  if AppenderList_isNull(logger.pAppenderList);
+    return;
+  endif;
 
-appIter = AppenderList_getIterator(logger.pAppenderList);
+  appIter = AppenderList_getIterator(logger.pAppenderList);
 
-dow AppenderList_getNumE(logger.pAppenderList) > 0;
-   pAppender = AppenderList_getFirst(appIter);
-   Logger_removeAppender(i_hLogger: Appender_getName(pAppender));
-enddo;
+  dow AppenderList_getNumE(logger.pAppenderList) > 0;
+    pAppender = AppenderList_getFirst(appIter);
+    Logger_removeAppender(i_hLogger: Appender_getName(pAppender));
+  enddo;
 
-return;
+  return;
 
 
 end-proc;
@@ -1255,15 +1254,15 @@ dcl-proc Logger_isNull export;
     i_hLogger like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-p_assert(i_hLogger = *NULL or
-         logger.node = cLOG4RPG_NODE_LOGGER
-         : 'Expected a logger node');
+  p_assert(i_hLogger = *NULL or
+           logger.node = cLOG4RPG_NODE_LOGGER
+           : 'Expected a logger node');
 
-return Node_isNull(i_hLogger);
+  return Node_isNull(i_hLogger);
 
 end-proc;
 
@@ -1279,9 +1278,9 @@ end-proc;
 dcl-proc Logger_null export;
   dcl-pi *n like(LOG4RPG_hLogger_t);
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return *NULL;
+  return *NULL;
 
 end-proc;
 
@@ -1307,23 +1306,23 @@ dcl-proc Logger_setLevel export;
     i_level   like(LOG4RPG_level_t) const;
   end-pi;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logging is disabled.
-if not Logger_isLogging();
-   return;
-endif;
+  // Return to caller if logging is disabled.
+  if not Logger_isLogging();
+    return;
+  endif;
 
-// Return to caller if logger is NULL
-if Logger_isNull(i_hLogger);
-   return;
-endif;
+  // Return to caller if logger is NULL
+  if Logger_isNull(i_hLogger);
+    return;
+  endif;
 
-logger.priority = Level_toInt(f_ucase(i_level));
+  logger.priority = Level_toInt(f_ucase(i_level));
 
-return;
+  return;
 
 
 end-proc;
@@ -1344,23 +1343,23 @@ dcl-proc Logger_resetLevel export;
     i_hLogger like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logging is disabled.
-if not Logger_isLogging();
-   return;
-endif;
+  // Return to caller if logging is disabled.
+  if not Logger_isLogging();
+    return;
+  endif;
 
-// Return to caller if logger is NULL
-if Logger_isNull(i_hLogger);
-   return;
-endif;
+  // Return to caller if logger is NULL
+  if Logger_isNull(i_hLogger);
+    return;
+  endif;
 
-logger.priority = cLOG4RPG_LEVEL_PARENT;
+  logger.priority = cLOG4RPG_LEVEL_PARENT;
 
-return;
+  return;
 
 
 end-proc;
@@ -1384,22 +1383,22 @@ dcl-proc Logger_setInternalDebugging export;
     i_output    like(LOG4RPG_debugOutput_t) options(*nopass) const;
   end-pi;
 
-//  Parameter positions
+  //  Parameter positions
   dcl-c p_output 2;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logging is disabled.
-if not Logger_isLogging();
-   return;
-endif;
+  // Return to caller if logging is disabled.
+  if not Logger_isLogging();
+    return;
+  endif;
 
-if %parms() >= p_output;
-   LogLog_setInternalDebugging(i_debugMode: i_output);
-else;
-   LogLog_setInternalDebugging(i_debugMode);
-endif;
+  if %parms() >= p_output;
+    LogLog_setInternalDebugging(i_debugMode: i_output);
+  else;
+    LogLog_setInternalDebugging(i_debugMode);
+  endif;
 
-return;
+  return;
 
 
 end-proc;
@@ -1416,14 +1415,14 @@ end-proc;
 dcl-proc Logger_getInternalDebugMode export;
   dcl-pi *n like(LOG4RPG_debugMode_t);
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logging is disabled.
-if not Logger_isLogging();
-   return '';
-endif;
+  // Return to caller if logging is disabled.
+  if not Logger_isLogging();
+    return '';
+  endif;
 
-return LogLog_getInternalDebugMode();
+  return LogLog_getInternalDebugMode();
 
 
 end-proc;
@@ -1440,14 +1439,14 @@ end-proc;
 dcl-proc Logger_getInternalDebugOutput export;
   dcl-pi *n like(LOG4RPG_debugOutput_t);
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logging is disabled.
-if not Logger_isLogging();
-   return '';
-endif;
+  // Return to caller if logging is disabled.
+  if not Logger_isLogging();
+    return '';
+  endif;
 
-return LogLog_getInternalDebugOutput();
+  return LogLog_getInternalDebugOutput();
 
 
 end-proc;
@@ -1468,22 +1467,22 @@ dcl-proc Logger_new export;
     i_logName like(LOG4RPG_loggerName_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s hLogger like(LOG4RPG_hLogger_t) inz;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(hLogger);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-LogLog_debug('Creating logger [' + i_logName + '] ...');
+  LogLog_debug('Creating logger [' + i_logName + '] ...');
 
-hLogger = %alloc(%size(LOG4RPG_logger_t));
+  hLogger = %alloc(%size(LOG4RPG_logger_t));
 
-initializeLoggerHandle(logger: i_logName);
+  initializeLoggerHandle(logger: i_logName);
 
-LogLog_verbose('+ Allocated memory for logger [' + logger.name + ']');
+  LogLog_verbose('+ Allocated memory for logger [' + logger.name + ']');
 
-return hLogger;
+  return hLogger;
 
 
 end-proc;
@@ -1504,30 +1503,30 @@ dcl-proc Logger_delete export;
     io_hLogger like(LOG4RPG_hLogger_t);
   end-pi;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(io_hLogger);
 
-//  Helper fields
+  //  Helper fields
   dcl-s name like(logger.name) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if not Repository_existLogger(logger.name);
-   io_hLogger = Logger_null();
-   return;
-endif;
+  if not Repository_existLogger(logger.name);
+    io_hLogger = Logger_null();
+    return;
+  endif;
 
-LogLog_verbose('Deleting logger [' + logger.name + '] ...');
+  LogLog_verbose('Deleting logger [' + logger.name + '] ...');
 
-name = logger.name;
+  name = logger.name;
 
-deleteLogger(io_hLogger);
+  deleteLogger(io_hLogger);
 
-dealloc(N) io_hLogger;
-io_hLogger = Logger_null();
+  dealloc(N) io_hLogger;
+  io_hLogger = Logger_null();
 
-LogLog_verbose('- Freed memory of logger [' + name + ']');
+  LogLog_verbose('- Freed memory of logger [' + name + ']');
 
-return;
+  return;
 
 
 end-proc;
@@ -1552,21 +1551,21 @@ dcl-proc Logger_addChild export;
     i_hChild  like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s index int(10) inz(-1);
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(hLogger);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-hLogger = i_hLogger;
+  hLogger = i_hLogger;
 
-p_assert(logger.node = cLOG4RPG_NODE_LOGGER
-         : 'Expected a logger node');
+  p_assert(logger.node = cLOG4RPG_NODE_LOGGER
+           : 'Expected a logger node');
 
-index = Node_addChild(i_hLogger: i_hChild);
+  index = Node_addChild(i_hLogger: i_hChild);
 
-return index;
+  return index;
 
 end-proc;
 
@@ -1588,23 +1587,23 @@ dcl-proc Logger_setParent export;
     i_hParent like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
   dcl-ds parent likeds(LOG4RPG_logger_t) based(i_hParent);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-p_assert(logger.node = cLOG4RPG_NODE_LOGGER
-         : 'Expected a logger node');
+  p_assert(logger.node = cLOG4RPG_NODE_LOGGER
+           : 'Expected a logger node');
 
-Node_setParent(i_hLogger: i_hParent);
+  Node_setParent(i_hLogger: i_hParent);
 
-if not Logger_isNull(i_hParent);
-   LogLog_verbose('Set parent of logger [' + logger.name + '] to ' +
-                                       '[' + parent.name + ']');
-else;
-   LogLog_verbose('Set parent of logger [' + logger.name + '] to ' +
-                                       '[' + '*NULL'     + ']');
-endif;
+  if not Logger_isNull(i_hParent);
+    LogLog_verbose('Set parent of logger [' + logger.name + '] to ' +
+                                        '[' + parent.name + ']');
+  else;
+    LogLog_verbose('Set parent of logger [' + logger.name + '] to ' +
+                                        '[' + '*NULL'     + ']');
+  endif;
 
 
 end-proc;
@@ -1625,11 +1624,11 @@ dcl-proc Logger_getParent export;
     i_hLogger like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return Node_getParent(i_hLogger);
+  return Node_getParent(i_hLogger);
 
 
 end-proc;
@@ -1649,18 +1648,18 @@ dcl-proc Node_getName export;
     i_hNode like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds node likeds(LOG4RPG_logger_t) based(hNode);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logger is NULL
-if Node_isNull(i_hNode);
-   return '';
-endif;
+  // Return to caller if logger is NULL
+  if Node_isNull(i_hNode);
+    return '';
+  endif;
 
-hNode = i_hNode;
+  hNode = i_hNode;
 
-return node.name;
+  return node.name;
 
 end-proc;
 
@@ -1682,20 +1681,20 @@ dcl-proc Node_isProvisionNode export;
     i_hNode like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hNode);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logger is NULL
-if Node_isNull(i_hNode);
-   return *off;
-else;
-   if logger.node <> cLOG4RPG_NODE_PROVISION;
+  // Return to caller if logger is NULL
+  if Node_isNull(i_hNode);
+    return *off;
+  else;
+    if logger.node <> cLOG4RPG_NODE_PROVISION;
       return *off;
-   endif;
-endif;
+    endif;
+  endif;
 
-return *on;
+  return *on;
 
 
 end-proc;
@@ -1718,20 +1717,20 @@ dcl-proc Node_isLoggerNode export;
     i_hNode like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hNode);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logger is NULL
-if Node_isNull(i_hNode);
-   return *off;
-else;
-   if logger.node <> cLOG4RPG_NODE_LOGGER;
+  // Return to caller if logger is NULL
+  if Node_isNull(i_hNode);
+    return *off;
+  else;
+    if logger.node <> cLOG4RPG_NODE_LOGGER;
       return *off;
-   endif;
-endif;
+    endif;
+  endif;
 
-return *on;
+  return *on;
 
 
 end-proc;
@@ -1753,26 +1752,26 @@ dcl-proc Node_getNumChildren export;
     i_hNode like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s numChildren int(10) inz(-1);
 
-//  Logger handle
+  //  Logger handle
   dcl-ds node likeds(LOG4RPG_logger_t) based(pNode);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-pNode = i_hNode;
+  pNode = i_hNode;
 
-p_assert(node.node = cLOG4RPG_NODE_PROVISION or
-         node.node = cLOG4RPG_NODE_LOGGER
-         : 'Expected a provision or logger node');
+  p_assert(node.node = cLOG4RPG_NODE_PROVISION or
+           node.node = cLOG4RPG_NODE_LOGGER
+           : 'Expected a provision or logger node');
 
-if BasicList_isNull(node.pChildren);
-   numChildren = 0;
-else;
-   numChildren = BasicList_getNumE(node.pChildren);
-endif;
+  if BasicList_isNull(node.pChildren);
+    numChildren = 0;
+  else;
+    numChildren = BasicList_getNumE(node.pChildren);
+  endif;
 
-return numChildren;
+  return numChildren;
 
 end-proc;
 
@@ -1793,22 +1792,22 @@ dcl-proc Node_getChild export;
     i_index int(10) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s hChild like(LOG4RPG_hLogger_t) inz;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(pLogger);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-pLogger = i_hNode;
+  pLogger = i_hNode;
 
-p_assert(logger.node = cLOG4RPG_NODE_PROVISION or
-         logger.node = cLOG4RPG_NODE_LOGGER
-         : 'Expected a provision or logger node');
+  p_assert(logger.node = cLOG4RPG_NODE_PROVISION or
+           logger.node = cLOG4RPG_NODE_LOGGER
+           : 'Expected a provision or logger node');
 
-hChild = BasicList_getPointer(logger.pChildren: i_index);
+  hChild = BasicList_getPointer(logger.pChildren: i_index);
 
-return hChild;
+  return hChild;
 
 end-proc;
 
@@ -1830,21 +1829,21 @@ dcl-proc Node_addChild export;
     i_hChild like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s index int(10) inz(-1);
 
-//  Logger handle
+  //  Logger handle
   dcl-ds node likeds(LOG4RPG_logger_t) based(pNode);
   dcl-ds child likeds(LOG4RPG_logger_t) based(pChild);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-pNode = i_hNode;
-pChild = i_hChild;
+  pNode = i_hNode;
+  pChild = i_hChild;
 
-index = BasicList_addPointer(node.pChildren: i_hChild);
-Node_setParent(i_hChild: i_hNode);
+  index = BasicList_addPointer(node.pChildren: i_hChild);
+  Node_setParent(i_hChild: i_hNode);
 
-return index;
+  return index;
 
 end-proc;
 
@@ -1865,15 +1864,15 @@ dcl-proc Node_setParent export;
     i_hParent like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds node likeds(LOG4RPG_logger_t) based(pNode);
   dcl-ds parent likeds(LOG4RPG_logger_t) based(pParent);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-pNode = i_hNode;
-pParent = i_hParent;
+  pNode = i_hNode;
+  pParent = i_hParent;
 
-node.pParent = i_hParent;
+  node.pParent = i_hParent;
 
 end-proc;
 
@@ -1892,11 +1891,11 @@ dcl-proc Node_getParent export;
     i_hNode like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds node likeds(LOG4RPG_logger_t) based(i_hNode);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return node.pParent;
+  return node.pParent;
 
 end-proc;
 
@@ -1917,28 +1916,28 @@ dcl-proc Node_removeChild export;
     i_index int(10) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s rc int(10) inz(-1);
 
-//  Logger handle
+  //  Logger handle
   dcl-ds node likeds(LOG4RPG_logger_t) based(hNode);
   dcl-ds child likeds(LOG4RPG_logger_t) based(hChild);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-hNode = i_hNode;
+  hNode = i_hNode;
 
-p_assert(node.node = cLOG4RPG_NODE_PROVISION or
-         node.node = cLOG4RPG_NODE_LOGGER
-         : 'Expected provision or logger nodes');
+  p_assert(node.node = cLOG4RPG_NODE_PROVISION or
+           node.node = cLOG4RPG_NODE_LOGGER
+           : 'Expected provision or logger nodes');
 
-hChild = BasicList_getPointer(node.pChildren: i_index);
+  hChild = BasicList_getPointer(node.pChildren: i_index);
 
-if (BasicList_remove(node.pChildren: i_index) = 0);
-   Node_setParent(hChild: Logger_null());
-   rc = 0;
-endif;
+  if (BasicList_remove(node.pChildren: i_index) = 0);
+    Node_setParent(hChild: Logger_null());
+    rc = 0;
+  endif;
 
-return rc;
+  return rc;
 
 
 end-proc;
@@ -1960,33 +1959,33 @@ dcl-proc Node_findChild export;
     i_hChild like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s numChildren int(10) inz;
   dcl-s x int(10) inz;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds node likeds(LOG4RPG_logger_t) based(hNode);
   dcl-ds child likeds(LOG4RPG_logger_t) based(hChild);
   dcl-ds curChild likeds(LOG4RPG_logger_t) based(hCurChild);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-hNode = i_hNode;
-hChild = i_hChild;
+  hNode = i_hNode;
+  hChild = i_hChild;
 
-p_assert(node.node = cLOG4RPG_NODE_PROVISION or
-         node.node = cLOG4RPG_NODE_LOGGER
-         : 'Expected a provision or logger node');
+  p_assert(node.node = cLOG4RPG_NODE_PROVISION or
+           node.node = cLOG4RPG_NODE_LOGGER
+           : 'Expected a provision or logger node');
 
-numChildren = BasicList_getNumE(node.pChildren);
+  numChildren = BasicList_getNumE(node.pChildren);
 
-for x = 1 to numChildren;
-   hCurChild = BasicList_getPointer(node.pChildren: x);
-   if (hCurChild = i_hChild);
+  for x = 1 to numChildren;
+    hCurChild = BasicList_getPointer(node.pChildren: x);
+    if (hCurChild = i_hChild);
       return x;
-   endif;
-endfor;
+    endif;
+  endfor;
 
-return -1;
+  return -1;
 
 
 end-proc;
@@ -2005,15 +2004,15 @@ dcl-proc Node_isNull export;
     i_hNode like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds node likeds(LOG4RPG_logger_t) based(i_hNode);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if i_hNode = Node_null();
-   return *on;
-endif;
+  if i_hNode = Node_null();
+    return *on;
+  endif;
 
-return *off;
+  return *off;
 
 end-proc;
 
@@ -2029,9 +2028,9 @@ end-proc;
 dcl-proc Node_null export;
   dcl-pi *n like(LOG4RPG_hLogger_t);
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return *NULL;
+  return *NULL;
 
 end-proc;
 
@@ -2049,60 +2048,59 @@ dcl-proc Node_toString export;
     i_hNode like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s desc varchar(117) inz;
   dcl-s appenders varchar(117) inz;
 
-//  Helper fields
+  //  Helper fields
   dcl-s priority like(node.priority);
   dcl-s pAppenderList like(LOG4RPG_pAppenderList_t) inz;
-  dcl-ds appIter DS likeds(LOG4RPG_Appender: ListIterator_t) inz;
-  end-ds;
+  dcl-ds appIter likeds(LOG4RPG_PropertyListIterator_t) inz;
   dcl-s pAppender like(LOG4RPG_pAppender_t) inz;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds node likeds(LOG4RPG_logger_t) based(i_hNode);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-select;
-when Node_isLoggerNode(i_hNode);
-   priority = getPriorityFromHierarchy(i_hNode);
-   desc = 'Logger:' + Node_getName(i_hNode);
-when Node_isProvisionNode(i_hNode);
-   priority = getPriorityFromHierarchy(i_hNode);
-   desc = 'ProvNode:' + Node_getName(i_hNode);
-other;
-   priority = -1;
-   desc = '*** Unknown node type ***';
-endsl;
+  select;
+  when Node_isLoggerNode(i_hNode);
+    priority = getPriorityFromHierarchy(i_hNode);
+    desc = 'Logger:' + Node_getName(i_hNode);
+  when Node_isProvisionNode(i_hNode);
+    priority = getPriorityFromHierarchy(i_hNode);
+    desc = 'ProvNode:' + Node_getName(i_hNode);
+  other;
+    priority = -1;
+    desc = '*** Unknown node type ***';
+  endsl;
 
-if (priority = -1);
-   return desc;
-endif;
+  if (priority = -1);
+    return desc;
+  endif;
 
-desc += ' [' + Level_toString(priority) + ']';
+  desc += ' [' + Level_toString(priority) + ']';
 
-pAppenderList = getAppenderListFromHierarchy(i_hNode);
-if AppenderList_isNull(pAppenderList);
-   return desc;
-endif;
+  pAppenderList = getAppenderListFromHierarchy(i_hNode);
+  if AppenderList_isNull(pAppenderList);
+    return desc;
+  endif;
 
-appIter = AppenderList_getIterator(pAppenderList);
-pAppender = AppenderList_getFirst(appIter);
+  appIter = AppenderList_getIterator(pAppenderList);
+  pAppender = AppenderList_getFirst(appIter);
 
-dow (not Appender_isNull(pAppender));
-   if (appenders = '');
+  dow (not Appender_isNull(pAppender));
+    if (appenders = '');
       appenders = '; ';
-   else;
+    else;
       appenders += ',';
-   endif;
-   appenders += Appender_getName(pAppender);
-   pAppender = AppenderList_getNext(appIter);
-enddo;
+    endif;
+    appenders += Appender_getName(pAppender);
+    pAppender = AppenderList_getNext(appIter);
+  enddo;
 
-desc += appenders;
+  desc += appenders;
 
-return desc;
+  return desc;
 
 end-proc;
 
@@ -2124,19 +2122,19 @@ dcl-proc ProvisionNode_getNumChildren export;
     i_hProvNode like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s numChildren int(10) inz(-1);
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hProvNode);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-p_assert(logger.node = cLOG4RPG_NODE_PROVISION
-         : 'Expected a provision node');
+  p_assert(logger.node = cLOG4RPG_NODE_PROVISION
+           : 'Expected a provision node');
 
-numChildren = Node_getNumChildren(i_hProvNode);
+  numChildren = Node_getNumChildren(i_hProvNode);
 
-return numChildren;
+  return numChildren;
 
 
 end-proc;
@@ -2161,22 +2159,22 @@ dcl-proc ProvisionNode_addChild export;
     i_hChild    like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s index int(10) inz(-1);
 
-//  Helper fields
+  //  Helper fields
   dcl-s hChild like(i_hChild);
 
-//  Logger handle
+  //  Logger handle
   dcl-ds provNode likeds(LOG4RPG_logger_t) based(i_hProvNode);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-p_assert(provNode.node = cLOG4RPG_NODE_PROVISION
-         : 'Expected a provision node');
+  p_assert(provNode.node = cLOG4RPG_NODE_PROVISION
+           : 'Expected a provision node');
 
-index = Node_addChild(i_hProvNode: i_hChild);
+  index = Node_addChild(i_hProvNode: i_hChild);
 
-return index;
+  return index;
 
 
 end-proc;
@@ -2200,19 +2198,19 @@ dcl-proc ProvisionNode_getChild export;
     i_index     int(10) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s hChild like(LOG4RPG_hLogger_t) inz;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hProvNode);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-p_assert(logger.node = cLOG4RPG_NODE_PROVISION
-         : 'Expected a provision node');
+  p_assert(logger.node = cLOG4RPG_NODE_PROVISION
+           : 'Expected a provision node');
 
-hChild = Node_getChild(i_hProvNode: i_index);
+  hChild = Node_getChild(i_hProvNode: i_index);
 
-return hChild;
+  return hChild;
 
 
 end-proc;
@@ -2236,19 +2234,19 @@ dcl-proc ProvisionNode_removeChild export;
     i_index     int(10) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s rc int(10) inz(-1);
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hProvNode);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-p_assert(logger.node = cLOG4RPG_NODE_PROVISION
-         : 'Expected provision node only');
+  p_assert(logger.node = cLOG4RPG_NODE_PROVISION
+           : 'Expected provision node only');
 
-rc = Node_removeChild(i_hProvNode: i_index);
+  rc = Node_removeChild(i_hProvNode: i_index);
 
-return rc;
+  return rc;
 
 
 end-proc;
@@ -2270,28 +2268,28 @@ dcl-proc ProvisionNode_setParent export;
     i_hParent   like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds provNode likeds(LOG4RPG_logger_t) based(hProvNode);
   dcl-ds parent likeds(LOG4RPG_logger_t) based(hParent);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-hProvNode = i_hProvNode;
-hParent = i_hParent;
+  hProvNode = i_hProvNode;
+  hParent = i_hParent;
 
-p_assert(provNode.node = cLOG4RPG_NODE_PROVISION
-         : 'Expected a provision node');
+  p_assert(provNode.node = cLOG4RPG_NODE_PROVISION
+           : 'Expected a provision node');
 
-Node_setParent(i_hProvNode: i_hParent);
+  Node_setParent(i_hProvNode: i_hParent);
 
-if not Logger_isNull(i_hParent);
-   LogLog_verbose('Set parent of provision node [' +
-                                           provNode.name + '] to ' +
-                                     '[' + parent.name   + ']');
-else;
-   LogLog_verbose('Set parent of provision node [' +
-                                           provNode.name + '] to ' +
-                                       '[' + '*NULL'     + ']');
-endif;
+  if not Logger_isNull(i_hParent);
+    LogLog_verbose('Set parent of provision node [' +
+                                            provNode.name + '] to ' +
+                                      '[' + parent.name   + ']');
+  else;
+    LogLog_verbose('Set parent of provision node [' +
+                                            provNode.name + '] to ' +
+                                        '[' + '*NULL'     + ']');
+  endif;
 
 end-proc;
 
@@ -2309,9 +2307,9 @@ dcl-proc ProvisionNode_getParent export;
   dcl-pi *n like(LOG4RPG_hLogger_t);
     i_hProvNode like(LOG4RPG_hLogger_t) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return Node_getParent(i_hProvNode);
+  return Node_getParent(i_hProvNode);
 
 end-proc;
 
@@ -2333,26 +2331,26 @@ dcl-proc ProvisionNode_makeProvisionNode export;
     i_hChild   like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-ds provNode likeds(LOG4RPG_logger_t) based(hProvNode);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-LogLog_verbose('Creating provision node [' + i_nodeName + '] ...');
+  LogLog_verbose('Creating provision node [' + i_nodeName + '] ...');
 
-hProvNode = Logger_null();
+  hProvNode = Logger_null();
 
-hProvNode = %alloc(%size(LOG4RPG_logger_t));
+  hProvNode = %alloc(%size(LOG4RPG_logger_t));
 
-clearHandleData(provNode);
+  clearHandleData(provNode);
 
-initializeProvisionNodeHandle(provNode: i_nodeName);
+  initializeProvisionNodeHandle(provNode: i_nodeName);
 
-ProvisionNode_addChild(hProvNode: i_hChild);
+  ProvisionNode_addChild(hProvNode: i_hChild);
 
-LogLog_verbose('+ Allocated memory for provision node [' +
-                i_nodeName + ']');
+  LogLog_verbose('+ Allocated memory for provision node [' +
+                  i_nodeName + ']');
 
-return hProvNode;
+  return hProvNode;
 
 
 end-proc;
@@ -2373,38 +2371,38 @@ dcl-proc ProvisionNode_free export;
     io_hProvNode like(LOG4RPG_hLogger_t);
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s nodeName like(LOG4RPG_loggerName_t) inz;
 
-//  Node handle
+  //  Node handle
   dcl-ds provNode likeds(LOG4RPG_logger_t) based(io_hProvNode);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if not Node_isProvisionNode(io_hProvNode);
-   LogLog_error('Illegal node type passed to ' + f_this() +
-                ': [' + provNode.name + '('
-                      + %char(provNode.node) + ')] ...');
-endif;
+  if not Node_isProvisionNode(io_hProvNode);
+    LogLog_error('Illegal node type passed to ' + f_this() +
+                 ': [' + provNode.name + '('
+                       + %char(provNode.node) + ')] ...');
+  endif;
 
-LogLog_verbose('Deleting provision node [' +
-                provNode.name + '] ...');
+  LogLog_verbose('Deleting provision node [' +
+                  provNode.name + '] ...');
 
-nodeName = provNode.name;
+  nodeName = provNode.name;
 
-p_assert(provNode.pAppenderList = AppenderList_null()
-         : 'Did not expect appender list on logger [' +
-            nodeName + ']');
+  p_assert(provNode.pAppenderList = AppenderList_null()
+           : 'Did not expect appender list on logger [' +
+              nodeName + ']');
 
-BasicList_delete(provNode.pChildren);
+  BasicList_delete(provNode.pChildren);
 
-clearHandleData(provNode);
+  clearHandleData(provNode);
 
-dealloc(N) io_hProvNode;
-io_hProvNode = Logger_null();
+  dealloc(N) io_hProvNode;
+  io_hProvNode = Logger_null();
 
-LogLog_verbose('- Free memory of provision node [' + nodeName + ']');
+  LogLog_verbose('- Free memory of provision node [' + nodeName + ']');
 
-return;
+  return;
 
 
 end-proc;
@@ -2427,41 +2425,41 @@ dcl-proc ProvisionNode_moveChildren export;
     i_hLogger   like(LOG4RPG_hLogger_t);
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-ds clone likeds(LOG4RPG_logger_t) based(hClone);
 
-//  Hellper fields
+  //  Hellper fields
   dcl-s x int(10) inz;
   dcl-s numChildren int(10) inz;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds provNode likeds(LOG4RPG_logger_t) based(hProvNode);
   dcl-ds logger likeds(LOG4RPG_logger_t) based(hLogger);
   dcl-ds child likeds(LOG4RPG_logger_t) based(hChild);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-hProvNode = i_hProvNode;
-hLogger = i_hLogger;
+  hProvNode = i_hProvNode;
+  hLogger = i_hLogger;
 
 
-p_assert(provNode.node = cLOG4RPG_NODE_PROVISION
-         : 'Expected a provision node');
-p_assert(logger.node = cLOG4RPG_NODE_LOGGER
-         : 'Expected a logger node');
-p_assert(BasicList_getNumE(logger.pChildren) = 0:
-         'Logger must not yet have any hildren');
+  p_assert(provNode.node = cLOG4RPG_NODE_PROVISION
+           : 'Expected a provision node');
+  p_assert(logger.node = cLOG4RPG_NODE_LOGGER
+           : 'Expected a logger node');
+  p_assert(BasicList_getNumE(logger.pChildren) = 0:
+           'Logger must not yet have any hildren');
 
-numChildren = BasicList_getNumE(provNode.pChildren);
-for x = numChildren downto 1;
-   hChild = BasicList_getPointer(provNode.pChildren: x);
-   ProvisionNode_removeChild(i_hProvNode: x);
-   Logger_addChild(i_hLogger: hChild);
-endfor;
+  numChildren = BasicList_getNumE(provNode.pChildren);
+  for x = numChildren downto 1;
+    hChild = BasicList_getPointer(provNode.pChildren: x);
+    ProvisionNode_removeChild(i_hProvNode: x);
+    Logger_addChild(i_hLogger: hChild);
+  endfor;
 
-p_assert(BasicList_getNumE(provNode.pChildren) = 0:
-         'Provision node must not have any hildren');
-p_assert(BasicList_getNumE(logger.pChildren) = numChildren:
-         'Logger must have ' + %char(numChildren) + ' any children');
+  p_assert(BasicList_getNumE(provNode.pChildren) = 0:
+           'Provision node must not have any hildren');
+  p_assert(BasicList_getNumE(logger.pChildren) = numChildren:
+           'Logger must have ' + %char(numChildren) + ' any children');
 
 end-proc;
 
@@ -2479,15 +2477,15 @@ dcl-proc ProvisionNode_isNull export;
     i_hProvNode like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds provNode likeds(LOG4RPG_logger_t) based(i_hProvNode);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-p_assert(i_hProvNode = *NULL or
-         provNode.node = cLOG4RPG_NODE_PROVISION
-         : 'Expected a provision node');
+  p_assert(i_hProvNode = *NULL or
+           provNode.node = cLOG4RPG_NODE_PROVISION
+           : 'Expected a provision node');
 
-return Node_isNull(i_hProvNode);
+  return Node_isNull(i_hProvNode);
 
 end-proc;
 
@@ -2503,9 +2501,9 @@ end-proc;
 dcl-proc ProvisionNode_null export;
   dcl-pi *n like(LOG4RPG_hLogger_t);
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return Node_null();
+  return Node_null();
 
 end-proc;
 
@@ -2518,12 +2516,12 @@ dcl-proc clearHandleData;
     io_logger likeds(LOG4RPG_logger_t);
   end-pi;
 
-//  Return value
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  //  Return value
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-clear io_logger;
+  clear io_logger;
 
-return;
+  return;
 
 
 end-proc;
@@ -2537,30 +2535,29 @@ dcl-proc deleteLogger;
     i_hLogger like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s logName like(LOG4RPG_loggerName_t) inz;
-  dcl-ds appIter DS likeds(LOG4RPG_Appender: ListIterator_t) inz;
-  end-ds;
+  dcl-ds appIter likeds(LOG4RPG_PropertyListIterator_t) inz;
   dcl-s pAppender like(LOG4RPG_pAppender_t) inz;
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-logName = logger.name;
+  logName = logger.name;
 
-if logger.pAppenderList <> AppenderList_null();
-   appIter = AppenderList_getIterator(logger.pAppenderList);
+  if logger.pAppenderList <> AppenderList_null();
+    appIter = AppenderList_getIterator(logger.pAppenderList);
 
-   dow AppenderList_getNumE(logger.pAppenderList) > 0;
+    dow AppenderList_getNumE(logger.pAppenderList) > 0;
       pAppender = AppenderList_getFirst(appIter);
       Logger_removeAppender(i_hLogger: Appender_getName(pAppender));
-   enddo;
+    enddo;
 
-   AppenderList_delete(logger.pAppenderList);
-endif;
+    AppenderList_delete(logger.pAppenderList);
+  endif;
 
-clearHandleData(logger);
+  clearHandleData(logger);
 
-return;
+  return;
 
 
 end-proc;
@@ -2574,29 +2571,29 @@ dcl-proc isLoggingEnabled;
     i_hLogger like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return to caller if logging is disabled.
-if not Logger_isLogging();
-   return *off;
-endif;
+  // Return to caller if logging is disabled.
+  if not Logger_isLogging();
+    return *off;
+  endif;
 
-// Return to caller if logger is NULL
-if Logger_isNull(i_hLogger);
-   return *off;
-endif;
+  // Return to caller if logger is NULL
+  if Logger_isNull(i_hLogger);
+    return *off;
+  endif;
 
-// Reload properties (if reloading has been enabled)
-Configurator_checkAndReloadPropertiesConfiguration();
+  // Reload properties (if reloading has been enabled)
+  Configurator_checkAndReloadPropertiesConfiguration();
 
-// Return to caller if logger does not exist
-if not Repository_existLogger(logger.name);
-   return *off;
-endif;
+  // Return to caller if logger does not exist
+  if not Repository_existLogger(logger.name);
+    return *off;
+  endif;
 
-return *on;
+  return *on;
 
 
 end-proc;
@@ -2610,21 +2607,21 @@ dcl-proc getPriorityFromHierarchy;
     i_hLogger like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-ds logger likeds(LOG4RPG_logger_t) based(pLogger);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-pLogger = i_hLogger;
+  pLogger = i_hLogger;
 
-dow logger.priority = cLOG4RPG_LEVEL_PARENT;
-   if logger.pParent = Logger_null();
+  dow logger.priority = cLOG4RPG_LEVEL_PARENT;
+    if logger.pParent = Logger_null();
       return cLOG4RPG_PRIORITY_NONE;
       leave;
-   endif;
-   pLogger = logger.pParent;
-enddo;
+    endif;
+    pLogger = logger.pParent;
+  enddo;
 
-return logger.priority;
+  return logger.priority;
 
 
 end-proc;
@@ -2642,10 +2639,10 @@ dcl-proc logLoggingEvent;
     i_errMsg   likeds(msg_t) options(*nopass) const;
   end-pi;
 
-//  Parameter positions
+  //  Parameter positions
   dcl-c p_errMsg 5;
 
-//  Helper fields
+  //  Helper fields
   dcl-s isMsgRtvErr ind inz(*off);
   dcl-s msgRtvErrText char(128) inz;
 
@@ -2655,40 +2652,39 @@ dcl-proc logLoggingEvent;
   dcl-s pAppender like(LOG4RPG_pAppender_t) inz;
   dcl-s pLogEvent like(LOG4RPG_pLogEvent_t) inz;
 
-  dcl-ds appIter DS likeds(LOG4RPG_Appender: ListIterator_t) inz;
-  end-ds;
+  dcl-ds appIter likeds(LOG4RPG_PropertyListIterator_t) inz;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds logger likeds(LOG4RPG_logger_t) based(i_hLogger);
 
-//  Structure for message data of CPF2419
+  //  Structure for message data of CPF2419
   dcl-ds CPF2419 qualified;
     msgID   char(7);
     msgF    char(10);
     msgFLib char(10);
   end-ds;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-pAppenderList = getAppenderListFromHierarchy(i_hLogger);
-if AppenderList_isNull(pAppenderList);
-   if (logger.name = cROOT_LOGGER) and not g_warnRootNoAppender;
+  pAppenderList = getAppenderListFromHierarchy(i_hLogger);
+  if AppenderList_isNull(pAppenderList);
+    if (logger.name = cROOT_LOGGER) and not g_warnRootNoAppender;
       LogLog_warning('No appenders could be found for logger [root]');
       LogLog_warning('Please initialize the log4rpg system properly.');
       g_warnRootNoAppender = *on;
-   endif;
-   return;
-endif;
+    endif;
+    return;
+  endif;
 
-appIter = AppenderList_getIterator(pAppenderList);
-pAppender = AppenderList_getFirst(appIter);
+  appIter = AppenderList_getIterator(pAppenderList);
+  pAppender = AppenderList_getFirst(appIter);
 
-pLogEvent = LogEvent_new(logger.name
-                         : i_priority
-                         : ''
-                         : i_caller);
+  pLogEvent = LogEvent_new(logger.name
+                           : i_priority
+                           : ''
+                           : i_caller);
 
-if (%parms() >= p_errMsg);
-   if (i_errMsg.ID = 'CPF2419');
+  if (%parms() >= p_errMsg);
+    if (i_errMsg.ID = 'CPF2419');
       CPF2419 = i_errMsg.data;
       msgRtvErrText = 'Unable to retrieve message description of +
                        message ' + CPF2419.msgID +
@@ -2697,31 +2693,31 @@ if (%parms() >= p_errMsg);
                        %trim(CPF2419.msgF);
       LogLog_error(msgRtvErrText);
       isMsgRtvErr = *on;
-   endif;
-endif;
+    endif;
+  endif;
 
-dow not Appender_isNull(pAppender);
+  dow not Appender_isNull(pAppender);
 
-   if (isMsgRtvErr);
+    if (isMsgRtvErr);
       LogEvent_setText(pLogEvent: msgRtvErrText);
-   else;
+    else;
       LogEvent_setText(pLogEvent: i_text);
-   endif;
+    endif;
 
-   Appender_doAppend(pAppender: pLogEvent);
-   pAppender = AppenderList_getNext(appIter);
+    Appender_doAppend(pAppender: pLogEvent);
+    pAppender = AppenderList_getNext(appIter);
 
-   pPropList = LogEvent_getPropertyList(pLogEvent);
-   if not PropertyList_isNull(pPropList);
+    pPropList = LogEvent_getPropertyList(pLogEvent);
+    if not PropertyList_isNull(pPropList);
       PropertyList_clear(pPropList);
       LogLog_verbose('> Cleared property list of log event');
-   endif;
+    endif;
 
-enddo;
+  enddo;
 
-LogEvent_delete(pLogEvent);
+  LogEvent_delete(pLogEvent);
 
-return;
+  return;
 
 
 end-proc;
@@ -2735,21 +2731,21 @@ dcl-proc getAppenderListFromHierarchy;
     i_hLogger like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-ds logger likeds(LOG4RPG_logger_t) based(pLogger);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-pLogger = i_hLogger;
+  pLogger = i_hLogger;
 
-dow logger.pAppenderList = AppenderList_null();
-   if logger.pParent = Logger_null();
+  dow logger.pAppenderList = AppenderList_null();
+    if logger.pParent = Logger_null();
       return AppenderList_null();
       leave;
-   endif;
-   pLogger = logger.pParent;
-enddo;
+    endif;
+    pLogger = logger.pParent;
+  enddo;
 
-return logger.pAppenderList;
+  return logger.pAppenderList;
 
 
 end-proc;
@@ -2769,22 +2765,22 @@ dcl-proc initializeLoggerHandle;
     io_logger likeds(LOG4RPG_logger_t);
     i_logName like(LOG4RPG_loggerName_t) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-clearHandleData(io_logger);
+  clearHandleData(io_logger);
 
-io_logger.node         = cLOG4RPG_NODE_LOGGER;  // Logger node
-io_logger.pParent      = Logger_null();         // Parent logger
-io_logger.name         = i_logName;             // Logger name
-io_logger.priority     = cLOG4RPG_LEVEL_PARENT; // Use log level of parent logger
-io_logger.pAppenderList= AppenderList_null();   // Appender list
-io_logger.pChildren    = BasicList_new('*CHILDREN');// Children of logger node
+  io_logger.node         = cLOG4RPG_NODE_LOGGER;  // Logger node
+  io_logger.pParent      = Logger_null();         // Parent logger
+  io_logger.name         = i_logName;             // Logger name
+  io_logger.priority     = cLOG4RPG_LEVEL_PARENT; // Use log level of parent logger
+  io_logger.pAppenderList= AppenderList_null();   // Appender list
+  io_logger.pChildren    = BasicList_new('*CHILDREN');// Children of logger node
 
-if i_logName = cROOT_LOGGER;
-   io_logger.priority = Level_toInt(cLOG4RPG_LEVEL_DEBUG);
-endif;
+  if i_logName = cROOT_LOGGER;
+    io_logger.priority = Level_toInt(cLOG4RPG_LEVEL_DEBUG);
+  endif;
 
-return;
+  return;
 
 
 end-proc;
@@ -2798,18 +2794,18 @@ dcl-proc initializeProvisionNodeHandle;
     io_provNode likeds(LOG4RPG_logger_t);
     i_nodeName  like(LOG4RPG_loggerName_t) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-clearHandleData(io_provNode);
+  clearHandleData(io_provNode);
 
-io_provNode.node         = cLOG4RPG_NODE_PROVISION; // Provision node
-io_provNode.pParent      = Logger_null();           // No parent logger
-io_provNode.name         = i_nodeName;              // Node name
-io_provNode.priority     = cLOG4RPG_LEVEL_PARENT;   // Use log level of parent logg
-io_provNode.pAppenderList= AppenderList_null();     // No Appender list
-io_provNode.pChildren    = BasicList_new('*CHILDREN');// Children of provision node
+  io_provNode.node         = cLOG4RPG_NODE_PROVISION; // Provision node
+  io_provNode.pParent      = Logger_null();           // No parent logger
+  io_provNode.name         = i_nodeName;              // Node name
+  io_provNode.priority     = cLOG4RPG_LEVEL_PARENT;   // Use log level of parent logg
+  io_provNode.pAppenderList= AppenderList_null();     // No Appender list
+  io_provNode.pChildren    = BasicList_new('*CHILDREN');// Children of provision node
 
-return;
+  return;
 
 
 end-proc;
@@ -2823,11 +2819,11 @@ dcl-proc setStubOfs export;
   dcl-pi *n;
     i_stubOfs int(3) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-g_stubOfs = i_stubOfs;
+  g_stubOfs = i_stubOfs;
 
-return;
+  return;
 
 
 end-proc;
@@ -2840,27 +2836,26 @@ dcl-proc initializeModule;
   dcl-pi *n;
   end-pi;
 
-//  Return value
-//
-//  Helper fields
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  //  Return value
+  //
+  //  Helper fields
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if g_isInit;
-   return;
-endif;
+  if g_isInit;
+    return;
+  endif;
 
-Loglog_verbose('Initializing module ' + sds.modContProc + '...');
+  Loglog_verbose('Initializing module ' + sds.modContProc + '...');
 
-Repository_initialize();
+  Repository_initialize();
 
-if not Repository_existLogger(cROOT_LOGGER);
-   // Configurator_loadDefaultConfiguration();
-endif;
+  if not Repository_existLogger(cROOT_LOGGER);
+  // Configurator_loadDefaultConfiguration();
+  endif;
 
-g_isInit = *on;
+  g_isInit = *on;
 
-return;
+  return;
 
 
 end-proc;
-

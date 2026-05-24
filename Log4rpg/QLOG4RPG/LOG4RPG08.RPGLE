@@ -73,7 +73,7 @@
 // -----------------------------------------
 //  Imported functions
 // -----------------------------------------
-/copy QLOG4RPG,PLOG4RPG                      Public API Specification
+/copy QLOG4RPG,PLOG4RPG Public API Specification
 
 // -----------------------------------------
 //  Exported functions
@@ -83,27 +83,27 @@
 // -----------------------------------------
 //  Type definitions
 // -----------------------------------------
-/copy QLOG4RPG,PLOG4RPG                      Public interface & type definitions
-/copy QLOG4RPG,PLOG4RPG01                    Logger
-/copy QLOG4RPG,PLOG4RPG10                    LogLog
+/copy QLOG4RPG,PLOG4RPG Public interface & type definitions
+/copy QLOG4RPG,PLOG4RPG01 Logger
+/copy QLOG4RPG,PLOG4RPG10 LogLog
 
 // -----------------------------------------
 //  Prototypes
 // -----------------------------------------
-/copy QLOG4RPG,CLIB                          C-Library
-/copy QBASICS1,PBASICS1                      Basic RPG Extensions
-/copy QIFS,PIFS                              IFS Stream file support
+/copy QLOG4RPG,CLIB C-Library
+/copy QBASICS1,PBASICS1 Basic RPG Extensions
+/copy QIFS,PIFS IFS Stream file support
 
-/copy QLOG4RPG,PLOG4RPG03                    Appender
-/copy QLOG4RPG,PLOG4RPG06                    Property
-/copy QLOG4RPG,PLOG4RPG07                    Property List
-/copy QLOG4RPG,PLOG4RPG10                    LogLog
-/copy QLOG4RPG,PLOG4RPG12                    ClassLoader
-/copy QLOG4RPG,PLOG4RPG13                    Repository
-/copy QLOG4RPG,PLOG4RPG14                    DebugMode
-/copy QLOG4RPG,PLOG4RPG15                    DebugOutput
-/copy QLOG4RPG,PLOG4RPG17                    Filter
-/copy QLOG4RPG,PLOG4RPG99                    Helpers
+/copy QLOG4RPG,PLOG4RPG03 Appender
+/copy QLOG4RPG,PLOG4RPG06 Property
+/copy QLOG4RPG,PLOG4RPG07 Property List
+/copy QLOG4RPG,PLOG4RPG10 LogLog
+/copy QLOG4RPG,PLOG4RPG12 ClassLoader
+/copy QLOG4RPG,PLOG4RPG13 Repository
+/copy QLOG4RPG,PLOG4RPG14 DebugMode
+/copy QLOG4RPG,PLOG4RPG15 DebugOutput
+/copy QLOG4RPG,PLOG4RPG17 Filter
+/copy QLOG4RPG,PLOG4RPG99 Helpers
 
 // -----------------------------------------
 //  Private prototypes
@@ -265,69 +265,69 @@ dcl-proc Configurator_loadDefaultConfiguration export;
   dcl-pi *n ind;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isConfigured ind inz(*off);
 
-//  Helper fields
+  //  Helper fields
   dcl-ds property likeds(LOG4RPG_Property_t) inz;
   dcl-s pPropList like(LOG4RPG_pPropertyList_t) inz;
   dcl-ds msg likeds(msg_t) inz;
 
-//  Local constants
+  //  Local constants
   dcl-c cDEFAULT_APPENDER 'defaultfile';
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if not Logger_isLogging();
-   return isConfigured;
-endif;
+  if not Logger_isLogging();
+    return isConfigured;
+  endif;
 
-initializeModule();
+  initializeModule();
 
-AutoReload_disable();
+  AutoReload_disable();
 
-LogLog_debug('Loading default configuration ...');
+  LogLog_debug('Loading default configuration ...');
 
-// Create property list for default configuration
-pPropList = PropertyList_new();
+  // Create property list for default configuration
+  pPropList = PropertyList_new();
 
-// Add properties ...
-// ...  log4rpg.rootLogger=DEBUG, defaultFile
-property.key   = cROOT_LOGGER_PREFIX;
-property.value = 'DEBUG, ' + cDEFAULT_APPENDER;
-PropertyList_put(pPropList: property);
+  // Add properties ...
+  // ...  log4rpg.rootLogger=DEBUG, defaultFile
+  property.key   = cROOT_LOGGER_PREFIX;
+  property.value = 'DEBUG, ' + cDEFAULT_APPENDER;
+  PropertyList_put(pPropList: property);
 
-// ...  log4rpg.appender.defaultFile=DailyRollingFileAppender
-property.key   = cAPPENDER_PREFIX + cDEFAULT_APPENDER;
-property.value = 'DailyRollingFileAppender';
-PropertyList_put(pPropList: property);
+  // ...  log4rpg.appender.defaultFile=DailyRollingFileAppender
+  property.key   = cAPPENDER_PREFIX + cDEFAULT_APPENDER;
+  property.value = 'DailyRollingFileAppender';
+  PropertyList_put(pPropList: property);
 
-// ...  log4rpg.appender.defaultFile.path=log4rpg.log
-property.key   = cAPPENDER_PREFIX + cDEFAULT_APPENDER + '.path';
-property.value = 'log4rpg.log';
-PropertyList_put(pPropList: property);
+  // ...  log4rpg.appender.defaultFile.path=log4rpg.log
+  property.key   = cAPPENDER_PREFIX + cDEFAULT_APPENDER + '.path';
+  property.value = 'log4rpg.log';
+  PropertyList_put(pPropList: property);
 
-// ...  log4rpg.appender.defaultFile.datePattern=.yyyy-MM-dd
-property.key   = cAPPENDER_PREFIX + cDEFAULT_APPENDER + '.datePattern';
-property.value = '.yyyy-MM-dd';
-PropertyList_put(pPropList: property);
+  // ...  log4rpg.appender.defaultFile.datePattern=.yyyy-MM-dd
+  property.key   = cAPPENDER_PREFIX + cDEFAULT_APPENDER + '.datePattern';
+  property.value = '.yyyy-MM-dd';
+  PropertyList_put(pPropList: property);
 
-// ...  log4rpg.appender.defaultFile.layout=PatternLayout
-property.key   = cAPPENDER_PREFIX + cDEFAULT_APPENDER + '.layout';
-property.value = 'PatternLayout';
-PropertyList_put(pPropList: property);
+  // ...  log4rpg.appender.defaultFile.layout=PatternLayout
+  property.key   = cAPPENDER_PREFIX + cDEFAULT_APPENDER + '.layout';
+  property.value = 'PatternLayout';
+  PropertyList_put(pPropList: property);
 
-// Configure root and non-root loggers
-doConfigure(pPropList);
+  // Configure root and non-root loggers
+  doConfigure(pPropList);
 
-// Free resources
-PropertyList_delete(pPropList);
+  // Free resources
+  PropertyList_delete(pPropList);
 
-LogLog_debug('Finished loading default configuration.');
-LogLog_debug('LOG4RPG is configured, now.');
+  LogLog_debug('Finished loading default configuration.');
+  LogLog_debug('LOG4RPG is configured, now.');
 
-isConfigured = *on;
+  isConfigured = *on;
 
-return isConfigured;
+  return isConfigured;
 
 
 end-proc;
@@ -351,28 +351,28 @@ dcl-proc Configurator_loadPropertiesConfiguration export;
     i_path like(LOG4RPG_path_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isConfigured ind inz(*off);
 
-//  Helper fields
+  //  Helper fields
   dcl-s realPath like(LOG4RPG_path_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if not Logger_isLogging();
-   return isConfigured;
-endif;
+  if not Logger_isLogging();
+    return isConfigured;
+  endif;
 
-initializeModule();
+  initializeModule();
 
-AutoReload_disable();
+  AutoReload_disable();
 
-if not loadPropertiesConfiguration(i_path: realPath);
-   return isConfigured;
-endif;
+  if not loadPropertiesConfiguration(i_path: realPath);
+    return isConfigured;
+  endif;
 
-isConfigured = *on;
+  isConfigured = *on;
 
-return isConfigured;
+  return isConfigured;
 
 
 end-proc;
@@ -398,62 +398,62 @@ dcl-proc Configurator_loadAndWatchPropertiesConfiguration export;
     i_unit     char(10) options(*nopass) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isConfigured ind inz(*off);
 
-//  Parameter positions
+  //  Parameter positions
   dcl-c p_waitTime 2;
   dcl-c p_unit 3;
 
-//  Field for optional parameters
+  //  Field for optional parameters
   dcl-s waitTime like(i_waitTime) inz;
   dcl-s unit like(i_unit) inz;
 
-//  Helper fields
+  //  Helper fields
   dcl-s realPath like(LOG4RPG_path_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if not Logger_isLogging();
-   return isConfigured;
-endif;
+  if not Logger_isLogging();
+    return isConfigured;
+  endif;
 
-initializeModule();
+  initializeModule();
 
-// Get optional parameter values ...
-// ... waitTime
-if %parms() >= p_waitTime;
-   waitTime = i_waitTime;
-else;
-   waitTime = cLOG4RPG_CONFIGURATION_DEFAULT_RELOAD_DELAY;
-endif;
+  // Get optional parameter values ...
+  // ... waitTime
+  if %parms() >= p_waitTime;
+    waitTime = i_waitTime;
+  else;
+    waitTime = cLOG4RPG_CONFIGURATION_DEFAULT_RELOAD_DELAY;
+  endif;
 
-// ... unit
-if %parms() >= p_unit;
-   unit = i_unit;
-else;
-   unit = cLOG4RPG_CONFIGURATION_DEFAULT_RELOAD_DELAY_UNIT;
-endif;
+  // ... unit
+  if %parms() >= p_unit;
+    unit = i_unit;
+  else;
+    unit = cLOG4RPG_CONFIGURATION_DEFAULT_RELOAD_DELAY_UNIT;
+  endif;
 
-if waitTime > 0;
-   LogLog_debug('Setting reload time to ' +
-                %char(waitTime) + ' (' + unit + ').');
-   AutoReload_enable(i_path: waitTime: unit);
-else;
-   LogLog_debug('AUTO-RELOAD disabled. No reload interval specified.');
-   AutoReload_disable();
-endif;
+  if waitTime > 0;
+    LogLog_debug('Setting reload time to ' +
+                 %char(waitTime) + ' (' + unit + ').');
+    AutoReload_enable(i_path: waitTime: unit);
+  else;
+    LogLog_debug('AUTO-RELOAD disabled. No reload interval specified.');
+    AutoReload_disable();
+  endif;
 
-if not loadPropertiesConfiguration(i_path: realPath);
-   return isConfigured;
-endif;
+  if not loadPropertiesConfiguration(i_path: realPath);
+    return isConfigured;
+  endif;
 
-if (g_autoReload.isAutoReload = *on and i_path <> realPath);
-   AutoReload_enable(realPath: waitTime: unit);
-endif;
+  if (g_autoReload.isAutoReload = *on and i_path <> realPath);
+    AutoReload_enable(realPath: waitTime: unit);
+  endif;
 
-isConfigured = *on;
+  isConfigured = *on;
 
-return isConfigured;
+  return isConfigured;
 
 
 end-proc;
@@ -473,32 +473,32 @@ dcl-proc Configurator_checkAndReloadPropertiesConfiguration export;
   end-pi;
 
 
-//  Helper fields
+  //  Helper fields
   dcl-s lastModOld like(g_autoReload.lastMod) inz;
   dcl-s realPath like(LOG4RPG_path_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if not g_autoReload.isAutoReload;
-   return;
-endif;
+  if not g_autoReload.isAutoReload;
+    return;
+  endif;
 
-if g_autoreload.nextUpd > %timestamp();
-   return;
-endif;
+  if g_autoreload.nextUpd > %timestamp();
+    return;
+  endif;
 
-AutoReload_setNextUpdateTime();
+  AutoReload_setNextUpdateTime();
 
-lastModOld = g_autoReload.lastMod;
-AutoReload_updateLastModificationTime();
+  lastModOld = g_autoReload.lastMod;
+  AutoReload_updateLastModificationTime();
 
-if lastModOld = g_autoReload.lastMod;
-   return;
-endif;
+  if lastModOld = g_autoReload.lastMod;
+    return;
+  endif;
 
-Repository_prepareReload();
-loadPropertiesConfiguration(g_autoReload.reloadURL: realPath);
+  Repository_prepareReload();
+  loadPropertiesConfiguration(g_autoReload.reloadURL: realPath);
 
-return;
+  return;
 
 
 end-proc;
@@ -515,21 +515,21 @@ end-proc;
 dcl-proc Configurator_clearConfiguration export;
   dcl-pi *n;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if not Logger_isLogging();
-   return;
-endif;
+  if not Logger_isLogging();
+    return;
+  endif;
 
-LogLog_debug('Clearing configuration ...');
+  LogLog_debug('Clearing configuration ...');
 
-AutoReload_disable();
+  AutoReload_disable();
 
-Repository_clear();
+  Repository_clear();
 
-LogLog_verbose('Configuration cleared.');
+  LogLog_verbose('Configuration cleared.');
 
-return;
+  return;
 
 
 end-proc;
@@ -547,9 +547,9 @@ end-proc;
 dcl-proc Configurator_isAutoReload export;
   dcl-pi *n ind;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return g_autoReload.isAutoReload;
+  return g_autoReload.isAutoReload;
 
 
 end-proc;
@@ -564,49 +564,49 @@ dcl-proc loadPropertiesConfiguration;
     o_realPath like(LOG4RPG_path_t);
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isConfigured ind inz(*off);
 
-//  Helper fields
+  //  Helper fields
   dcl-s isLoaded ind inz(*off);
   dcl-s url like(url_t) inz;
   dcl-s pPropList like(LOG4RPG_pPropertyList_t) inz;
   dcl-ds msg likeds(msg_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-LogLog_debug('Loading properties configuration ...');
+  LogLog_debug('Loading properties configuration ...');
 
-// Load configuration into property list
-url = URL_new(i_path);
+  // Load configuration into property list
+  url = URL_new(i_path);
 
-LogLog_debug(
-   'Loading properties configuration from: ' +
-    URL_toString(url) + ' ...');
+  LogLog_debug(
+     'Loading properties configuration from: ' +
+      URL_toString(url) + ' ...');
 
-pPropList = PropertyList_new();
-isLoaded = PropertyList_loadFromUrl(pPropList: url);
-if not isLoaded;
-   LogLog_warning('Could not read configuration file [' +
-                   i_path  + '].');
-   o_realPath = '';
-   return isConfigured;
-endif;
+  pPropList = PropertyList_new();
+  isLoaded = PropertyList_loadFromUrl(pPropList: url);
+  if not isLoaded;
+    LogLog_warning('Could not read configuration file [' +
+                    i_path  + '].');
+    o_realPath = '';
+    return isConfigured;
+  endif;
 
-o_realPath = PropertyList_getUrl(pPropList);
+  o_realPath = PropertyList_getUrl(pPropList);
 
-// Configure root and non-root loggers
-doConfigure(pPropList);
+  // Configure root and non-root loggers
+  doConfigure(pPropList);
 
-// Free resources
-PropertyList_delete(pPropList);
+  // Free resources
+  PropertyList_delete(pPropList);
 
-LogLog_debug('Finished loading properties configuration from: ' +
-             URL_toString(url));
-LogLog_debug('LOG4RPG is configured, now.');
+  LogLog_debug('Finished loading properties configuration from: ' +
+               URL_toString(url));
+  LogLog_debug('LOG4RPG is configured, now.');
 
-isConfigured = *on;
+  isConfigured = *on;
 
-return isConfigured;
+  return isConfigured;
 
 
 end-proc;
@@ -619,22 +619,22 @@ dcl-proc doConfigure;
   dcl-pi *n;
     i_pPropList like(LOG4RPG_pPropertyList_t) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Configure base system of log4rpg
-configureBaseSystem(i_pPropList);
-if not Logger_isLogging();
-   return;
-endif;
+  // Configure base system of log4rpg
+  configureBaseSystem(i_pPropList);
+  if not Logger_isLogging();
+    return;
+  endif;
 
-// Configure root logger
-configureRootLogger(i_pPropList);
+  // Configure root logger
+  configureRootLogger(i_pPropList);
 
-// Configure non-root loggers
-configureLoggers(i_pPropList: cLOGGER_PREFIX);
+  // Configure non-root loggers
+  configureLoggers(i_pPropList: cLOGGER_PREFIX);
 
-// Dump repository
-Repository_dumpHierarchy();
+  // Dump repository
+  Repository_dumpHierarchy();
 
 
 end-proc;
@@ -648,18 +648,20 @@ dcl-proc configureBaseSystem;
     i_pPropList like(LOG4RPG_pPropertyList_t) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s value like(LOG4RPG_Property_value_t) inz;
   dcl-s pToken pointer inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// Enable/disable internal log
-  dcl-s debugMode like(LOG4RPG_debugMode_t) inz(cLOG4RPG_DEBUG_OFF) dcl-s output
-    like(LOG4RPG_debugOutput_t) inz(cLOG4RPG_DEBUG_OUTP: configureInternalLog(i_pPropList): ;)
+  dcl-s debugMode like(LOG4RPG_debugMode_t) inz(cLOG4RPG_DEBUG_OFF);
+  dcl-s output like(LOG4RPG_debugOutput_t) inz(cLOG4RPG_DEBUG_OUTPUT_PRINTER);
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Enable/disable Log4rpg
-configureLog4rpgMode(i_pPropList);
+  // Enable/disable internal log
+  configureInternalLog(i_pPropList);
 
-return;
+  // Enable/disable Log4rpg
+  configureLog4rpgMode(i_pPropList);
+
+  return;
 
 
 end-proc;
@@ -673,33 +675,34 @@ dcl-proc configureInternalLog;
     i_pPropList like(LOG4RPG_pPropertyList_t) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s value like(LOG4RPG_Property_value_t) inz;
   dcl-s pToken pointer inz;
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   dcl-s debugMode like(LOG4RPG_debugMode_t) inz(cLOG4RPG_DEBUG_OFF);
   dcl-s output like(LOG4RPG_debugOutput_t) inz(cLOG4RPG_DEBUG_OUTPUT_PRINTER);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   value = PropertyList_get(i_pPropList: cPROPERTY_DEBUG);
-if value = '';
-   return;
-endif;
+  if value = '';
+    return;
+  endif;
 
-// Get debug mode
-pToken = strtok(value: ',');
-if pToken <> *NULL;
-   debugMode = %trim(%str(pToken));
-endif;
+  // Get debug mode
+  pToken = strtok(value: ',');
+  if pToken <> *NULL;
+    debugMode = %trim(%str(pToken));
+  endif;
 
-// Get output
-pToken = strtok(*NULL: ',');
-if pToken <> *NULL;
-   output = %trim(%str(pToken));
-endif;
+  // Get output
+  pToken = strtok(*NULL: ',');
+  if pToken <> *NULL;
+    output = %trim(%str(pToken));
+  endif;
 
-LogLog_setInternalDebugging(debugMode: output);
+  LogLog_setInternalDebugging(debugMode: output);
 
-return;
+  return;
 
 
 end-proc;
@@ -713,28 +716,28 @@ dcl-proc configureLog4rpgMode;
     i_pPropList like(LOG4RPG_pPropertyList_t) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s value varchar(32) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Enable/disable Log4rpg
-if PropertyList_containsKey(i_pPropList: cPROPERTY_LOG4RPG);
-   value = f_lcase(PropertyList_get(i_pPropList: cPROPERTY_LOG4RPG));
-   select;
-   when (value = '1') or (value = 'true') or (value = 'on');
+  // Enable/disable Log4rpg
+  if PropertyList_containsKey(i_pPropList: cPROPERTY_LOG4RPG);
+    value = f_lcase(PropertyList_get(i_pPropList: cPROPERTY_LOG4RPG));
+    select;
+    when (value = '1') or (value = 'true') or (value = 'on');
       Logger_setLogging(*on);
-   when (value = '0') or (value = 'false') or (value = 'off');
+    when (value = '0') or (value = 'false') or (value = 'off');
       LogLog_debug('Log4rpg disabled. +
                     Stopped configuration procedure.');
       Logger_setLogging(*off);
       return;
-   other;
+    other;
       LogLog_warning('Invalid value specified for property ''' +
                       cPROPERTY_LOG4RPG + ''': ' + value);
-   endsl;
-endif;
+    endsl;
+  endif;
 
-return;
+  return;
 
 
 end-proc;
@@ -748,25 +751,25 @@ dcl-proc configureRootLogger;
     i_pPropList like(LOG4RPG_pPropertyList_t) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s value like(LOG4RPG_Property_value_t) inz;
   dcl-s pRootLogger like(LOG4RPG_hLogger_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-value = PropertyList_get(i_pPropList: cROOT_LOGGER_PREFIX);
-if value = '';
-   LogLog_warning('Could not find root logger information. +
-                   Is this OK?');
-   return;
-endif;
+  value = PropertyList_get(i_pPropList: cROOT_LOGGER_PREFIX);
+  if value = '';
+    LogLog_warning('Could not find root logger information. +
+                    Is this OK?');
+    return;
+  endif;
 
-// Get rootLogger
-pRootLogger = Repository_getLogger(cROOT_LOGGER);
+  // Get rootLogger
+  pRootLogger = Repository_getLogger(cROOT_LOGGER);
 
-// Parse root logger configuration data
-parseLogger(i_pPropList: pRootLogger: value);
+  // Parse root logger configuration data
+  parseLogger(i_pPropList: pRootLogger: value);
 
-return;
+  return;
 
 
 end-proc;
@@ -781,22 +784,21 @@ dcl-proc configureLoggers;
     i_prefix    like(LOG4RPG_prefix_t) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s logName like(LOG4RPG_loggerName_t) inz;
   dcl-ds property likeds(LOG4RPG_property_t) inz;
   dcl-s pLogger like(LOG4RPG_hLogger_t) inz;
-  dcl-ds propIter DS likeds(LOG4RPG_Property: ListIterator_t) inz;
-  end-ds;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  dcl-ds propIter likeds(LOG4RPG_PropertyListIterator_t) inz;
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-propIter = PropertyList_getIterator(i_pPropList);
+  propIter = PropertyList_getIterator(i_pPropList);
 
-property = PropertyList_getFirst(propIter);
+  property = PropertyList_getFirst(propIter);
 
-dow property.key <> '';
+  dow property.key <> '';
 
-   if f_startsWith(i_prefix: property.key) and
-      %len(property.key) > %len(i_prefix);
+    if f_startsWith(i_prefix: property.key) and
+       %len(property.key) > %len(i_prefix);
 
       logName = %subst(property.key: %len(i_prefix) + 1);
       logName = translateLoggerName(logName);
@@ -806,12 +808,12 @@ dow property.key <> '';
 
       parseLogger(i_pPropList: pLogger: property.value);
 
-   endif;
+    endif;
 
-   property = PropertyList_getNext(propIter);
-enddo;
+    property = PropertyList_getNext(propIter);
+  enddo;
 
-return;
+  return;
 
 
 end-proc;
@@ -827,42 +829,42 @@ dcl-proc parseLogger;
     i_value     like(LOG4RPG_Property_value_t) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s pToken pointer inz;
   dcl-s pAppender like(LOG4RPG_pAppender_t) inz;
   dcl-s appName like(LOG4RPG_appenderName_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Get log level
-pToken = strtok(i_value: ',');
-if pToken <> *NULL;
-   Logger_setLevel(i_pLogger: %str(pToken));
-endif;
+  // Get log level
+  pToken = strtok(i_value: ',');
+  if pToken <> *NULL;
+    Logger_setLevel(i_pLogger: %str(pToken));
+  endif;
 
-// Remove all existing appenders
-Logger_removeAllAppenders(i_pLogger);
+  // Remove all existing appenders
+  Logger_removeAllAppenders(i_pLogger);
 
-// Get & configure appenders
-pToken = strtok(*NULL: ',');
-dow pToken <> *NULL;
-   appName = f_lcase(%trim(%str(pToken)));
+  // Get & configure appenders
+  pToken = strtok(*NULL: ',');
+  dow pToken <> *NULL;
+    appName = f_lcase(%trim(%str(pToken)));
 
-   if not Repository_existAppender(appName);
+    if not Repository_existAppender(appName);
       pAppender = parseAppender(i_pPropList: appName);
-   else;
+    else;
       pAppender = Repository_getAppender(appName);
-   endif;
+    endif;
 
-   if not Appender_isNull(pAppender);
+    if not Appender_isNull(pAppender);
 
       // Add appender to logger
       Logger_addAppender(i_pLogger: pAppender);
-   endif;
+    endif;
 
-   pToken = strtok(*NULL: ',');
-enddo;
+    pToken = strtok(*NULL: ',');
+  enddo;
 
-return;
+  return;
 
 
 end-proc;
@@ -877,62 +879,62 @@ dcl-proc parseAppender;
     i_appName   like(LOG4RPG_appenderName_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s pAppender like(LOG4RPG_pAppender_t) inz;
 
-//  Helper fields
+  //  Helper fields
   dcl-s value like(LOG4RPG_Property_value_t) inz;
   dcl-s prefix like(LOG4RPG_prefix_t) inz;
   dcl-s pLayout like(LOG4RPG_pLayout_t) inz;
   dcl-s pFilter like(LOG4RPG_pFilter_t) inz;
   dcl-s filterName like(LOG4RPG_filterName_t) inz;
   dcl-s key like(LOG4RPG_property_key_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-prefix = cAPPENDER_PREFIX + i_appName;
+  prefix = cAPPENDER_PREFIX + i_appName;
 
-value = PropertyList_get(i_pPropList: prefix);
-if value = '';
-   LogLog_warning('Could not find appender information for +
-                   appender named [' + i_appName + ']');
-   return pAppender;
-endif;
+  value = PropertyList_get(i_pPropList: prefix);
+  if value = '';
+    LogLog_warning('Could not find appender information for +
+                    appender named [' + i_appName + ']');
+    return pAppender;
+  endif;
 
-pAppender = Appender_new(i_appName: value);
-if Appender_isNull(pAppender);
-   LogLog_warning('Could not instantiate appender [' +
-                   i_appName + ']');
-   return pAppender;
-endif;
+  pAppender = Appender_new(i_appName: value);
+  if Appender_isNull(pAppender);
+    LogLog_warning('Could not instantiate appender [' +
+                    i_appName + ']');
+    return pAppender;
+  endif;
 
-Appender_setProperties(pAppender: i_pPropList: prefix + '.');
+  Appender_setProperties(pAppender: i_pPropList: prefix + '.');
 
-// Parse layout if appender requires layout
-if Appender_requiresLayout(pAppender);
-   pLayout = parseLayout(i_pPropList: i_appName
-                                    : prefix + cLAYOUT_SUFFIX);
-   if not Layout_isNull(pLayout);
+  // Parse layout if appender requires layout
+  if Appender_requiresLayout(pAppender);
+    pLayout = parseLayout(i_pPropList: i_appName
+                                     : prefix + cLAYOUT_SUFFIX);
+    if not Layout_isNull(pLayout);
       Appender_setLayout(pAppender: pLayout);
-   endif;
-endif;
+    endif;
+  endif;
 
-// Parse filter if properties file specifies a filter for the appender
-key = cAPPENDER_PREFIX + i_appName + cFILTER_SUFFIX;
-if PropertyList_containsKey(i_pPropList: key);
-   filterName = f_lcase(PropertyList_get(i_pPropList: key));
-   if not Repository_existFilter(filterName);
+  // Parse filter if properties file specifies a filter for the appender
+  key = cAPPENDER_PREFIX + i_appName + cFILTER_SUFFIX;
+  if PropertyList_containsKey(i_pPropList: key);
+    filterName = f_lcase(PropertyList_get(i_pPropList: key));
+    if not Repository_existFilter(filterName);
       pFilter = parseFilter(i_pPropList: filterName);
-   else;
+    else;
       pFilter = Repository_getFilter(filterName);
-   endif;
+    endif;
 
-   // Attach filter to appender
-   if not Filter_isNull(pFilter);
+    // Attach filter to appender
+    if not Filter_isNull(pFilter);
       Appender_setFilter(pAppender: pFilter);
-   endif;
-endif;
+    endif;
+  endif;
 
-return pAppender;
+  return pAppender;
 
 
 end-proc;
@@ -948,79 +950,79 @@ dcl-proc parseFilter;
     i_pFilterMap like(BasicMap_handle_t) options(*nopass) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s pFilter like(LOG4RPG_pFilter_t) inz;
 
-//  Parameter positions
+  //  Parameter positions
   dcl-c p_pFilterMap 3;
 
-//  Fields for optional parameters
+  //  Fields for optional parameters
   dcl-s pFilterMap like(i_pFilterMap) inz;
 
-//  Helper fields
+  //  Helper fields
   dcl-s value like(LOG4RPG_Property_value_t) inz;
   dcl-s prefix like(LOG4RPG_prefix_t) inz;
   dcl-s pNextFilter like(LOG4RPG_pFilter_t) inz;
   dcl-s nextFilterName like(LOG4RPG_filterName_t) inz;
   dcl-s key like(LOG4RPG_property_key_t) inz;
   dcl-s isLocalFilterMap ind inz(*off);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-prefix = cFILTER_PREFIX + i_filterName;
+  prefix = cFILTER_PREFIX + i_filterName;
 
-value = PropertyList_get(i_pPropList: prefix);
-if value = '';
-   LogLog_warning('Could not find filter information for +
-                   filter named [' + i_filterName + ']');
-   return pFilter;
-endif;
+  value = PropertyList_get(i_pPropList: prefix);
+  if value = '';
+    LogLog_warning('Could not find filter information for +
+                    filter named [' + i_filterName + ']');
+    return pFilter;
+  endif;
 
-pFilter = Filter_new(i_filterName: value);
-if Filter_isNull(pFilter);
-   LogLog_warning('Could not instantiate filter [' +
-                   i_filterName + ']');
-   return pFilter;
-endif;
+  pFilter = Filter_new(i_filterName: value);
+  if Filter_isNull(pFilter);
+    LogLog_warning('Could not instantiate filter [' +
+                    i_filterName + ']');
+    return pFilter;
+  endif;
 
-Filter_setProperties(pFilter: i_pPropList: prefix + '.');
+  Filter_setProperties(pFilter: i_pPropList: prefix + '.');
 
-if %parms() >= p_pFilterMap;
-   pFilterMap = i_pFilterMap;
-   isLocalFilterMap = *off;
-else;
-   pFilterMap = BasicMap_new();
-   isLocalFilterMap = *on;
-endif;
+  if %parms() >= p_pFilterMap;
+    pFilterMap = i_pFilterMap;
+    isLocalFilterMap = *off;
+  else;
+    pFilterMap = BasicMap_new();
+    isLocalFilterMap = *on;
+  endif;
 
-BasicMap_put(pFilterMap: i_filterName: '*');
+  BasicMap_put(pFilterMap: i_filterName: '*');
 
-// Parse next filter if properties file specifies a next filter
-key = cFILTER_PREFIX + i_filterName + cFILTER_NEXT_FILTER;
-if PropertyList_containsKey(i_pPropList: key);
-   nextFilterName = f_lcase(PropertyList_get(i_pPropList: key));
-   if BasicMap_containsKey(pFilterMap: nextFilterName);
+  // Parse next filter if properties file specifies a next filter
+  key = cFILTER_PREFIX + i_filterName + cFILTER_NEXT_FILTER;
+  if PropertyList_containsKey(i_pPropList: key);
+    nextFilterName = f_lcase(PropertyList_get(i_pPropList: key));
+    if BasicMap_containsKey(pFilterMap: nextFilterName);
       LogLog_warning('Recursion detected for filter [' +
                       i_filterName + ']');
-   else;
+    else;
       if not Repository_existFilter(nextFilterName);
-         pNextFilter = parseFilter(
-                          i_pPropList: nextFilterName: pFilterMap);
+        pNextFilter = parseFilter(
+                         i_pPropList: nextFilterName: pFilterMap);
       else;
-         pNextFilter = Repository_getFilter(nextFilterName);
+        pNextFilter = Repository_getFilter(nextFilterName);
       endif;
 
       // Set next filter of filter
       if not Filter_isNull(pNextFilter);
-         Filter_setNext(pFilter: pNextFilter);
+        Filter_setNext(pFilter: pNextFilter);
       endif;
-   endif;
-endif;
+    endif;
+  endif;
 
-if isLocalFilterMap;
-   BasicMap_delete(pFilterMap);
-endif;
+  if isLocalFilterMap;
+    BasicMap_delete(pFilterMap);
+  endif;
 
-return pFilter;
+  return pFilter;
 
 
 end-proc;
@@ -1036,32 +1038,32 @@ dcl-proc parseLayout;
     i_prefix    like(LOG4RPG_prefix_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s pLayout like(LOG4RPG_pLayout_t) inz;
 
-//  Helper fields
+  //  Helper fields
   dcl-s value like(LOG4RPG_Property_value_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-pLayout = Layout_null();
+  pLayout = Layout_null();
 
-value = PropertyList_get(i_pPropList: i_prefix);
-if value = '';
-   LogLog_warning('Property [Layout] is missing for appender +
-                   [' + i_logName + ']');
-   return pLayout;
-endif;
+  value = PropertyList_get(i_pPropList: i_prefix);
+  if value = '';
+    LogLog_warning('Property [Layout] is missing for appender +
+                    [' + i_logName + ']');
+    return pLayout;
+  endif;
 
-pLayout = Layout_new(value);
-if Layout_isNull(pLayout);
-   LogLog_warning('Could not instantiate layout [' +
-                   getProcedure(value) + ']');
-   return pLayout;
-endif;
+  pLayout = Layout_new(value);
+  if Layout_isNull(pLayout);
+    LogLog_warning('Could not instantiate layout [' +
+                    getProcedure(value) + ']');
+    return pLayout;
+  endif;
 
-Layout_setProperties(pLayout: i_pPropList: i_prefix + '.');
+  Layout_setProperties(pLayout: i_pPropList: i_prefix + '.');
 
-return pLayout;
+  return pLayout;
 
 
 end-proc;
@@ -1073,18 +1075,18 @@ end-proc;
 dcl-proc AutoReload_disable;
   dcl-pi *n;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-g_autoReload.isAutoReload = *off;
-g_autoReload.waitTime     = 0;
-g_autoReload.unit         = '*N';
-g_autoReload.reloadURL    = '';
-g_autoReload.nextUpd      = *loval;
-g_autoReload.lastMod      = *loval;
+  g_autoReload.isAutoReload = *off;
+  g_autoReload.waitTime     = 0;
+  g_autoReload.unit         = '*N';
+  g_autoReload.reloadURL    = '';
+  g_autoReload.nextUpd      = *loval;
+  g_autoReload.lastMod      = *loval;
 
-LogLog_debug('AUTO-RELOAD feature disabled.');
+  LogLog_debug('AUTO-RELOAD feature disabled.');
 
-return;
+  return;
 
 
 end-proc;
@@ -1101,28 +1103,28 @@ dcl-proc AutoReload_enable;
   end-pi;
 
   dcl-s protocol like(url_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-protocol = Url_getProtocol(i_url);
-if protocol <> 'file' and protocol <> 'mbr';
-   AutoReload_disable();
-   LogLog_error('Unsupported URL protocol. AUTO-RELOAD disabled.');
-   return;
-endif;
+  protocol = Url_getProtocol(i_url);
+  if protocol <> 'file' and protocol <> 'mbr';
+    AutoReload_disable();
+    LogLog_error('Unsupported URL protocol. AUTO-RELOAD disabled.');
+    return;
+  endif;
 
-g_autoReload.isAutoReload = *on;
-g_autoReload.waitTime     = i_time;
-g_autoReload.reloadURL    = i_url;
-g_autoReload.unit         = i_unit;
+  g_autoReload.isAutoReload = *on;
+  g_autoReload.waitTime     = i_time;
+  g_autoReload.reloadURL    = i_url;
+  g_autoReload.unit         = i_unit;
 
-AutoReload_setNextUpdateTime();
-AutoReload_updateLastModificationTime();
+  AutoReload_setNextUpdateTime();
+  AutoReload_updateLastModificationTime();
 
-LogLog_debug('AUTO-RELOAD feature enabled.');
-LogLog_debug(' -> URL : ' + g_autoReload.reloadURL);
-LogLog_debug(' -> Wait: ' + %char(g_autoReload.waitTime));
+  LogLog_debug('AUTO-RELOAD feature enabled.');
+  LogLog_debug(' -> URL : ' + g_autoReload.reloadURL);
+  LogLog_debug(' -> Wait: ' + %char(g_autoReload.waitTime));
 
-return;
+  return;
 
 
 end-proc;
@@ -1152,51 +1154,51 @@ dcl-proc AutoReload_updateLastModificationTime;
   end-ds;
 
   dcl-ds msg likeds(msg_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-g_autoReload.lastMod = *LOVAL;
+  g_autoReload.lastMod = *LOVAL;
 
-protocol = Url_getProtocol(g_autoReload.reloadURL);
+  protocol = Url_getProtocol(g_autoReload.reloadURL);
 
-// Get time the object was last modified for a ...
-select;
-   // ... file object
-when protocol = 'file';
-   g_autoReload.lastMod = f_getIfsFileDataChgTime(
-                             Url_getPath(g_autoReload.reloadURL): msg);
-   if (msg.ID <> cMSG_ID_OK);
+  // Get time the object was last modified for a ...
+  select;
+  // ... file object
+  when protocol = 'file';
+    g_autoReload.lastMod = f_getIfsFileDataChgTime(
+                              Url_getPath(g_autoReload.reloadURL): msg);
+    if (msg.ID <> cMSG_ID_OK);
       return;
-   endif;
+    endif;
 
-   // ... member object
-when protocol = 'mbr';
-   URL_getMbr(g_autoReload.reloadURL
-              : mbr.file: mbr.lib: mbr.name);
-   mbrd0100 = f_rtvMbrD(mbr.file: mbr.lib: mbr.name: 'MBRD0100': msg);
-   if (msg.ID <> cMSG_ID_OK);
+  // ... member object
+  when protocol = 'mbr';
+    URL_getMbr(g_autoReload.reloadURL
+               : mbr.file: mbr.lib: mbr.name);
+    mbrd0100 = f_rtvMbrD(mbr.file: mbr.lib: mbr.name: 'MBRD0100': msg);
+    if (msg.ID <> cMSG_ID_OK);
       return;
-   endif;
+    endif;
 
-   if mbrd0100.isSrcFile = '0';
+    if mbrd0100.isSrcFile = '0';
       mbrd0200 = f_rtvMbrD(
                        mbr.file: mbr.lib: mbr.name: 'MBRD0200': *omit);
       lastChgDateAPI = mbrd0200.mbrChgDatTim;
-   else;
+    else;
       lastChgDateAPI = mbrd0100.chgDatTim;
-   endif;
+    endif;
 
-   monitor;
+    monitor;
       g_autoReload.lastMod = %date(lastChgDateAPI.cymd: *CYMD0) +
                              %time(lastChgDateAPI.hms : *HMS0 );
-   on-error;
-      // Nothing to do here
-   endmon;
+    on-error;
+    // Nothing to do here
+    endmon;
 
-other;
-   // Ignore any other protocol
-endsl;
+  other;
+  // Ignore any other protocol
+  endsl;
 
-return;
+  return;
 
 
 end-proc;
@@ -1208,32 +1210,32 @@ end-proc;
 dcl-proc AutoReload_setNextUpdateTime;
   dcl-pi *n;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-select;
-   // milli-seconds
-when (g_autoReload.unit = cCOMPILER_MSECONDS or
-      g_autoReload.unit = cCOMPILER_MSECONDS_SHORT);
-   g_autoReload.nextUpd = %timestamp() +
-                          %mseconds(g_autoReload.waitTime);
-   // seconds
-when (g_autoReload.unit = cCOMPILER_SECONDS or
-      g_autoReload.unit = cCOMPILER_SECONDS_SHORT);
-   g_autoReload.nextUpd = %timestamp() +
-                          %seconds(g_autoReload.waitTime);
-   // minutes
-when (g_autoReload.unit = cCOMPILER_MINUTES or
-      g_autoReload.unit = cCOMPILER_MINUTES_SHORT);
-   g_autoReload.nextUpd = %timestamp() +
-                          %minutes(g_autoReload.waitTime);
-   // hours
-when (g_autoReload.unit = cCOMPILER_HOURS or
-      g_autoReload.unit = cCOMPILER_HOURS_SHORT);
-   g_autoReload.nextUpd = %timestamp() +
-                          %hours(g_autoReload.waitTime);
-endsl;
+  select;
+  // milli-seconds
+  when (g_autoReload.unit = cCOMPILER_MSECONDS or
+        g_autoReload.unit = cCOMPILER_MSECONDS_SHORT);
+    g_autoReload.nextUpd = %timestamp() +
+                           %mseconds(g_autoReload.waitTime);
+  // seconds
+  when (g_autoReload.unit = cCOMPILER_SECONDS or
+        g_autoReload.unit = cCOMPILER_SECONDS_SHORT);
+    g_autoReload.nextUpd = %timestamp() +
+                           %seconds(g_autoReload.waitTime);
+  // minutes
+  when (g_autoReload.unit = cCOMPILER_MINUTES or
+        g_autoReload.unit = cCOMPILER_MINUTES_SHORT);
+    g_autoReload.nextUpd = %timestamp() +
+                           %minutes(g_autoReload.waitTime);
+  // hours
+  when (g_autoReload.unit = cCOMPILER_HOURS or
+        g_autoReload.unit = cCOMPILER_HOURS_SHORT);
+    g_autoReload.nextUpd = %timestamp() +
+                           %hours(g_autoReload.waitTime);
+  endsl;
 
-return;
+  return;
 
 
 end-proc;
@@ -1246,23 +1248,22 @@ dcl-proc initializeModule;
   dcl-pi *n;
   end-pi;
 
-//  Return value
-//
-//  Helper fields
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  //  Return value
+  //
+  //  Helper fields
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if g_isInit;
-   return;
-endif;
+  if g_isInit;
+    return;
+  endif;
 
-Loglog_verbose('Initializing module ' + sds.modContProc + '...');
+  Loglog_verbose('Initializing module ' + sds.modContProc + '...');
 
-Repository_initialize();
+  Repository_initialize();
 
-g_isInit = *on;
+  g_isInit = *on;
 
-return;
+  return;
 
 
 end-proc;
-

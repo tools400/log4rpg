@@ -1,5 +1,5 @@
 **free
-/if NOT DEFINED(PTYPES)
+/if NOT defined(PTYPES)
 /define PTYPES
 
 // =========================================
@@ -10,8 +10,8 @@
 //  Type definitions
 // -----------------------------------------
 /define TYPES_ONLY
-/copy QLOG4RPG,PLOG4RPG                      Public API Specification
-/copy QLOG4RPG,PLOG4RPG04                    AppenderList
+/copy QLOG4RPG,PLOG4RPG Public API Specification
+/copy QLOG4RPG,PLOG4RPG04 AppenderList
 
 // -----------------------------------------
 //  Constants
@@ -19,13 +19,13 @@
 dcl-c cROOT_LOGGER 'root';
 
 // @deprecated, use *on instead
-/if NOT DEFINED(cTrue)
+/if NOT defined(cTrue)
 /define cTrue
 dcl-c cTrue *on;
 /endif
 
 // @deprecated, use *off instead
-/if NOT DEFINED(cFalse)
+/if NOT defined(cFalse)
 /define cFalse
 dcl-c cFalse *off;
 /endif

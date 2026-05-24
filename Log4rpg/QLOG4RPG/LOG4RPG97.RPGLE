@@ -55,8 +55,8 @@
 // -----------------------------------------
 //  Prototypes
 // -----------------------------------------
-/copy QLOG4RPG,CEELIB                        CEE-Procedures
-/copy QBASICS1,PBASICS1                      Basic RPG Extensions
+/copy QLOG4RPG,CEELIB CEE-Procedures
+/copy QBASICS1,PBASICS1 Basic RPG Extensions
 
 // -----------------------------------------
 //  Private prototypes
@@ -94,11 +94,11 @@ dcl-proc Synchronisation_setLogMode export;
   dcl-pi *n;
     i_mode ind const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-g_isLogMode = i_mode;
+  g_isLogMode = i_mode;
 
-return;
+  return;
 
 
 end-proc;
@@ -110,11 +110,11 @@ dcl-proc Synchronisation_setObjectDesc export;
   dcl-pi *n;
     i_text varchar(50) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-g_objectDesc = i_text;
+  g_objectDesc = i_text;
 
-return;
+  return;
 
 
 end-proc;
@@ -131,27 +131,27 @@ dcl-proc Synchronisation_start export;
     o_msg    likeds(msg_t) options(*nopass: *omit);
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isStarted ind inz(*off);
 
-//  Parameter positions
+  //  Parameter positions
   dcl-c p_msg 4;
 
-//  Optional parameter fields
+  //  Optional parameter fields
   dcl-ds msg likeds(o_msg) inz;
 
-//  Helper fields
+  //  Helper fields
   dcl-s isPresent int(10) inz;
   dcl-s cmd char(128) inz;
   dcl-ds rcvm0200 likeds(rcvm0200_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-clear o_ticket;
-msg = f_newMsg(cMSG_ID_OK);
+  clear o_ticket;
+  msg = f_newMsg(cMSG_ID_OK);
 
-dou '1';
+  dou '1';
 
-   if (not f_exist(i_dtaara: i_lib: '*DTAARA'));
+    if (not f_exist(i_dtaara: i_lib: '*DTAARA'));
       cmd = 'CRTDTAARA DTAARA(%LIB%/%DTAARA%) +
                        TYPE(*CHAR) LEN(%LEN%) +
                        TEXT(''' + g_objectDesc + ''')';
@@ -160,51 +160,51 @@ dou '1';
       cmd = f_replace('%LEN%'   : %char(%len(g_syncData)): cmd);
       f_execute(cmd: *omit: msg);
       if (msg.ID <> cMSG_ID_OK);
-         leave;
+        leave;
       endif;
-   endif;
+    endif;
 
-   g_syncObjName = %trimR(i_lib) + '/' + %trimR(i_dtaara);
+    g_syncObjName = %trimR(i_lib) + '/' + %trimR(i_dtaara);
 
-   monitor;
+    monitor;
       in *lock g_syncData;
-   on-error;
+    on-error;
       rcvm0200 = f_rcvPgmMsg(cMsg_Escape: *omit: cMsg_Act_Old);
       msg = f_cvtRcvMsgToMsg(rcvm0200);
       leave;
-   endmon;
+    endmon;
 
-   g_syncData.jobName = %trimR(%char(sds.nbr)) + '/' +
-                        %trimR(sds.user)       + '/' +
-                        %trimR(sds.job );
-   g_syncData.alcTime = %timestamp();
+    g_syncData.jobName = %trimR(%char(sds.nbr)) + '/' +
+                         %trimR(sds.user)       + '/' +
+                         %trimR(sds.job );
+    g_syncData.alcTime = %timestamp();
 
-   if (g_isLogMode);
+    if (g_isLogMode);
       out *lock g_syncData;
-   endif;
+    endif;
 
-   o_ticket.jobName = g_syncData.jobName;
-   o_ticket.alcTime = g_syncData.alcTime;
-   isStarted = *on;
-enddo;
+    o_ticket.jobName = g_syncData.jobName;
+    o_ticket.alcTime = g_syncData.alcTime;
+    isStarted = *on;
+  enddo;
 
-if (msg.ID <> cMSG_ID_OK);
-   msg.type = cMsg_Escape;
-endif;
+  if (msg.ID <> cMSG_ID_OK);
+    msg.type = cMsg_Escape;
+  endif;
 
-// Process optional/omissible message parameter
-if (%parms() >= p_msg);
-   CEETSTA(isPresent: p_msg: *omit);
-   if (isPresent = 1);
+  // Process optional/omissible message parameter
+  if (%parms() >= p_msg);
+    CEETSTA(isPresent: p_msg: *omit);
+    if (isPresent = 1);
       o_msg = msg;
-   endif;
-else;
-   if (msg.ID <> cMSG_ID_OK);
+    endif;
+  else;
+    if (msg.ID <> cMSG_ID_OK);
       f_sndPgmMsg(msg: cMsg_Prv);
-   endif;
-endif;
+    endif;
+  endif;
 
-return isStarted;
+  return isStarted;
 
 
 end-proc;
@@ -218,34 +218,34 @@ dcl-proc Synchronisation_end export;
     o_msg     likeds(msg_t) options(*nopass: *omit);
   end-pi;
 
-//  Parameter positions
+  //  Parameter positions
   dcl-c p_msg 2;
 
-//  Optional parameter fields
+  //  Optional parameter fields
   dcl-ds msg likeds(o_msg) inz;
 
-//  Helper fields
+  //  Helper fields
   dcl-s isPresent int(10) inz;
   dcl-ds rcvm0200 likeds(rcvm0200_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-msg = f_newMsg(cMSG_ID_OK);
+  msg = f_newMsg(cMSG_ID_OK);
 
-dou '1';
+  dou '1';
 
-   monitor;
+    monitor;
       if (g_isLogMode);
-         in *lock g_syncData;
+        in *lock g_syncData;
       else;
-         unlock g_syncData;
+        unlock g_syncData;
       endif;
-   on-error;
+    on-error;
       rcvm0200 = f_rcvPgmMsg(cMsg_Escape: *omit: cMsg_Act_Old);
       msg = f_cvtRcvMsgToMsg(rcvm0200);
       leave;
-   endmon;
+    endmon;
 
-   if (g_isLogMode);
+    if (g_isLogMode);
       p_assert(io_ticket.jobName = g_syncData.jobName and
                io_ticket.alcTime = g_syncData.alcTime
                : 'Invalid ticket data when attempting +
@@ -253,29 +253,28 @@ dou '1';
 
       clear g_syncData;
       out g_syncData;
-   endif;
+    endif;
 
-   clear io_ticket;
-enddo;
+    clear io_ticket;
+  enddo;
 
-if (msg.ID <> cMSG_ID_OK);
-   msg.type = cMsg_Escape;
-endif;
+  if (msg.ID <> cMSG_ID_OK);
+    msg.type = cMsg_Escape;
+  endif;
 
-// Process optional/omissible message parameter
-if (%parms() >= p_msg);
-   CEETSTA(isPresent: p_msg: *omit);
-   if (isPresent = 1);
+  // Process optional/omissible message parameter
+  if (%parms() >= p_msg);
+    CEETSTA(isPresent: p_msg: *omit);
+    if (isPresent = 1);
       o_msg = msg;
-   endif;
-else;
-   if (msg.ID <> cMSG_ID_OK);
+    endif;
+  else;
+    if (msg.ID <> cMSG_ID_OK);
       f_sndPgmMsg(msg: cMsg_Prv);
-   endif;
-endif;
+    endif;
+  endif;
 
-return;
+  return;
 
 
 end-proc;
-

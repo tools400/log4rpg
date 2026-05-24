@@ -51,12 +51,12 @@
 // -----------------------------------------
 //  Type definitions
 // -----------------------------------------
-/copy QLOG4RPG,PLOG4RPG                      Public interface & type definitions
+/copy QLOG4RPG,PLOG4RPG Public interface & type definitions
 
 // -----------------------------------------
 //  Prototypes
 // -----------------------------------------
-/copy QBASICS1,PBASICS1                      Basic RPG Extensions
+/copy QBASICS1,PBASICS1 Basic RPG Extensions
 
 // -----------------------------------------
 //  Private prototypes
@@ -83,16 +83,16 @@ dcl-proc DebugOutput_toInt export;
   dcl-pi *n int(5);
     i_debugOutput like(LOG4RPG_debugOutput_t) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-select;
-when i_debugOutput = cLOG4RPG_DEBUG_OUTPUT_PRINTER;
-   return cLOG4RPG_INT_DEBUG_OUTPUT_PRINTER;
-when i_debugOutput = cLOG4RPG_DEBUG_OUTPUT_STDOUT;
-   return cLOG4RPG_INT_DEBUG_OUTPUT_STDOUT;
-other;
-   return cLOG4RPG_INT_DEBUG_OUTPUT_PRINTER;
-endsl;
+  select;
+  when i_debugOutput = cLOG4RPG_DEBUG_OUTPUT_PRINTER;
+    return cLOG4RPG_INT_DEBUG_OUTPUT_PRINTER;
+  when i_debugOutput = cLOG4RPG_DEBUG_OUTPUT_STDOUT;
+    return cLOG4RPG_INT_DEBUG_OUTPUT_STDOUT;
+  other;
+    return cLOG4RPG_INT_DEBUG_OUTPUT_PRINTER;
+  endsl;
 
 
 end-proc;
@@ -110,16 +110,16 @@ dcl-proc DebugOutput_toString export;
   dcl-pi *n like(LOG4RPG_debugOutput_t);
     i_debugOutput int(5) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-select;
-when i_debugOutput = cLOG4RPG_INT_DEBUG_OUTPUT_PRINTER;
-   return cLOG4RPG_DEBUG_OUTPUT_PRINTER;
-when i_debugOutput = cLOG4RPG_INT_DEBUG_OUTPUT_STDOUT;
-   return cLOG4RPG_DEBUG_OUTPUT_STDOUT;
-other;
-   return '';
-endsl;
+  select;
+  when i_debugOutput = cLOG4RPG_INT_DEBUG_OUTPUT_PRINTER;
+    return cLOG4RPG_DEBUG_OUTPUT_PRINTER;
+  when i_debugOutput = cLOG4RPG_INT_DEBUG_OUTPUT_STDOUT;
+    return cLOG4RPG_DEBUG_OUTPUT_STDOUT;
+  other;
+    return '';
+  endsl;
 
 
 end-proc;
@@ -137,15 +137,14 @@ dcl-proc DebugOutput_isValid export;
   dcl-pi *n ind;
     i_debugOutput like(LOG4RPG_debugOutput_t) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if (i_debugOutput = cLOG4RPG_DEBUG_OUTPUT_PRINTER) or
-   (i_debugOutput = cLOG4RPG_DEBUG_OUTPUT_STDOUT);
-   return *on;
-else;
-   return *off;
-endif;
+  if (i_debugOutput = cLOG4RPG_DEBUG_OUTPUT_PRINTER) or
+     (i_debugOutput = cLOG4RPG_DEBUG_OUTPUT_STDOUT);
+    return *on;
+  else;
+    return *off;
+  endif;
 
 
 end-proc;
-

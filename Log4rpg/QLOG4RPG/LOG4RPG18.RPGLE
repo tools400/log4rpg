@@ -51,7 +51,7 @@
 // -----------------------------------------
 //  Type definitions
 // -----------------------------------------
-/copy QLOG4RPG,PTYPES                        Private type definitions
+/copy QLOG4RPG,PTYPES Private type definitions
 
 dcl-ds handle_t qualified based(pDummy);
   pMap like(BasicMap_handle_t);
@@ -60,11 +60,11 @@ end-ds;
 // -----------------------------------------
 //  Prototypes
 // -----------------------------------------
-/copy QBASICS1,PBASICS1                      Basic RPG Extensions
-/copy QIFS,PIFS                              IFS Stream file support
+/copy QBASICS1,PBASICS1 Basic RPG Extensions
+/copy QIFS,PIFS IFS Stream file support
 
-/copy QLOG4RPG,PLOG4RPG10                    LogLog
-/copy QLOG4RPG,PLOG4RPG99                    Helpers
+/copy QLOG4RPG,PLOG4RPG10 LogLog
+/copy QLOG4RPG,PLOG4RPG99 Helpers
 
 // -----------------------------------------
 //  Private prototypes
@@ -92,28 +92,28 @@ dcl-proc FilterList_new export;
   dcl-pi *n like(LOG4RPG_pFilterList_t);
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-ds fltList likeds(handle_t) based(pFltList);
 
-//  Helper fields
+  //  Helper fields
   dcl-ds tempFltList likeds(handle_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-LogLog_verbose('Creating filter list ...');
+  LogLog_verbose('Creating filter list ...');
 
-pFltList = FilterList_null();
+  pFltList = FilterList_null();
 
-// Initialize filter list handle
-clear tempFltList;
-tempFltList.pMap = BasicMap_new();
+  // Initialize filter list handle
+  clear tempFltList;
+  tempFltList.pMap = BasicMap_new();
 
-// Return properties list to caller
-pFltList = %alloc(%size(handle_t));
-fltList = tempFltList;
+  // Return properties list to caller
+  pFltList = %alloc(%size(handle_t));
+  fltList = tempFltList;
 
-LogLog_verbose('+ Allocated memory for filter list.');
+  LogLog_verbose('+ Allocated memory for filter list.');
 
-return pFltList;
+  return pFltList;
 
 
 end-proc;
@@ -133,11 +133,11 @@ dcl-proc FilterList_getNumE export;
     i_pFltList like(LOG4RPG_pFilterList_t) const;
   end-pi;
 
-//  Filter list handle
+  //  Filter list handle
   dcl-ds fltList likeds(handle_t) based(i_pFltList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return BasicMap_getNumE(fltList.pMap);
+  return BasicMap_getNumE(fltList.pMap);
 
 
 end-proc;
@@ -158,18 +158,18 @@ dcl-proc FilterList_put export;
     i_pFilter  like(LOG4RPG_pFilter_t) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s pFilter like(i_pFilter);
 
-//  Filter list handle
+  //  Filter list handle
   dcl-ds fltList likeds(handle_t) based(i_pFltList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-pFilter = i_pFilter;
+  pFilter = i_pFilter;
 
-return BasicMap_put(fltList.pMap: Filter_getName(pFilter)
-                                : %addr(pFilter)
-                                : %len(pFilter ));
+  return BasicMap_put(fltList.pMap: Filter_getName(pFilter)
+                                  : %addr(pFilter)
+                                  : %len(pFilter ));
 
 
 end-proc;
@@ -191,11 +191,11 @@ dcl-proc FilterList_remove export;
     i_fltName  like(LOG4RPG_filterName_t) const;
   end-pi;
 
-//  Filter list handle
+  //  Filter list handle
   dcl-ds fltList likeds(handle_t) based(i_pFltList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return BasicMap_remove(fltList.pMap: i_fltName);
+  return BasicMap_remove(fltList.pMap: i_fltName);
 
 
 end-proc;
@@ -216,17 +216,17 @@ dcl-proc FilterList_get export;
     i_fltName  like(LOG4RPG_filterName_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s pFilter like(LOG4RPG_pFilter_t) inz;
 
-//  Filter list handle
+  //  Filter list handle
   dcl-ds fltList likeds(handle_t) based(i_pFltList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-BasicMap_get(fltList.pMap: i_fltName: %addr(pFilter)
-                                    : %size(pFilter));
+  BasicMap_get(fltList.pMap: i_fltName: %addr(pFilter)
+                                      : %size(pFilter));
 
-return pFilter;
+  return pFilter;
 
 
 end-proc;
@@ -247,11 +247,11 @@ dcl-proc FilterList_exist export;
     i_fltName  like(LOG4RPG_filterName_t) const;
   end-pi;
 
-//  Filter list handle
+  //  Filter list handle
   dcl-ds fltList likeds(handle_t) based(i_pFltList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return BasicMap_containsKey(fltList.pMap: i_fltName);
+  return BasicMap_containsKey(fltList.pMap: i_fltName);
 
 
 end-proc;
@@ -266,22 +266,19 @@ end-proc;
 //   fltIter       - Iterator for the filter list.
 //=========================================================================
 dcl-proc FilterList_getIterator export;
+  dcl-pi *n likeds(LOG4RPG_FilterListIterator_t);
+    i_pFltList like(LOG4RPG_pFilterList_t) const;
+  end-pi;
 
-  dcl-ds FilterList_getIteratorPI likeds(LOG4RPG_Filter: ListIterator_t);
-i_pFltList      const  like(LOG4RPG_pFilterList_t );
-  end-ds;
+  //  Return value
+  dcl-ds fltIter likeds(LOG4RPG_FilterListIterator_t) inz;
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-//  Return value
-  dcl-ds fltIter DS likeds(LOG4RPG_Filter: ListIterator_t) inz;
-  end-ds;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  clear fltIter;
+  fltIter.pFltList = i_pFltList;
+  fltIter.lastFlt  = 0;
 
-clear fltIter;
-fltIter.pFltList = i_pFltList;
-fltIter.lastFlt  = 0;
-
-return fltIter;
-
+  return fltIter;
 
 end-proc;
 
@@ -300,29 +297,29 @@ dcl-proc FilterList_getFirst export;
     io_fltIter likeds(LOG4RPG_FilterListIterator_t);
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s pFilter like(LOG4RPG_pFilter_t) inz;
 
-//  Helper fields
+  //  Helper fields
   dcl-s fltName like(LOG4RPG_filterName_t) inz;
 
-//  Filter list handle
+  //  Filter list handle
   dcl-ds fltList likeds(handle_t) based(io_fltIter.pFltList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-pFilter = Filter_null();
+  pFilter = Filter_null();
 
-if FilterList_getNumE(io_fltIter.pFltList) = 0;
-   return pFilter;
-endif;
+  if FilterList_getNumE(io_fltIter.pFltList) = 0;
+    return pFilter;
+  endif;
 
-io_fltIter.lastFlt = 1;
+  io_fltIter.lastFlt = 1;
 
-fltName = BasicMap_getKeyByIndex(fltList.pMap
-                                 : io_fltIter.lastFlt);
-pFilter = FilterList_get(io_fltIter.pFltList: fltName);
+  fltName = BasicMap_getKeyByIndex(fltList.pMap
+                                   : io_fltIter.lastFlt);
+  pFilter = FilterList_get(io_fltIter.pFltList: fltName);
 
-return pFilter;
+  return pFilter;
 
 
 end-proc;
@@ -342,29 +339,29 @@ dcl-proc FilterList_getNext export;
     io_fltIter likeds(LOG4RPG_FilterListIterator_t);
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s pFilter like(LOG4RPG_pFilter_t) inz;
 
-//  Helper fields
+  //  Helper fields
   dcl-s fltName like(LOG4RPG_filterName_t) inz;
 
-//  Filter list handle
+  //  Filter list handle
   dcl-ds fltList likeds(handle_t) based(io_fltIter.pFltList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-pFilter = Filter_null();
+  pFilter = Filter_null();
 
-if FilterList_getNumE(io_fltIter.pFltList) <= io_fltIter.lastFlt;
-   return pFilter;
-endif;
+  if FilterList_getNumE(io_fltIter.pFltList) <= io_fltIter.lastFlt;
+    return pFilter;
+  endif;
 
-io_fltIter.lastFlt = io_fltIter.lastFlt + 1;
+  io_fltIter.lastFlt = io_fltIter.lastFlt + 1;
 
-fltName = BasicMap_getKeyByIndex(fltList.pMap
-                                 : io_fltIter.lastFlt);
-pFilter = FilterList_get(io_fltIter.pFltList: fltName);
+  fltName = BasicMap_getKeyByIndex(fltList.pMap
+                                   : io_fltIter.lastFlt);
+  pFilter = FilterList_get(io_fltIter.pFltList: fltName);
 
-return pFilter;
+  return pFilter;
 
 
 end-proc;
@@ -383,52 +380,51 @@ dcl-proc FilterList_delete export;
     io_pFltList like(LOG4RPG_pFilterList_t);
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isDeleted ind inz(*off);
 
-//  Helper fields
+  //  Helper fields
   dcl-s name like(LOG4RPG_filterName_t) inz;
-  dcl-ds fltIter DS likeds(LOG4RPG_Filter: ListIterator_t) inz;
-  end-ds;
+  dcl-ds fltIter likeds(LOG4RPG_FilterListIterator_t) inz;
   dcl-s pFilter like(LOG4RPG_pFilter_t) inz;
 
-//  Filter list handle
+  //  Filter list handle
   dcl-ds fltList likeds(handle_t) based(io_pFltList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if BasicMap_isNull(fltList.pMap);
-   return *on;
-endif;
+  if BasicMap_isNull(fltList.pMap);
+    return *on;
+  endif;
 
-LogLog_verbose('Deleting filter list ...');
+  LogLog_verbose('Deleting filter list ...');
 
-p_assert(FilterList_getNumE(io_pFltList) = 0
-         : 'All filters should have been removed from this +
-            filter list by the logger or the repository.');
+  p_assert(FilterList_getNumE(io_pFltList) = 0
+           : 'All filters should have been removed from this +
+              filter list by the logger or the repository.');
 
-fltIter = FilterList_getIterator(io_pFltList);
+  fltIter = FilterList_getIterator(io_pFltList);
 
-dow FilterList_getNumE(io_pFltList) > 0;
-   pFilter = FilterList_getFirst(fltIter);
-   name = Filter_getName(pFilter);
-   FilterList_remove(io_pFltList: name);
-   Filter_delete(pFilter);
-enddo;
+  dow FilterList_getNumE(io_pFltList) > 0;
+    pFilter = FilterList_getFirst(fltIter);
+    name = Filter_getName(pFilter);
+    FilterList_remove(io_pFltList: name);
+    Filter_delete(pFilter);
+  enddo;
 
-if BasicMap_delete(fltList.pMap) = 0;
-   isDeleted = *on;
-else;
-   isDeleted = *off;
-endif;
+  if BasicMap_delete(fltList.pMap) = 0;
+    isDeleted = *on;
+  else;
+    isDeleted = *off;
+  endif;
 
-clear fltList;
-dealloc(N) io_pFltList;
+  clear fltList;
+  dealloc(N) io_pFltList;
 
-io_pFltList = FilterList_null();
+  io_pFltList = FilterList_null();
 
-LogLog_verbose('- Freed memory of filter list.');
+  LogLog_verbose('- Freed memory of filter list.');
 
-return isDeleted;
+  return isDeleted;
 
 
 end-proc;
@@ -448,15 +444,15 @@ dcl-proc FilterList_isNull export;
     i_pFltList like(LOG4RPG_pFilterList_t) const;
   end-pi;
 
-//  Filter list handle
+  //  Filter list handle
   dcl-ds fltList likeds(handle_t) based(i_pFltList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if i_pFltList = FilterList_null();
-   return *on;
-else;
-   return BasicMap_isNull(fltList.pMap);
-endif;
+  if i_pFltList = FilterList_null();
+    return *on;
+  else;
+    return BasicMap_isNull(fltList.pMap);
+  endif;
 
 
 end-proc;
@@ -473,10 +469,9 @@ end-proc;
 dcl-proc FilterList_null export;
   dcl-pi *n like(LOG4RPG_pFilterList_t);
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return BasicMap_null();
+  return BasicMap_null();
 
 
 end-proc;
-

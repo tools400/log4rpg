@@ -1,12 +1,12 @@
 **free
-/if NOT DEFINED(PLOG4RPG07)
+/if NOT defined(PLOG4RPG07)
 /define PLOG4RPG07
 
 // -----------------------------------------
 //  Type definitions
 // -----------------------------------------
-/copy QBASICS1,PBASICS1                      URL
-/copy QLOG4RPG,PLOG4RPG06                    Property
+/copy QBASICS1,PBASICS1 URL
+/copy QLOG4RPG,PLOG4RPG06 Property
 
 dcl-s LOG4RPG_pPropertyList_t pointer based(pDummy);
 

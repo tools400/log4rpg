@@ -48,8 +48,8 @@ ctl-opt expropts(*resdecpos) extbinint(*yes);
 // ------------------------------------
 //  External Prototypes
 // ------------------------------------
-/copy QBASICS1,PBASICS1                      SrvPgm: Basics 1
-/copy QLOG4RPG,PLOG4RPG                      Log4rpg
+/copy QBASICS1,PBASICS1 SrvPgm Basics 1
+/copy QLOG4RPG,PLOG4RPG Log4rpg
 
 // ------------------------------------
 //  Global Fields

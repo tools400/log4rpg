@@ -1,11 +1,11 @@
 **free
-/if NOT DEFINED(PLOG4RPG04)
+/if NOT defined(PLOG4RPG04)
 /define PLOG4RPG04
 
 // -----------------------------------------
 //  Type definitions
 // -----------------------------------------
-/copy QLOG4RPG,PLOG4RPG03                    Appender
+/copy QLOG4RPG,PLOG4RPG03 Appender
 
 dcl-s LOG4RPG_pAppenderList_t pointer based(pDummy);
 

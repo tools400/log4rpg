@@ -59,7 +59,7 @@
 // -----------------------------------------
 //  Type definitions
 // -----------------------------------------
-/copy QLOG4RPG,PLOG4RPG                     Public interface & type definitions
+/copy QLOG4RPG,PLOG4RPG Public interface & type definitions
 
 dcl-ds handle_t qualified based(pDummy);
   pSuper like(LOG4RPG_pAppender_t);
@@ -69,8 +69,8 @@ end-ds;
 // -----------------------------------------
 //  Prototypes
 // -----------------------------------------
-/copy QLOG4RPG,PLOG4RPG10                   LogLog
-/copy QLOG4RPG,PLOG4RPG99                   Helper
+/copy QLOG4RPG,PLOG4RPG10 LogLog
+/copy QLOG4RPG,PLOG4RPG99 Helper
 
 // -----------------------------------------
 //  Private prototypes
@@ -79,13 +79,12 @@ end-ds;
 // -----------------------------------------
 //  Global constants
 // -----------------------------------------
-dcl-c cTHIS_CLASS;
-     D                                            'NullAppender')
-//
+dcl-c cTHIS_CLASS 'NullAppender';
+
 // -----------------------------------------
 //  Global fields
 // -----------------------------------------
-//
+
 //=====================================================================*
 //  Creates a new NullAppender.
 //=====================================================================*
@@ -95,30 +94,30 @@ dcl-c cTHIS_CLASS;
 //   i_pPropsList  - Handle of the property list that contains the
 //                   properties for the appender.
 //   i_prefix      - Prefix of the relevant property keys.
-//
+
 //  Returns:
 //   isDone        - Returns TRUE on success, else FALSE.
 //=====================================================================*
 dcl-proc NullAppender_new export;
-dcl-pi NullAppender_new ind;
-  i_pSuper    like(LOG4RPG_pAppender_t) const;
-  io_pHandle  pointer;
-  i_pPropList like(LOG4RPG_pPropertyList_t) const;
-  i_prefix    like(LOG4RPG_prefix_t) const;
-end-pi;
+  dcl-pi *n ind;
+    i_pSuper    like(LOG4RPG_pAppender_t) const;
+    io_pHandle  pointer;
+    i_pPropList like(LOG4RPG_pPropertyList_t) const;
+    i_prefix    like(LOG4RPG_prefix_t) const;
+  end-pi;
 
-//  Return value
-dcl-s isDone ind inz(*off);
+  //  Return value
+  dcl-s isDone ind inz(*off);
 
-//  Appender handle
-dcl-ds handle likeds(handle_t) based(io_pHandle);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  //  Appender handle
+  dcl-ds handle likeds(handle_t) based(io_pHandle);
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-io_pHandle = *NULL;
+  io_pHandle = *NULL;
 
-LogLog_debug('Loaded instance of [' + cTHIS_CLASS + '].');
+  LogLog_debug('Loaded instance of [' + cTHIS_CLASS + '].');
 
-return isDone;
+  return isDone;
 
 
 end-proc;
@@ -138,9 +137,9 @@ dcl-proc NullAppender_requiresLayout export;
   dcl-pi *n ind;
     i_pHandle pointer const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return *off;
+  return *off;
 
 
 end-proc;
@@ -162,16 +161,16 @@ dcl-proc NullAppender_doAppend export;
     i_pLogEvent like(LOG4RPG_pLogEvent_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isDone ind inz(*off);
 
-//  Appender handle
+  //  Appender handle
   dcl-ds handle likeds(handle_t) based(i_pHandle);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-isDone = *on;
+  isDone = *on;
 
-return isDone;
+  return isDone;
 
 
 end-proc;
@@ -196,11 +195,11 @@ dcl-proc NullAppender_setProperties export;
     i_prefix    like(LOG4RPG_prefix_t) const;
   end-pi;
 
-//  NullAppender handle
+  //  NullAppender handle
   dcl-ds handle likeds(handle_t) based(i_pHandle);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return;
+  return;
 
 
 end-proc;
@@ -220,19 +219,18 @@ dcl-proc NullAppender_delete export;
     io_pHandle pointer;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isDone ind inz(*off);
 
-//  Appender handle
+  //  Appender handle
   dcl-ds handle likeds(handle_t) based(io_pHandle);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
+  LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
 
-isDone = *on;
+  isDone = *on;
 
-return isDone;
+  return isDone;
 
 
 end-proc;
-

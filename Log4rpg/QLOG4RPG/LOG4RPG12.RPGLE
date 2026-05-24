@@ -63,10 +63,10 @@
 // -----------------------------------------
 //  Prototypes
 // -----------------------------------------
-/copy QBASICS1,PBASICS1                      Basic RPG Extensions
+/copy QBASICS1,PBASICS1 Basic RPG Extensions
 
-/copy QLOG4RPG,PLOG4RPG10                    LogLog
-/copy QLOG4RPG,PLOG4RPG99                    Helpers
+/copy QLOG4RPG,PLOG4RPG10 LogLog
+/copy QLOG4RPG,PLOG4RPG99 Helpers
 
 // -----------------------------------------
 //  Private prototypes
@@ -125,84 +125,84 @@ dcl-proc ClassLoader_resolveAppender export;
     o_classAppender likeds(LOG4RPG_classAppender_t);
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isResolved ind inz(*off);
 
-//  Helper fields
+  //  Helper fields
   dcl-ds srvPgm likeds(qObj_t) inz;
   dcl-s proc like(LOG4RPG_procedure_t) inz;
   dcl-ds tempClassAppender likeds(LOG4RPG_classAppender_t) inz;
   dcl-ds msg likeds(msg_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-clear o_classAppender;
-clear tempClassAppender;
+  clear o_classAppender;
+  clear tempClassAppender;
 
-srvPgm = getSrvPgm(i_appendImpl);
-proc   = getProcedure(i_appendImpl);
+  srvPgm = getSrvPgm(i_appendImpl);
+  proc   = getProcedure(i_appendImpl);
 
-tempClassAppender.pHandle = *NULL;
-tempClassAppender.srvPgm  = f_activateSrvPgm(srvPgm.name
-                                             : srvPgm.lib
-                                             : msg);
-if msg.ID <> cMSG_ID_OK;
-   LogLog_warning('Can not activate service program [' +
-                   i_appendImpl + ']');
-   return isResolved;
-endif;
+  tempClassAppender.pHandle = *NULL;
+  tempClassAppender.srvPgm  = f_activateSrvPgm(srvPgm.name
+                                               : srvPgm.lib
+                                               : msg);
+  if msg.ID <> cMSG_ID_OK;
+    LogLog_warning('Can not activate service program [' +
+                    i_appendImpl + ']');
+    return isResolved;
+  endif;
 
-tempClassAppender.proc = proc;
+  tempClassAppender.proc = proc;
 
-tempClassAppender.procNew            =
-              f_getProcPtrByName(proc + cAPPENDER_NEW
-                                 : tempClassAppender.srvPgm: *omit);
-if tempClassAppender.procNew.procptr = *NULL;
-   LogLog_error('Could not resolve procedure: ' +
-                 proc + cAPPENDER_NEW);
-   return isResolved;
-endif;
+  tempClassAppender.procNew            =
+                f_getProcPtrByName(proc + cAPPENDER_NEW
+                                   : tempClassAppender.srvPgm: *omit);
+  if tempClassAppender.procNew.procptr = *NULL;
+    LogLog_error('Could not resolve procedure: ' +
+                  proc + cAPPENDER_NEW);
+    return isResolved;
+  endif;
 
-tempClassAppender.procRequiresLayout =
-              f_getProcPtrByName(proc + cAPPENDER_REQUIRES_LAYOUT
-                                 : tempClassAppender.srvPgm: *omit);
-if tempClassAppender.procRequiresLayout.procptr = *NULL;
-   LogLog_error('Could not resolve procedure: ' +
-                 proc + cAPPENDER_REQUIRES_LAYOUT);
-   return isResolved;
-endif;
+  tempClassAppender.procRequiresLayout =
+                f_getProcPtrByName(proc + cAPPENDER_REQUIRES_LAYOUT
+                                   : tempClassAppender.srvPgm: *omit);
+  if tempClassAppender.procRequiresLayout.procptr = *NULL;
+    LogLog_error('Could not resolve procedure: ' +
+                  proc + cAPPENDER_REQUIRES_LAYOUT);
+    return isResolved;
+  endif;
 
-tempClassAppender.procDoAppend       =
-              f_getProcPtrByName(proc + cAPPENDER_DOAPPEND
-                                 : tempClassAppender.srvPgm: *omit);
-if tempClassAppender.procDoAppend.procptr = *NULL;
-   LogLog_error('Could not resolve procedure: ' +
-                 proc + cAPPENDER_DOAPPEND);
-   return isResolved;
-endif;
+  tempClassAppender.procDoAppend       =
+                f_getProcPtrByName(proc + cAPPENDER_DOAPPEND
+                                   : tempClassAppender.srvPgm: *omit);
+  if tempClassAppender.procDoAppend.procptr = *NULL;
+    LogLog_error('Could not resolve procedure: ' +
+                  proc + cAPPENDER_DOAPPEND);
+    return isResolved;
+  endif;
 
-tempClassAppender.procSetProperties  =
-              f_getProcPtrByName(proc + cAPPENDER_SET_PROPERTIES
-                                 : tempClassAppender.srvPgm: *omit);
-if tempClassAppender.procSetProperties.procptr = *NULL;
-   LogLog_error('Could not resolve procedure: ' +
-                 proc + cAPPENDER_SET_PROPERTIES);
-   return isResolved;
-endif;
+  tempClassAppender.procSetProperties  =
+                f_getProcPtrByName(proc + cAPPENDER_SET_PROPERTIES
+                                   : tempClassAppender.srvPgm: *omit);
+  if tempClassAppender.procSetProperties.procptr = *NULL;
+    LogLog_error('Could not resolve procedure: ' +
+                  proc + cAPPENDER_SET_PROPERTIES);
+    return isResolved;
+  endif;
 
-tempClassAppender.procDelete         =
-              f_getProcPtrByName(proc + cAPPENDER_DELETE
-                                 : tempClassAppender.srvPgm: *omit);
-if tempClassAppender.procDelete.procptr = *NULL;
-   LogLog_error('Could not resolve procedure: ' +
-                 proc + cAPPENDER_DELETE);
-   return isResolved;
-endif;
+  tempClassAppender.procDelete         =
+                f_getProcPtrByName(proc + cAPPENDER_DELETE
+                                   : tempClassAppender.srvPgm: *omit);
+  if tempClassAppender.procDelete.procptr = *NULL;
+    LogLog_error('Could not resolve procedure: ' +
+                  proc + cAPPENDER_DELETE);
+    return isResolved;
+  endif;
 
-o_classAppender = tempClassAppender;
+  o_classAppender = tempClassAppender;
 
-isResolved = *on;
+  isResolved = *on;
 
-return isResolved;
+  return isResolved;
 
 
 end-proc;
@@ -225,92 +225,92 @@ dcl-proc ClassLoader_resolveLayout export;
     o_classLayout likeds(LOG4RPG_classLayout_t);
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isResolved ind inz(*off);
 
-//  Helper fields
+  //  Helper fields
   dcl-ds srvPgm likeds(qObj_t) inz;
   dcl-s proc like(LOG4RPG_procedure_t) inz;
   dcl-ds tempClassLayout likeds(LOG4RPG_classLayout_t) inz;
   dcl-ds msg likeds(msg_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-clear o_classLayout;
-clear tempClassLayout;
+  clear o_classLayout;
+  clear tempClassLayout;
 
-srvPgm = getSrvPgm(i_layoutImpl);
-proc   = getProcedure(i_layoutImpl);
+  srvPgm = getSrvPgm(i_layoutImpl);
+  proc   = getProcedure(i_layoutImpl);
 
-tempClassLayout.pHandle = *NULL;
-tempClassLayout.srvPgm  = f_activateSrvPgm(srvPgm.name
-                                           : srvPgm.lib
-                                           : msg);
-if msg.ID <> cMSG_ID_OK;
-   LogLog_warning('Can not activate service program [' +
-                   i_layoutImpl + ']');
-   return isResolved;
-endif;
+  tempClassLayout.pHandle = *NULL;
+  tempClassLayout.srvPgm  = f_activateSrvPgm(srvPgm.name
+                                             : srvPgm.lib
+                                             : msg);
+  if msg.ID <> cMSG_ID_OK;
+    LogLog_warning('Can not activate service program [' +
+                    i_layoutImpl + ']');
+    return isResolved;
+  endif;
 
-tempClassLayout.proc = proc;
+  tempClassLayout.proc = proc;
 
-tempClassLayout.procNew            =
-              f_getProcPtrByName(proc + cLAYOUT_NEW
-                                 : tempClassLayout.srvPgm: *omit);
-if tempClassLayout.procNew.procptr = *NULL;
-   LogLog_error('Could not resolve procedure: ' +
-                 proc + cLAYOUT_NEW);
-   return isResolved;
-endif;
+  tempClassLayout.procNew            =
+                f_getProcPtrByName(proc + cLAYOUT_NEW
+                                   : tempClassLayout.srvPgm: *omit);
+  if tempClassLayout.procNew.procptr = *NULL;
+    LogLog_error('Could not resolve procedure: ' +
+                  proc + cLAYOUT_NEW);
+    return isResolved;
+  endif;
 
-tempClassLayout.procFormat         =
-              f_getProcPtrByName(proc + cLAYOUT_FORMAT
-                                 : tempClassLayout.srvPgm: *omit);
-if tempClassLayout.procFormat.procptr = *NULL;
-   LogLog_error('Could not resolve procedure: ' +
-                 proc + cLAYOUT_NEW);
-   return isResolved;
-endif;
+  tempClassLayout.procFormat         =
+                f_getProcPtrByName(proc + cLAYOUT_FORMAT
+                                   : tempClassLayout.srvPgm: *omit);
+  if tempClassLayout.procFormat.procptr = *NULL;
+    LogLog_error('Could not resolve procedure: ' +
+                  proc + cLAYOUT_NEW);
+    return isResolved;
+  endif;
 
-tempClassLayout.procSetProperties  =
-              f_getProcPtrByName(proc + cLAYOUT_SET_PROPERTIES
-                                 : tempClassLayout.srvPgm: *omit);
-if tempClassLayout.procSetProperties.procptr = *NULL;
-   LogLog_error('Could not resolve procedure: ' +
-                 proc + cLAYOUT_NEW);
-   return isResolved;
-endif;
+  tempClassLayout.procSetProperties  =
+                f_getProcPtrByName(proc + cLAYOUT_SET_PROPERTIES
+                                   : tempClassLayout.srvPgm: *omit);
+  if tempClassLayout.procSetProperties.procptr = *NULL;
+    LogLog_error('Could not resolve procedure: ' +
+                  proc + cLAYOUT_NEW);
+    return isResolved;
+  endif;
 
-tempClassLayout.procDelete         =
-              f_getProcPtrByName(proc + cLAYOUT_DELETE
-                                 : tempClassLayout.srvPgm: *omit);
-if tempClassLayout.procDelete.procptr = *NULL;
-   LogLog_error('Could not resolve procedure: ' +
-                 proc + cLAYOUT_NEW);
-   return isResolved;
-endif;
+  tempClassLayout.procDelete         =
+                f_getProcPtrByName(proc + cLAYOUT_DELETE
+                                   : tempClassLayout.srvPgm: *omit);
+  if tempClassLayout.procDelete.procptr = *NULL;
+    LogLog_error('Could not resolve procedure: ' +
+                  proc + cLAYOUT_NEW);
+    return isResolved;
+  endif;
 
-// Resolve optional procedures
-tempClassLayout.procGetHeader      =
-              f_getProcPtrByName(proc + cLAYOUT_GET_HEADER
-                                 : tempClassLayout.srvPgm: *omit);
-if tempClassLayout.procGetHeader.procptr = *NULL;
-   LogLog_verbose('Could not resolve procedure: ' +
-                   proc + cLAYOUT_GET_HEADER);
-endif;
+  // Resolve optional procedures
+  tempClassLayout.procGetHeader      =
+                f_getProcPtrByName(proc + cLAYOUT_GET_HEADER
+                                   : tempClassLayout.srvPgm: *omit);
+  if tempClassLayout.procGetHeader.procptr = *NULL;
+    LogLog_verbose('Could not resolve procedure: ' +
+                    proc + cLAYOUT_GET_HEADER);
+  endif;
 
-tempClassLayout.procGetFooter      =
-              f_getProcPtrByName(proc + cLAYOUT_GET_FOOTER
-                                 : tempClassLayout.srvPgm: *omit);
-if tempClassLayout.procGetFooter.procptr = *NULL;
-   LogLog_verbose('Could not resolve procedure: ' +
-                   proc + cLAYOUT_GET_FOOTER);
-endif;
+  tempClassLayout.procGetFooter      =
+                f_getProcPtrByName(proc + cLAYOUT_GET_FOOTER
+                                   : tempClassLayout.srvPgm: *omit);
+  if tempClassLayout.procGetFooter.procptr = *NULL;
+    LogLog_verbose('Could not resolve procedure: ' +
+                    proc + cLAYOUT_GET_FOOTER);
+  endif;
 
-o_classLayout = tempClassLayout;
+  o_classLayout = tempClassLayout;
 
-isResolved = *on;
+  isResolved = *on;
 
-return isResolved;
+  return isResolved;
 
 
 end-proc;
@@ -333,76 +333,75 @@ dcl-proc ClassLoader_resolveFilter export;
     o_classFilter likeds(LOG4RPG_classFilter_t);
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isResolved ind inz(*off);
 
-//  Helper fields
+  //  Helper fields
   dcl-ds srvPgm likeds(qObj_t) inz;
   dcl-s proc like(LOG4RPG_procedure_t) inz;
   dcl-ds tempClassFilter likeds(LOG4RPG_classFilter_t) inz;
   dcl-ds msg likeds(msg_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-clear o_classFilter;
-clear tempClassFilter;
+  clear o_classFilter;
+  clear tempClassFilter;
 
-srvPgm = getSrvPgm(i_filterImpl);
-proc   = getProcedure(i_filterImpl);
+  srvPgm = getSrvPgm(i_filterImpl);
+  proc   = getProcedure(i_filterImpl);
 
-tempClassFilter.pHandle = *NULL;
-tempClassFilter.srvPgm  = f_activateSrvPgm(srvPgm.name
-                                           : srvPgm.lib
-                                           : msg);
-if msg.ID <> cMSG_ID_OK;
-   LogLog_warning('Can not activate service program [' +
-                   i_filterImpl + ']');
-   return isResolved;
-endif;
+  tempClassFilter.pHandle = *NULL;
+  tempClassFilter.srvPgm  = f_activateSrvPgm(srvPgm.name
+                                             : srvPgm.lib
+                                             : msg);
+  if msg.ID <> cMSG_ID_OK;
+    LogLog_warning('Can not activate service program [' +
+                    i_filterImpl + ']');
+    return isResolved;
+  endif;
 
-tempClassFilter.proc = proc;
+  tempClassFilter.proc = proc;
 
-tempClassFilter.procNew            =
-              f_getProcPtrByName(proc + cFILTER_NEW
-                                 : tempClassFilter.srvPgm: *omit);
-if tempClassFilter.procNew.procptr = *NULL;
-   LogLog_error('Could not resolve procedure: ' +
-                 proc + cFILTER_NEW);
-   return isResolved;
-endif;
+  tempClassFilter.procNew            =
+                f_getProcPtrByName(proc + cFILTER_NEW
+                                   : tempClassFilter.srvPgm: *omit);
+  if tempClassFilter.procNew.procptr = *NULL;
+    LogLog_error('Could not resolve procedure: ' +
+                  proc + cFILTER_NEW);
+    return isResolved;
+  endif;
 
-tempClassFilter.procDecide         =
-              f_getProcPtrByName(proc + cFILTER_DECIDE
-                                 : tempClassFilter.srvPgm: *omit);
-if tempClassFilter.procDecide.procptr = *NULL;
-   LogLog_error('Could not resolve procedure: ' +
-                 proc + cFILTER_DECIDE);
-   return isResolved;
-endif;
+  tempClassFilter.procDecide         =
+                f_getProcPtrByName(proc + cFILTER_DECIDE
+                                   : tempClassFilter.srvPgm: *omit);
+  if tempClassFilter.procDecide.procptr = *NULL;
+    LogLog_error('Could not resolve procedure: ' +
+                  proc + cFILTER_DECIDE);
+    return isResolved;
+  endif;
 
-tempClassFilter.procSetProperties  =
-              f_getProcPtrByName(proc + cFILTER_SET_PROPERTIES
-                                 : tempClassFilter.srvPgm: *omit);
-if tempClassFilter.procSetProperties.procptr = *NULL;
-   LogLog_error('Could not resolve procedure: ' +
-                 proc + cFILTER_SET_PROPERTIES);
-   return isResolved;
-endif;
+  tempClassFilter.procSetProperties  =
+                f_getProcPtrByName(proc + cFILTER_SET_PROPERTIES
+                                   : tempClassFilter.srvPgm: *omit);
+  if tempClassFilter.procSetProperties.procptr = *NULL;
+    LogLog_error('Could not resolve procedure: ' +
+                  proc + cFILTER_SET_PROPERTIES);
+    return isResolved;
+  endif;
 
-tempClassFilter.procDelete         =
-              f_getProcPtrByName(proc + cFILTER_DELETE
-                                 : tempClassFilter.srvPgm: *omit);
-if tempClassFilter.procDelete.procptr = *NULL;
-   LogLog_error('Could not resolve procedure: ' +
-                 proc + cFILTER_DELETE);
-   return isResolved;
-endif;
+  tempClassFilter.procDelete         =
+                f_getProcPtrByName(proc + cFILTER_DELETE
+                                   : tempClassFilter.srvPgm: *omit);
+  if tempClassFilter.procDelete.procptr = *NULL;
+    LogLog_error('Could not resolve procedure: ' +
+                  proc + cFILTER_DELETE);
+    return isResolved;
+  endif;
 
-o_classFilter = tempClassFilter;
+  o_classFilter = tempClassFilter;
 
-isResolved = *on;
+  isResolved = *on;
 
-return isResolved;
+  return isResolved;
 
 
 end-proc;
-

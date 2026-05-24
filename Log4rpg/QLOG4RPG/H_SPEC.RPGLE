@@ -1,8 +1,8 @@
 **free
-/if NOT DEFINED(H_SPEC)
+/if NOT defined(H_SPEC)
 /define H_SPEC
 
-/if NOT DEFINED(UNIT_TEST)
+/if NOT defined(UNIT_TEST)
 ctl-opt nomain;
 /endif
 //  Standard H-Specs

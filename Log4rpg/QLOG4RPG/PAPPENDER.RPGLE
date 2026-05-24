@@ -1,7 +1,7 @@
-**FREE
-/IF NOT DEFINED(PAPPENDER)
-/DEFINE PAPPENDER
-//
+**free
+/if NOT defined(PAPPENDER)
+/define PAPPENDER
+
 //  Who should use this copy book:   Developer of appenders
 //
 //  This copy book defines the prototypes that are needed to write an
@@ -27,79 +27,62 @@
 // -----------------------------------------
 //  Type definitions
 // -----------------------------------------
-/COPY QLOG4RPG,PSHARE                        Type defs shared with appenders & layouts
-//
+/copy QLOG4RPG,PSHARE Type defs shared with appenders & layouts
+
 // -----------------------------------------
 //  Appender Prototypes & Type Defs
 // -----------------------------------------
-//
+
 //  Custom appender ...
 //  ... prototye: new, returns TRUE on success else FALSE
-/IF DEFINED (DEFINE_PROCPTR)
-dcl-pr SrvPgmAppender_new
-       ind extproc(g_pAppender_new);
+/if defined(DEFINE_PROCPTR)
+dcl-pr SrvPgmAppender_new ind extproc(g_pAppender_new);
+/else
+dcl-pr SrvPgmAppender_new ind extproc('SrvPgmAppender_new');
+/endif
+  i_pSuper   like(LOG4RPG_pAppender_t) const;
+  io_pHandle pointer;
+  i_propList like(LOG4RPG_pPropertyList_t) const;
+  i_prefix   like(LOG4RPG_prefix_t) const;
 end-pr;
-/ELSE
-dcl-pr SrvPgmAppender_new
-       ind extproc('SrvPgmAppender_new');
-end-pr;
-/ENDIF
-     D  i_pSuper                           const  like(LOG4RPG_pAppender_t     )
-     D  io_pHandle                     *
-     D  i_propList                         const  like(LOG4RPG_pPropertyList_t )
-     D  i_prefix                           const  like(LOG4RPG_prefix_t        )
-//
+
 //  ... prototye: requiresLayout, returns TRUE if the appender requires a layout
-/IF DEFINED (DEFINE_PROCPTR)
-dcl-pr SrvPgmAppender_requiresLayout
-       ind extproc(g_pAppender_requiresLayout);
+/if defined(DEFINE_PROCPTR)
+dcl-pr SrvPgmAppender_requiresLayout ind extproc(g_pAppender_requiresLayout);
+/else
+dcl-pr SrvPgmAppender_requiresLayout ind extproc('SrvPgmAppender_requiresLayout');
+/endif
+  i_pHandle pointer const;
 end-pr;
-/ELSE
-dcl-pr SrvPgmAppender_requiresLayout
-       ind extproc('SrvPgmAppender_+
-       requiresLayout');
-end-pr;
-/ENDIF
-     D  i_pHandle                      *   const
-//
+
 //  ... prototye: doAppend, returns TRUE on success else FALSE
-/IF DEFINED (DEFINE_PROCPTR)
-dcl-pr SrvPgmAppender_doAppend
-       ind extproc(g_pAppender_doAppend);
+/if defined(DEFINE_PROCPTR)
+dcl-pr SrvPgmAppender_doAppend ind extproc(g_pAppender_doAppend);
+/else
+dcl-pr SrvPgmAppender_doAppend ind extproc('SrvPgmAppender_doAppend');
+/endif
+  i_pHandle   pointer const;
+  i_pLogEvent like(LOG4RPG_pLogEvent_t) const;
 end-pr;
-/ELSE
-dcl-pr SrvPgmAppender_doAppend
-       ind extproc('SrvPgmAppender_doAppend');
-end-pr;
-/ENDIF
-     D  i_pHandle                      *   const
-     D  i_pLogEvent                        const like(LOG4RPG_pLogEvent_t )
-//
+
 //  ... prototye: setProperties, sets the proeprties for the appender
-/IF DEFINED (DEFINE_PROCPTR)
-dcl-pr SrvPgmAppender_setProperties
-       extproc(g_pAppender_setProperties);
+/if defined(DEFINE_PROCPTR)
+dcl-pr SrvPgmAppender_setProperties extproc(g_pAppender_setProperties);
+/else
+dcl-pr SrvPgmAppender_setProperties extproc('SrvPgmAppender_setProperties');
+/endif
+  i_pHandle  pointer const;
+  i_propList like(LOG4RPG_pPropertyList_t) const;
+  i_prefix   like(LOG4RPG_prefix_t) const;
 end-pr;
-/ELSE
-dcl-pr SrvPgmAppender_setProperties
-       extproc('SrvPgmAppender_+
-       setProperties');
-end-pr;
-/ENDIF
-     D  i_pHandle                      *   const
-     D  i_propList                         const  like(LOG4RPG_pPropertyList_t )
-     D  i_prefix                           const  like(LOG4RPG_prefix_t        )
-//
+
 //  ... prototye: delete, returns TRUE on success else FALSE
-/IF DEFINED (DEFINE_PROCPTR)
-dcl-pr SrvPgmAppender_delete
-       ind extproc(g_pAppender_delete);
+/if defined(DEFINE_PROCPTR)
+dcl-pr SrvPgmAppender_delete ind extproc(g_pAppender_delete);
+/else
+dcl-pr SrvPgmAppender_delete ind extproc('SrvPgmAppender_delete');
+/endif
+  io_pHandle pointer;
 end-pr;
-/ELSE
-dcl-pr SrvPgmAppender_delete
-       ind extproc('SrvPgmAppender_delete');
-end-pr;
-/ENDIF
-     D  io_pHandle                     *
-//
-/ENDIF
+
+/endif

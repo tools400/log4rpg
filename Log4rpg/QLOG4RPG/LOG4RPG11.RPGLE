@@ -60,17 +60,17 @@ end-ds;
 // -----------------------------------------
 //  Prototypes
 // -----------------------------------------
-/copy QLOG4RPG,CLIB                          C Library
-/copy QLOG4RPG,CEELIB                        CEE-Procedures
-/copy QBASICS1,PBASICS1                      Basic RPG Extensions
+/copy QLOG4RPG,CLIB C Library
+/copy QLOG4RPG,CEELIB CEE-Procedures
+/copy QBASICS1,PBASICS1 Basic RPG Extensions
 
-/copy QLOG4RPG,PLOG4RPG07                    PropertyList
-/copy QLOG4RPG,PLOG4RPG10                    LogLog
-/copy QLOG4RPG,PLOG4RPG12                    ClassLoader
-/copy QLOG4RPG,PLOG4RPG99                    Helpers
+/copy QLOG4RPG,PLOG4RPG07 PropertyList
+/copy QLOG4RPG,PLOG4RPG10 LogLog
+/copy QLOG4RPG,PLOG4RPG12 ClassLoader
+/copy QLOG4RPG,PLOG4RPG99 Helpers
 
 /define DEFINE_PROCPTR
-/copy QLOG4RPG,PLAYOUT                       Layout implementation
+/copy QLOG4RPG,PLAYOUT Layout implementation
 /undefine DEFINE_PROCPTR
 
 // -----------------------------------------
@@ -104,70 +104,70 @@ dcl-proc Layout_new export;
     i_pPropString pointer options(*nopass: *omit: *string) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-ds layout likeds(handle_t) based(pLayout);
 
-//  Paremeter positions
+  //  Paremeter positions
   dcl-c p_pPropString 2;
 
-//  Fields for optional parameters
+  //  Fields for optional parameters
   dcl-s pPropString like(i_pPropString) inz;
 
-//  Helper fields
+  //  Helper fields
   dcl-s isPresent int(10) inz;
   dcl-s pPropList like(LOG4RPG_pPropertyList_t) inz;
   dcl-ds tempLayout likeds(handle_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-LogLog_debug('Creating layout ...');
+  LogLog_debug('Creating layout ...');
 
-pLayout = Layout_null();
+  pLayout = Layout_null();
 
-// Get optional parameters ...
-// ... property string
-if %parms() >= p_pPropString;
-   CEETSTA(isPresent: p_pPropString: *omit);
-else;
-   isPresent = 0;
-endif;
+  // Get optional parameters ...
+  // ... property string
+  if %parms() >= p_pPropString;
+    CEETSTA(isPresent: p_pPropString: *omit);
+  else;
+    isPresent = 0;
+  endif;
 
-if isPresent = 1;
-   pPropString = i_pPropString;
-else;
-   pPropString = *NULL;
-endif;
+  if isPresent = 1;
+    pPropString = i_pPropString;
+  else;
+    pPropString = *NULL;
+  endif;
 
-// Initialize layout;
-if not ClassLoader_resolveLayout(i_layoutImpl: tempLayout.layoutImpl);
-   return pLayout;
-endif;
+  // Initialize layout;
+  if not ClassLoader_resolveLayout(i_layoutImpl: tempLayout.layoutImpl);
+    return pLayout;
+  endif;
 
-// Create properties list
-if pPropString <> *NULL;
-   pPropList = PropertyList_new(pPropString);
-else;
-   pPropList = PropertyList_null();
-endif;
+  // Create properties list
+  if pPropString <> *NULL;
+    pPropList = PropertyList_new(pPropString);
+  else;
+    pPropList = PropertyList_null();
+  endif;
 
-// Create layout handle
-pLayout = %alloc(%size(handle_t));
-layout = tempLayout;
+  // Create layout handle
+  pLayout = %alloc(%size(handle_t));
+  layout = tempLayout;
 
-// Instanciate layout implementation object
-g_pLayout_new = layout.layoutImpl.procNew.procptr;
-SrvPgmLayout_new(pLayout
-                 : layout.layoutImpl.pHandle
-                 : pPropList
-                 : '');
+  // Instanciate layout implementation object
+  g_pLayout_new = layout.layoutImpl.procNew.procptr;
+  SrvPgmLayout_new(pLayout
+                   : layout.layoutImpl.pHandle
+                   : pPropList
+                   : '');
 
-// Destroy properties list
-if not PropertyList_isNull(pPropList);
-   PropertyList_delete(pPropList);
-endif;
+  // Destroy properties list
+  if not PropertyList_isNull(pPropList);
+    PropertyList_delete(pPropList);
+  endif;
 
-LogLog_verbose('+ Allocated memory for layout.');
+  LogLog_verbose('+ Allocated memory for layout.');
 
-return pLayout;
+  return pLayout;
 
 
 end-proc;
@@ -187,18 +187,18 @@ dcl-proc Layout_format export;
     i_pLogEvent like(LOG4RPG_pLogEvent_t) const;
   end-pi;
 
-//  Layout handle
+  //  Layout handle
   dcl-ds layout likeds(handle_t) based(i_pLayout);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-LogLog_verbose('-> Formatting log event of logger [' +
-                   LogEvent_getLoggerName(i_pLogEvent) + ']...');
+  LogLog_verbose('-> Formatting log event of logger [' +
+                     LogEvent_getLoggerName(i_pLogEvent) + ']...');
 
-g_pLayout_format = layout.layoutImpl.procFormat.procptr;
-SrvPgmLayout_format(layout.layoutImpl.pHandle
-                    : i_pLogEvent);
+  g_pLayout_format = layout.layoutImpl.procFormat.procptr;
+  SrvPgmLayout_format(layout.layoutImpl.pHandle
+                      : i_pLogEvent);
 
-return;
+  return;
 
 
 end-proc;
@@ -217,20 +217,20 @@ dcl-proc Layout_getHeader export;
     i_pLayout like(LOG4RPG_pLayout_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s header like(LOG4RPG_header_t) inz;
 
-//  Layout handle
+  //  Layout handle
   dcl-ds layout likeds(handle_t) based(i_pLayout);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-g_pLayout_getHeader = layout.layoutImpl.procGetHeader.procptr;
+  g_pLayout_getHeader = layout.layoutImpl.procGetHeader.procptr;
 
-if g_pLayout_getHeader <> *NULL;
-   header = SrvPgmLayout_getHeader(layout.layoutImpl.pHandle);
-endif;
+  if g_pLayout_getHeader <> *NULL;
+    header = SrvPgmLayout_getHeader(layout.layoutImpl.pHandle);
+  endif;
 
-return header;
+  return header;
 
 
 end-proc;
@@ -249,20 +249,20 @@ dcl-proc Layout_getFooter export;
     i_pLayout like(LOG4RPG_pLayout_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s footer like(LOG4RPG_footer_t) inz;
 
-//  Layout handle
+  //  Layout handle
   dcl-ds layout likeds(handle_t) based(i_pLayout);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-g_pLayout_getFooter = layout.layoutImpl.procGetFooter.procptr;
+  g_pLayout_getFooter = layout.layoutImpl.procGetFooter.procptr;
 
-if g_pLayout_getFooter <> *NULL;
-   footer = SrvPgmLayout_getFooter(layout.layoutImpl.pHandle);
-endif;
+  if g_pLayout_getFooter <> *NULL;
+    footer = SrvPgmLayout_getFooter(layout.layoutImpl.pHandle);
+  endif;
 
-return footer;
+  return footer;
 
 
 end-proc;
@@ -279,9 +279,9 @@ end-proc;
 dcl-proc Layout_newLine export;
   dcl-pi *n varchar(2);
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return '\n';
+  return '\n';
 
 
 end-proc;
@@ -304,17 +304,17 @@ dcl-proc Layout_setProperties export;
     i_prefix    like(LOG4RPG_prefix_t) const;
   end-pi;
 
-//  Layout handle
+  //  Layout handle
   dcl-ds layout likeds(handle_t) based(i_pLayout);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-g_pLayout_setProperties =
-      layout.layoutImpl.procSetProperties.procptr;
-SrvPgmLayout_setProperties(layout.layoutImpl.pHandle
-                           : i_pPropList
-                           : i_prefix);
+  g_pLayout_setProperties =
+        layout.layoutImpl.procSetProperties.procptr;
+  SrvPgmLayout_setProperties(layout.layoutImpl.pHandle
+                             : i_pPropList
+                             : i_prefix);
 
-return;
+  return;
 
 
 end-proc;
@@ -333,25 +333,25 @@ dcl-proc Layout_delete export;
     io_pLayout like(LOG4RPG_pLayout_t);
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isDeleted ind inz(*off);
 
-//  Layout handle
+  //  Layout handle
   dcl-ds layout likeds(handle_t) based(io_pLayout);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-LogLog_verbose('Deleting layout ...');
+  LogLog_verbose('Deleting layout ...');
 
-// Delete layout
-g_pLayout_delete = layout.layoutImpl.procDelete.procptr;
-isDeleted = SrvPgmLayout_delete(layout.layoutImpl.pHandle);
+  // Delete layout
+  g_pLayout_delete = layout.layoutImpl.procDelete.procptr;
+  isDeleted = SrvPgmLayout_delete(layout.layoutImpl.pHandle);
 
-dealloc(N) io_pLayout;
-io_pLayout = Layout_null();
+  dealloc(N) io_pLayout;
+  io_pLayout = Layout_null();
 
-LogLog_verbose('- Free memory of layout.');
+  LogLog_verbose('- Free memory of layout.');
 
-return isDeleted;
+  return isDeleted;
 
 
 end-proc;
@@ -371,12 +371,12 @@ dcl-proc Layout_knowsProperty export;
   dcl-pi *n ind;
     i_parameter like(LOG4RPG_Property_key_t) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-select;
-other;
-   return *off;
-endsl;
+  select;
+  other;
+    return *off;
+  endsl;
 
 
 end-proc;
@@ -397,17 +397,17 @@ dcl-proc Layout_isNull export;
     i_pLayout like(LOG4RPG_pLayout_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isNull ind inz(*off);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if i_pLayout = Layout_null();
-   isNull = *on;
-else;
-   isNull = *off;
-endif;
+  if i_pLayout = Layout_null();
+    isNull = *on;
+  else;
+    isNull = *off;
+  endif;
 
-return isNull;
+  return isNull;
 
 
 end-proc;
@@ -424,10 +424,9 @@ end-proc;
 dcl-proc Layout_null export;
   dcl-pi *n like(LOG4RPG_pLayout_t);
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return *NULL;
+  return *NULL;
 
 
 end-proc;
-

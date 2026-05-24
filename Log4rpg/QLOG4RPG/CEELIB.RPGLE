@@ -1,5 +1,5 @@
 **free
-/if NOT DEFINED(CEELIB)
+/if NOT defined(CEELIB)
 /define CEELIB
 
 // ---------------------------------------------------------------

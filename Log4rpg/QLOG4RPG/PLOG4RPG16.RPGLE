@@ -1,11 +1,11 @@
 **free
-/if NOT DEFINED(PLOG4RPG16)
+/if NOT defined(PLOG4RPG16)
 /define PLOG4RPG16
 
 // -----------------------------------------
 //  Type definitions
 // -----------------------------------------
-/copy QLOG4RPG,PSHARE                        Type defs appenders, layouts, filters
+/copy QLOG4RPG,PSHARE Type defs appenders, layouts, filters
 
 dcl-s LOG4RPG_pLogEvent_t pointer based(pDummy);
 

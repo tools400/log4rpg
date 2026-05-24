@@ -1,5 +1,5 @@
 **free
-/if NOT DEFINED(PLOG4RPG06)
+/if NOT defined(PLOG4RPG06)
 /define PLOG4RPG06
 
 // -----------------------------------------

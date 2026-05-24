@@ -72,11 +72,11 @@ end-ds;
 //  Prototypes
 // -----------------------------------------
 /copy QLOG4RPG,CLIB
-/copy QLOG4RPG,PLOG4RPG07                    PropertyList
-/copy QLOG4RPG,PLOG4RPG09                    Level
-/copy QLOG4RPG,PLOG4RPG10                    LogLog
-/copy QLOG4RPG,PLOG4RPG99                    Helper
-/copy QLOG4RPG,QUSRJOBI                      Retrieve Job Information (QUSRJOBI) API
+/copy QLOG4RPG,PLOG4RPG07 PropertyList
+/copy QLOG4RPG,PLOG4RPG09 Level
+/copy QLOG4RPG,PLOG4RPG10 LogLog
+/copy QLOG4RPG,PLOG4RPG99 Helper
+/copy QLOG4RPG,QUSRJOBI Retrieve Job information(QUSRJOBI) API
 
 // -----------------------------------------
 //  Private prototypes
@@ -101,12 +101,9 @@ end-pr;
 // -----------------------------------------
 //  Global constants
 // -----------------------------------------
-dcl-c; cTHIS_CLASS
+dcl-c cTHIS_CLASS 'PatternLayout';
 
-     D                                            'PatternLayout'
-//
-dcl-c cPARAMETER_CONVERSION_PATTERN
-      'conversionpattern';
+dcl-c cPARAMETER_CONVERSION_PATTERN 'conversionpattern';
 
 dcl-c cTIMESTAMP_PATTERN 'timestamppattern';
 
@@ -143,34 +140,34 @@ dcl-proc PatternLayout_new export;
     i_prefix    like(LOG4RPG_prefix_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isDone ind inz(*off);
 
-//  Helper fields
+  //  Helper fields
   dcl-ds tempHandle likeds(handle_t) inz;
 
-//  PatternLayout handle
+  //  PatternLayout handle
   dcl-ds handle likeds(handle_t) based(io_pHandle);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-clear tempHandle;
+  clear tempHandle;
 
-// Initialize handle
-tempHandle.pSuper  = i_pSuper;   // Handle of the super class 'Layout'
-tempHandle.pattern = '%z [%M.%F]  %-5p  %S - %m';
-clear tempHandle.tmStmpPattern;
+  // Initialize handle
+  tempHandle.pSuper  = i_pSuper;   // Handle of the super class 'Layout'
+  tempHandle.pattern = '%z [%M.%F]  %-5p  %S - %m';
+  clear tempHandle.tmStmpPattern;
 
-// Initialize handle from configuration properties
-if (i_pPropList <> *NULL) and not PropertyList_isNull(i_pPropList);
-   loadConfiguration(tempHandle: i_pPropList: i_prefix);
-endif;
+  // Initialize handle from configuration properties
+  if (i_pPropList <> *NULL) and not PropertyList_isNull(i_pPropList);
+    loadConfiguration(tempHandle: i_pPropList: i_prefix);
+  endif;
 
-io_pHandle = %alloc(%size(tempHandle));
-handle = tempHandle;
+  io_pHandle = %alloc(%size(tempHandle));
+  handle = tempHandle;
 
-LogLog_debug('Loaded instance of [' + cTHIS_CLASS + '].');
+  LogLog_debug('Loaded instance of [' + cTHIS_CLASS + '].');
 
-return isDone;
+  return isDone;
 
 
 end-proc;
@@ -229,7 +226,7 @@ dcl-proc PatternLayout_format export;
     i_pLogEvent like(LOG4RPG_pLogEvent_t) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s x int(10) inz;
   dcl-s y int(10) inz;
   dcl-s lengthStr varchar(5) inz;
@@ -241,127 +238,127 @@ dcl-proc PatternLayout_format export;
   dcl-ds jobi0600 likeds(jobi0600_t) inz;
   dcl-s buffer char(128);
 
-//  Constants
+  //  Constants
   dcl-c cTMPTEXTMAXLEN 128;
 
   dcl-ds tm likeds(tm_t) based(ptm);
   dcl-s size int(10);
   dcl-s mSec int(10);
   dcl-s mSecStr varchar(10);
-//  PatternLayout handle
+  //  PatternLayout handle
   dcl-ds handle likeds(handle_t) based(i_pHandle);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Load return message text with pattern layout
-string = handle.pattern;
+  // Load return message text with pattern layout
+  string = handle.pattern;
 
-// Search for patterns and replace them
-x = %scan('%': string: 1);
-dow x > 0 and x < %len(string);
+  // Search for patterns and replace them
+  x = %scan('%': string: 1);
+  dow x > 0 and x < %len(string);
 
-   lengthStr = '';
-   length    = 0;
-   pattern   = '';
+    lengthStr = '';
+    length    = 0;
+    pattern   = '';
 
-   // get length if specified
-   y = x + 1;
-   if (%subst(string: y: 1) = '-') and (y < %len(string));
+    // get length if specified
+    y = x + 1;
+    if (%subst(string: y: 1) = '-') and (y < %len(string));
       y = y + 1;
       dow (y <= %len(string) and
           (%check('0123456789': %subst(string: y: 1)) = 0));
-         lengthStr = lengthStr + %subst(string: y: 1);
-         y = y + 1;
+        lengthStr = lengthStr + %subst(string: y: 1);
+        y = y + 1;
       enddo;
-   endif;
+    endif;
 
-   // get pattern
-   pattern = %subst(string: y: 1);
+    // get pattern
+    pattern = %subst(string: y: 1);
 
-   // get length
-   length = atoi(lengthStr);
+    // get length
+    length = atoi(lengthStr);
 
-   // replace pattern
-   select;
-   when pattern = 'p';      // priority/level
+    // replace pattern
+    select;
+    when pattern = 'p';      // priority/level
       tmpText = Level_toString(LogEvent_getPriority(i_pLogEvent));
-   when pattern = 't';      // Time
+    when pattern = 't';      // Time
       tmpText = %char(%time(LogEvent_getTime(i_pLogEvent)): *jobrun);
-   when pattern = 'd';      // Date
+    when pattern = 'd';      // Date
       tmpText = %char(%date(LogEvent_getTime(i_pLogEvent)): *jobrun);
-   when pattern = 'z';      // Timestamp
+    when pattern = 'z';      // Timestamp
       if (handle.tmStmpPattern.value = '');
-         tmpText = %char(LogEvent_getTime(i_pLogEvent));
+        tmpText = %char(LogEvent_getTime(i_pLogEvent));
       else;
-         ptm = localtime(time(*null));
-         size = strftime(%addr(buffer): %size(buffer)
-                       : handle.tmStmpPattern.value: tm);
-         tmpText = %subst(buffer: 1: size);
-         if (handle.tmStmpPattern.isMSec);
-            mSec = %subdt(%timestamp(): *mseconds);
-            mSecStr = %char(mSec);
-            if (handle.tmStmpPattern.length <= %len(mSecStr));
-               mSecStr = %subst(mSecStr: 1: handle.tmStmpPattern.length);
-            else;
-               LogLog_warning('Incorrect mSec-length: '
-                             + %char(handle.tmStmpPattern.length) + '. '
-                             + 'Value too short: ' + mSecStr + '. '
-                            + 'Check appender property: timestampPattern'
-                             );
-            endif;
-            tmpText = %scanrpl('%ms': mSecStr: tmpText);
-         endif;
+        ptm = localtime(time(*null));
+        size = strftime(%addr(buffer): %size(buffer)
+                      : handle.tmStmpPattern.value: tm);
+        tmpText = %subst(buffer: 1: size);
+        if (handle.tmStmpPattern.isMSec);
+          mSec = %subdt(%timestamp(): *mseconds);
+          mSecStr = %char(mSec);
+          if (handle.tmStmpPattern.length <= %len(mSecStr));
+            mSecStr = %subst(mSecStr: 1: handle.tmStmpPattern.length);
+          else;
+            LogLog_warning('Incorrect mSec-length: '
+                          + %char(handle.tmStmpPattern.length) + '. '
+                          + 'Value too short: ' + mSecStr + '. '
+                         + 'Check appender property: timestampPattern'
+                          );
+          endif;
+          tmpText = %scanrpl('%ms': mSecStr: tmpText);
+        endif;
       endif;
-   when pattern = 'l';      // Logger Name
+    when pattern = 'l';      // Logger Name
       tmpText = LogEvent_getLoggerName(i_pLogEvent);
-   when pattern = 'm';      // application supplied message
+    when pattern = 'm';      // application supplied message
       tmpText = LogEvent_getText(i_pLogEvent);
-   when pattern = 'n';      // New Line
+    when pattern = 'n';      // New Line
       tmpText = '\n';
-   when pattern = 'P';      // Program Name
+    when pattern = 'P';      // Program Name
       caller  = LogEvent_getCaller(i_pLogEvent);
       tmpText = %trimR(caller.pgm.name);
-   when pattern = 'L';      // Program Library Name
+    when pattern = 'L';      // Program Library Name
       tmpText = %trimR(LogEvent_resolveCallerPgmLibrary(i_pLogEvent));
-   when pattern = 'M';      // Module Name
+    when pattern = 'M';      // Module Name
       caller  = LogEvent_getCaller(i_pLogEvent);
       tmpText = %trimR(caller.module.name);
-   when pattern = 'F';      // Procedure/Function Name
+    when pattern = 'F';      // Procedure/Function Name
       caller  = LogEvent_getCaller(i_pLogEvent);
       tmpText = %trimR(caller.procedure);
-   when pattern = 'S';      // Statement ID
+    when pattern = 'S';      // Statement ID
       caller  = LogEvent_getCaller(i_pLogEvent);
       tmpText = %trim(caller.stmtID);
-   when pattern = 'j';      // full qualified job name
+    when pattern = 'j';      // full qualified job name
       tmpText = %editc(sds.nbr: 'X') + '/' + %trimR(sds.user)
                                      + '/' + %trimR(sds.job );
-   when pattern = 'u';      // user name
+    when pattern = 'u';      // user name
       tmpText = %trimR(sds.user);
-   when pattern = 'U';      // current user name
+    when pattern = 'U';      // current user name
       jobi0600 = rtvJobInf();
       tmpText = jobi0600.curUser;
-   other;
+    other;
       tmpText = '';
-   endsl;
+    endsl;
 
-   if pattern <> '';
+    if pattern <> '';
       if (length > 0) and (length < cTMPTEXTMAXLEN);
-         %len(tmpText) = length;
+        %len(tmpText) = length;
       endif;
 
       string = %replace(tmpText: string: x: y-x+1);
-   endif;
+    endif;
 
-   if x < %len(string);
+    if x < %len(string);
       x = %scan('%': string: y);
-   else;
+    else;
       x = 0;
-   endif;
+    endif;
 
-enddo;
+  enddo;
 
-LogEvent_setText(i_pLogEvent: string);
+  LogEvent_setText(i_pLogEvent: string);
 
-return;
+  return;
 
 
 end-proc;
@@ -386,13 +383,13 @@ dcl-proc PatternLayout_setProperties export;
     i_prefix    like(LOG4RPG_prefix_t) const;
   end-pi;
 
-//  PatternLayout handle
+  //  PatternLayout handle
   dcl-ds handle likeds(handle_t) based(i_pHandle);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-loadConfiguration(handle: i_pPropList: i_prefix);
+  loadConfiguration(handle: i_pPropList: i_prefix);
 
-return;
+  return;
 
 
 end-proc;
@@ -412,24 +409,24 @@ dcl-proc PatternLayout_delete export;
     io_pHandle pointer;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isDone ind inz(*off);
 
-//  PatternLayout handle
+  //  PatternLayout handle
   dcl-ds handle likeds(handle_t) based(io_pHandle);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Clear handle data
-clear handle;
+  // Clear handle data
+  clear handle;
 
-// Free handle memory
-dealloc(N) io_pHandle;
+  // Free handle memory
+  dealloc(N) io_pHandle;
 
-LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
+  LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
 
-isDone = *on;
+  isDone = *on;
 
-return isDone;
+  return isDone;
 
 
 end-proc;
@@ -445,46 +442,45 @@ dcl-proc loadConfiguration;
     i_prefix    like(LOG4RPG_prefix_t) const;
   end-pi;
 
-//  Local fields
+  //  Local fields
   dcl-s parameter like(property.key) inz;
   dcl-s prefix like(i_prefix) inz;
   dcl-ds property likeds(LOG4RPG_property_t) inz;
-  dcl-ds propIter DS likeds(LOG4RPG_Property: ListIterator_t) inz;
-  end-ds;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  dcl-ds propIter likeds(LOG4RPG_PropertyListIterator_t) inz;
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-prefix = f_lcase(i_prefix);
+  prefix = f_lcase(i_prefix);
 
-propIter = PropertyList_getIterator(i_pPropList);
+  propIter = PropertyList_getIterator(i_pPropList);
 
-property = PropertyList_getFirst(propIter);
+  property = PropertyList_getFirst(propIter);
 
-dow property.key <> '';
+  dow property.key <> '';
 
-   if (prefix = '') or (f_startsWith(prefix: property.key) and
-                        %len(property.key) > %len(prefix));
+    if (prefix = '') or (f_startsWith(prefix: property.key) and
+                         %len(property.key) > %len(prefix));
 
       parameter = f_lcase(%subst(property.key: %len(prefix) + 1));
 
       select;
       when parameter = cPARAMETER_CONVERSION_PATTERN;
-         io_handle.pattern = property.value;
+        io_handle.pattern = property.value;
       when parameter = cTIMESTAMP_PATTERN;
-         io_handle.tmStmpPattern = getTmStmpPattern(property.value);
+        io_handle.tmStmpPattern = getTmStmpPattern(property.value);
       when Layout_knowsProperty(parameter);
-         // Ignore all parameters known by super Layout class
+      // Ignore all parameters known by super Layout class
       other;
-         LogLog_warning('No such property ['     +
-                         property.key            +
-                        '] in [' + cTHIS_CLASS + ']');
+        LogLog_warning('No such property ['     +
+                        property.key            +
+                       '] in [' + cTHIS_CLASS + ']');
       endsl;
 
-   endif;
+    endif;
 
-   property = PropertyList_getNext(propIter);
-enddo;
+    property = PropertyList_getNext(propIter);
+  enddo;
 
-return;
+  return;
 
 
 end-proc;
@@ -497,72 +493,72 @@ dcl-proc getTmStmpPattern;
     i_pattern varchar(128) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-ds tmStmpPattern likeds(tmStmpPattern_t) inz;
 
-//  Local fields
+  //  Local fields
   dcl-s x int(10);
   dcl-s y int(10);
   dcl-s length int(10);
   dcl-s char char(1);
   dcl-s value varchar(20);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-clear tmStmpPattern;
-tmStmpPattern.value = '';
-tmStmpPattern.isMSec = *off;
-tmStmpPattern.length = 0;
+  clear tmStmpPattern;
+  tmStmpPattern.value = '';
+  tmStmpPattern.isMSec = *off;
+  tmStmpPattern.length = 0;
 
-if (i_pattern = '');
-   return tmStmpPattern;
-endif;
+  if (i_pattern = '');
+    return tmStmpPattern;
+  endif;
 
-x = %scan(MSECS_PATTERN: i_pattern);
-if (x = 0);
-   return tmStmpPattern;
-endif;
+  x = %scan(MSECS_PATTERN: i_pattern);
+  if (x = 0);
+    return tmStmpPattern;
+  endif;
 
-x = x + %len(MSECS_PATTERN);
-y = x;
-value = '';
+  x = x + %len(MSECS_PATTERN);
+  y = x;
+  value = '';
 
-// Get digits following '%ms'...
-dow (y <= %len(i_pattern));
-   char = %subst(i_pattern: y: 1);
-   if (char >= '0' and char <= '9');
+  // Get digits following '%ms'...
+  dow (y <= %len(i_pattern));
+    char = %subst(i_pattern: y: 1);
+    if (char >= '0' and char <= '9');
       value += char;
-   else;
+    else;
       leave;
-   endif;
-   y += 1;
-enddo;
+    endif;
+    y += 1;
+  enddo;
 
-// Produce return value
-tmStmpPattern.isMSec = *on;
-tmStmpPattern.length = 6;
-tmStmpPattern.value = i_pattern;
+  // Produce return value
+  tmStmpPattern.isMSec = *on;
+  tmStmpPattern.length = 6;
+  tmStmpPattern.value = i_pattern;
 
-// Override mSec length
-if (y > x);
-   monitor;
+  // Override mSec length
+  if (y > x);
+    monitor;
       length = y - x;
       tmStmpPattern.length = %int(%subst(i_pattern: x: length));
       tmStmpPattern.value = %replace('': i_pattern: x: length);
-   on-error;
+    on-error;
       LogLog_error('mSec-length pattern is not numeric: '
                   + i_pattern + '. '
                   + 'Check appender property: timestampPattern'
                   );
-   endmon;
-endif;
+    endmon;
+  endif;
 
-// Change '%ms' to '%%ms', because the first '%'
-// is removed by strftime().
-tmStmpPattern.value = %scanrpl(MSECS_PATTERN
-                             : '%' + MSECS_PATTERN
-                             : tmStmpPattern.value);
+  // Change '%ms' to '%%ms', because the first '%'
+  // is removed by strftime().
+  tmStmpPattern.value = %scanrpl(MSECS_PATTERN
+                               : '%' + MSECS_PATTERN
+                               : tmStmpPattern.value);
 
-return tmStmpPattern;
+  return tmStmpPattern;
 
 end-proc;
 
@@ -574,22 +570,21 @@ dcl-proc rtvJobInf;
   dcl-pi *n likeds(jobi0600_t);
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-ds jobi0600 likeds(jobi0600_t) inz;
 
-//  Local fields
+  //  Local fields
   dcl-ds qJob likeds(LOG4RPG_qJob_t) inz;
   dcl-ds errCode likeds(errCode_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-qjob.name = '*';
-qjob.user = '';
-qjob.nbr  = '';
-errCode = f_newApiErrCode(*on);
-QUSRJOBI(jobi0600: %size(jobi0600): 'JOBI0600': qJob: '': errCode);
+  qjob.name = '*';
+  qjob.user = '';
+  qjob.nbr  = '';
+  errCode = f_newApiErrCode(*on);
+  QUSRJOBI(jobi0600: %size(jobi0600): 'JOBI0600': qJob: '': errCode);
 
-return jobi0600;
+  return jobi0600;
 
 
 end-proc;
-

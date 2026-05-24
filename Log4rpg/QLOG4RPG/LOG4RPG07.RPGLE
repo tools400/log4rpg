@@ -92,7 +92,7 @@ end-ds;
 // -----------------------------------------
 //  Type definitions
 // -----------------------------------------
-/copy QLOG4RPG,PTYPES                        Private type definitions
+/copy QLOG4RPG,PTYPES Private type definitions
 
 dcl-ds handle_t qualified based(pDummy);
   pMap like(BasicMap_handle_t);
@@ -102,13 +102,13 @@ end-ds;
 // -----------------------------------------
 //  Prototypes
 // -----------------------------------------
-/copy QLOG4RPG,CEELIB                        CEE-Procedures
-/copy QLOG4RPG,OPNLSTAPIS                    Process Open List APIs
-/copy QBASICS1,PBASICS1                      Basic RPG Extensions
-/copy QIFS,PIFS                              IFS Stream file support
+/copy QLOG4RPG,CEELIB CEE-Procedures
+/copy QLOG4RPG,OPNLSTAPIS Process Open List APIs
+/copy QBASICS1,PBASICS1 Basic RPG Extensions
+/copy QIFS,PIFS IFS Stream file support
 
-/copy QLOG4RPG,PLOG4RPG10                    LogLog
-/copy QLOG4RPG,PLOG4RPG99                    Helpers
+/copy QLOG4RPG,PLOG4RPG10 LogLog
+/copy QLOG4RPG,PLOG4RPG99 Helpers
 
 // -----------------------------------------
 //  Private prototypes
@@ -178,58 +178,58 @@ dcl-proc PropertyList_new export;
     i_pString pointer options(*nopass: *omit: *string) const;
   end-pi;
 
-//  Parameter positions
+  //  Parameter positions
   dcl-c p_pString 1;
 
-//  Fields for optional parameters
+  //  Fields for optional parameters
   dcl-s pString like(i_pString) inz;
 
-//  Return value
+  //  Return value
   dcl-ds propList likeds(handle_t) based(pPropList);
 
-//  Helper fields
+  //  Helper fields
   dcl-s isPresent int(10) inz;
   dcl-ds tempPropList likeds(handle_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Get optional parameters
-// ... pString
-if %parms() >= p_pString;
-   CEETSTA(isPresent: p_pString: *omit);
-else;
-   isPresent = 0;
-endif;
+  // Get optional parameters
+  // ... pString
+  if %parms() >= p_pString;
+    CEETSTA(isPresent: p_pString: *omit);
+  else;
+    isPresent = 0;
+  endif;
 
-if isPresent = 1;
-   pString = i_pString;
-else;
-   pString = *NULL;
-endif;
+  if isPresent = 1;
+    pString = i_pString;
+  else;
+    pString = *NULL;
+  endif;
 
-LogLog_verbose('Creating properties list ...');
+  LogLog_verbose('Creating properties list ...');
 
-pPropList = PropertyList_null();
+  pPropList = PropertyList_null();
 
-// Initialize property list handle
-clear tempPropList;
-tempPropList.pMap    = BasicMap_new();
-tempPropList.url     = '';
+  // Initialize property list handle
+  clear tempPropList;
+  tempPropList.pMap    = BasicMap_new();
+  tempPropList.url     = '';
 
-// Load properties from string
-if pString <> *NULL;
-   if not loadPropertiesFromString(tempPropList.pMap: pString);
+  // Load properties from string
+  if pString <> *NULL;
+    if not loadPropertiesFromString(tempPropList.pMap: pString);
       return pPropList;
-   endif;
-   tempPropList.url = '';
-endif;
+    endif;
+    tempPropList.url = '';
+  endif;
 
-// Return properties list to caller
-pPropList = %alloc(%size(handle_t));
-propList = tempPropList;
+  // Return properties list to caller
+  pPropList = %alloc(%size(handle_t));
+  propList = tempPropList;
 
-LogLog_verbose('+ Allocated memory for properties list.');
+  LogLog_verbose('+ Allocated memory for properties list.');
 
-return pPropList;
+  return pPropList;
 
 
 end-proc;
@@ -252,30 +252,30 @@ dcl-proc PropertyList_loadFromUrl export;
     i_url       like(url_t) const;
   end-pi;
 
-//  Property list handle
+  //  Property list handle
   dcl-ds propList likeds(handle_t) based(i_pPropList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Load properties ...
-select;
-   // ... from stream file
-when Url_getProtocol(i_url) = 'file';
-   if not loadPropertiesFromStmf(propList.pMap: Url_getPath(i_url));
+  // Load properties ...
+  select;
+  // ... from stream file
+  when Url_getProtocol(i_url) = 'file';
+    if not loadPropertiesFromStmf(propList.pMap: Url_getPath(i_url));
       return *off;
-   endif;
-   propList.url = i_url;
-when Url_getProtocol(i_url) = 'mbr';
-   if not loadPropertiesFromMbr(propList.pMap: Url_getPath(i_url));
+    endif;
+    propList.url = i_url;
+  when Url_getProtocol(i_url) = 'mbr';
+    if not loadPropertiesFromMbr(propList.pMap: Url_getPath(i_url));
       return *off;
-   endif;
-   propList.url = 'mbr:' + %trim(g_file) + '.' + %trim(g_mbr);
-other;
-   LogLog_warning('Unknown URL protocol: ' +
-                   Url_getProtocol(i_url));
-   return *off;
-endsl;
+    endif;
+    propList.url = 'mbr:' + %trim(g_file) + '.' + %trim(g_mbr);
+  other;
+    LogLog_warning('Unknown URL protocol: ' +
+                    Url_getProtocol(i_url));
+    return *off;
+  endsl;
 
-return *on;
+  return *on;
 
 
 end-proc;
@@ -297,11 +297,11 @@ dcl-proc PropertyList_getUrl export;
     i_pPropList like(LOG4RPG_pPropertyList_t) const;
   end-pi;
 
-//  Property list handle
+  //  Property list handle
   dcl-ds propList likeds(handle_t) based(i_pPropList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return propList.url;
+  return propList.url;
 
 
 end-proc;
@@ -322,11 +322,11 @@ dcl-proc PropertyList_getNumE export;
     i_pPropList like(LOG4RPG_pPropertyList_t) const;
   end-pi;
 
-//  Property list handle
+  //  Property list handle
   dcl-ds propList likeds(handle_t) based(i_pPropList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return BasicMap_getNumE(propList.pMap);
+  return BasicMap_getNumE(propList.pMap);
 
 
 end-proc;
@@ -349,18 +349,18 @@ dcl-proc PropertyList_put export;
     i_property  likeds(LOG4RPG_Property_t) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-ds property likeds(i_property);
 
-//  Property list handle
+  //  Property list handle
   dcl-ds propList likeds(handle_t) based(i_pPropList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-property = i_property;
+  property = i_property;
 
-return BasicMap_put(propList.pMap: property.key
-                                 : %addr(property.value)
-                                 : %len(property.value) + 2);
+  return BasicMap_put(propList.pMap: property.key
+                                   : %addr(property.value)
+                                   : %len(property.value) + 2);
 
 
 end-proc;
@@ -382,16 +382,16 @@ dcl-proc PropertyList_get export;
     i_key       like(LOG4RPG_Property_key_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s value like(LOG4RPG_Property_value_t) inz;
 
-//  Property list handle
+  //  Property list handle
   dcl-ds propList likeds(handle_t) based(i_pPropList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-BasicMap_get(propList.pMap: i_key: %addr(value): %size(value));
+  BasicMap_get(propList.pMap: i_key: %addr(value): %size(value));
 
-return value;
+  return value;
 
 
 end-proc;
@@ -407,24 +407,22 @@ end-proc;
 //   propIter      - Iterator for the property list.
 //=========================================================================
 dcl-proc PropertyList_getIterator export;
+  dcl-pi *n likeds(LOG4RPG_PropertyListIterator_t);
+    i_pPropList like(LOG4RPG_pPropertyList_t) const;
+  end-pi;
 
-  dcl-ds PropertyList_getIteratorPI likeds(LOG4RPG_Property: ListIterator_t);
-i_pPropList     const  like(LOG4RPG_pPropertyList_t );
-  end-ds;
+  //  Return value
+  dcl-ds propIter likeds(LOG4RPG_PropertyListIterator_t) inz;
 
-//  Return value
-  dcl-ds propIter DS likeds(LOG4RPG_Property: ListIterator_t) inz;
-  end-ds;
-
-//  Property list handle
+  //  Property list handle
   dcl-ds propList likeds(handle_t) based(i_pPropList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-clear propIter;
-propIter.pPropList = i_pPropList;
-propIter.lastProp  = 0;
+  clear propIter;
+  propIter.pPropList = i_pPropList;
+  propIter.lastProp  = 0;
 
-return propIter;
+  return propIter;
 
 
 end-proc;
@@ -445,27 +443,27 @@ dcl-proc PropertyList_getFirst export;
     io_propIter likeds(LOG4RPG_PropertyListIterator_t);
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-ds property likeds(LOG4RPG_Property_t) inz;
 
-//  Property list handle
+  //  Property list handle
   dcl-ds propList likeds(handle_t) based(io_propIter.pPropList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if PropertyList_getNumE(io_propIter.pPropList) = 0;
-   return property;
-endif;
+  if PropertyList_getNumE(io_propIter.pPropList) = 0;
+    return property;
+  endif;
 
-io_propIter.lastProp = 1;
+  io_propIter.lastProp = 1;
 
-property.key = BasicMap_getKeyByIndex(propList.pMap
-                                      : io_propIter.lastProp);
-BasicMap_getValueByIndex(propList.pMap
-                         : io_propIter.lastProp
-                         : %addr(property.value)
-                         : %size(property.value));
+  property.key = BasicMap_getKeyByIndex(propList.pMap
+                                        : io_propIter.lastProp);
+  BasicMap_getValueByIndex(propList.pMap
+                           : io_propIter.lastProp
+                           : %addr(property.value)
+                           : %size(property.value));
 
-return property;
+  return property;
 
 
 end-proc;
@@ -486,27 +484,27 @@ dcl-proc PropertyList_getNext export;
     io_propIter likeds(LOG4RPG_PropertyListIterator_t);
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-ds property likeds(LOG4RPG_Property_t) inz;
 
-//  Property list handle
+  //  Property list handle
   dcl-ds propList likeds(handle_t) based(io_propIter.pPropList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if PropertyList_getNumE(io_propIter.pPropList) <= io_propIter.lastProp;
-   return property;
-endif;
+  if PropertyList_getNumE(io_propIter.pPropList) <= io_propIter.lastProp;
+    return property;
+  endif;
 
-io_propIter.lastProp = io_propIter.lastProp + 1;
+  io_propIter.lastProp = io_propIter.lastProp + 1;
 
-property.key = BasicMap_getKeyByIndex(propList.pMap
-                                      : io_propIter.lastProp);
-BasicMap_getValueByIndex(propList.pMap
-                         : io_propIter.lastProp
-                         : %addr(property.value)
-                         : %size(property.value));
+  property.key = BasicMap_getKeyByIndex(propList.pMap
+                                        : io_propIter.lastProp);
+  BasicMap_getValueByIndex(propList.pMap
+                           : io_propIter.lastProp
+                           : %addr(property.value)
+                           : %size(property.value));
 
-return property;
+  return property;
 
 
 end-proc;
@@ -530,11 +528,11 @@ dcl-proc PropertyList_containsKey export;
     i_key       like(LOG4RPG_Property_key_t) const;
   end-pi;
 
-//  Property list handle
+  //  Property list handle
   dcl-ds propList likeds(handle_t) based(i_pPropList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return BasicMap_containsKey(propList.pMap: i_key);
+  return BasicMap_containsKey(propList.pMap: i_key);
 
 
 end-proc;
@@ -556,13 +554,13 @@ dcl-proc PropertyList_remove export;
     i_key       like(LOG4RPG_Property_key_t) const;
   end-pi;
 
-//  Property list handle
+  //  Property list handle
   dcl-ds propList likeds(handle_t) based(i_pPropList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-BasicMap_remove(propList.pMap: i_key);
+  BasicMap_remove(propList.pMap: i_key);
 
-return;
+  return;
 
 
 end-proc;
@@ -582,23 +580,23 @@ dcl-proc PropertyList_clear export;
     i_pPropList like(LOG4RPG_pPropertyList_t) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s x int(10) inz;
   dcl-s numE int(10) inz;
   dcl-s key like(LOG4RPG_Property_key_t);
 
-//  Property list handle
+  //  Property list handle
   dcl-ds propList likeds(handle_t) based(i_pPropList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-numE = BasicMap_getNumE(propList.pMap);
+  numE = BasicMap_getNumE(propList.pMap);
 
-for x = 1 to numE;
-   key = BasicMap_getKeyByIndex(propList.pMap: 1);
-   BasicMap_remove(propList.pMap: key);
-endfor;
+  for x = 1 to numE;
+    key = BasicMap_getKeyByIndex(propList.pMap: 1);
+    BasicMap_remove(propList.pMap: key);
+  endfor;
 
-return;
+  return;
 
 
 end-proc;
@@ -618,31 +616,31 @@ dcl-proc PropertyList_delete export;
     io_pPropList like(LOG4RPG_pPropertyList_t);
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isDeleted ind inz(*off);
 
-//  Property list handle
+  //  Property list handle
   dcl-ds propList likeds(handle_t) based(io_pPropList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-LogLog_verbose('Deleting properties list ...');
+  LogLog_verbose('Deleting properties list ...');
 
-if (not BasicMap_isNull(propList.pMap));
-   BasicMap_delete(propList.pMap);
-endif;
+  if (not BasicMap_isNull(propList.pMap));
+    BasicMap_delete(propList.pMap);
+  endif;
 
-propList.url = '';
+  propList.url = '';
 
-clear propList;
-dealloc(N) io_pPropList;
+  clear propList;
+  dealloc(N) io_pPropList;
 
-io_pPropList = PropertyList_null();
+  io_pPropList = PropertyList_null();
 
-LogLog_verbose('- Freed memory of properties list.');
+  LogLog_verbose('- Freed memory of properties list.');
 
-isDeleted = *on;
+  isDeleted = *on;
 
-return isDeleted;
+  return isDeleted;
 
 
 end-proc;
@@ -663,15 +661,15 @@ dcl-proc PropertyList_isNull export;
     i_pPropList like(LOG4RPG_pPropertyList_t) const;
   end-pi;
 
-//  Property list handle
+  //  Property list handle
   dcl-ds propList likeds(handle_t) based(i_pPropList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if i_pPropList = PropertyList_null();
-   return *on;
-else;
-   return BasicMap_isNull(propList.pMap);
-endif;
+  if i_pPropList = PropertyList_null();
+    return *on;
+  else;
+    return BasicMap_isNull(propList.pMap);
+  endif;
 
 
 end-proc;
@@ -687,9 +685,9 @@ end-proc;
 dcl-proc PropertyList_null export;
   dcl-pi *n like(LOG4RPG_pPropertyList_t);
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return BasicMap_null();
+  return BasicMap_null();
 
 
 end-proc;
@@ -704,60 +702,60 @@ dcl-proc loadPropertiesFromStmf;
     i_path like(LOG4RPG_path_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isLoaded ind inz(*off);
 
-//  Helper fields
+  //  Helper fields
   dcl-s hFile like(ifs_hFile_t) inz;
   dcl-s bytesRed int(10) inz;
   dcl-s buffer char(1024) inz;
   dcl-ds msg likeds(msg_t) inz;
   dcl-ds st_stat likeds(st_stat_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-LogLog_debug('Loading properties from file [' + i_path + '] ...');
+  LogLog_debug('Loading properties from file [' + i_path + '] ...');
 
-// Test, if configuration file exists
-if not f_isIfsFile(i_path: msg);
-   LogLog_warningMsg(msg);
-   return isLoaded;
-endif;
+  // Test, if configuration file exists
+  if not f_isIfsFile(i_path: msg);
+    LogLog_warningMsg(msg);
+    return isLoaded;
+  endif;
 
-if not f_isIfsFile(i_path: msg);
-   LogLog_warningMsg(msg);
-   return isLoaded;
-endif;
+  if not f_isIfsFile(i_path: msg);
+    LogLog_warningMsg(msg);
+    return isLoaded;
+  endif;
 
-stat(i_path: %addr(st_stat));
+  stat(i_path: %addr(st_stat));
 
-hFile = f_openIfsFile(i_path
-                      : O_RDONLY + O_SHARE_RDONLY + O_CREAT +
-                        O_TEXTDATA + O_TEXT_CREAT + O_CCSID
-                      : st_stat.ccsid: *omit: msg);
-if hFile = RC_ERROR;
-   LogLog_warningMsg(msg);
-   return isLoaded;
-endif;
+  hFile = f_openIfsFile(i_path
+                        : O_RDONLY + O_SHARE_RDONLY + O_CREAT +
+                          O_TEXTDATA + O_TEXT_CREAT + O_CCSID
+                        : st_stat.ccsid: *omit: msg);
+  if hFile = RC_ERROR;
+    LogLog_warningMsg(msg);
+    return isLoaded;
+  endif;
 
-bytesRed = f_readLineIfsFile(hFile
-                             : %addr(buffer): %size(buffer): *omit);
-dow   bytesRed <> cIFS_EOF;
+  bytesRed = f_readLineIfsFile(hFile
+                               : %addr(buffer): %size(buffer): *omit);
+  dow   bytesRed <> cIFS_EOF;
 
-   if bytesRed > 0;
+    if bytesRed > 0;
       addPropertyToList(i_pMap: %subst(buffer: 1: bytesRed));
-   endif;
+    endif;
 
-   bytesRed = f_readLineIfsFile(hFile
-                                : %addr(buffer): %size(buffer): *omit);
-enddo;
+    bytesRed = f_readLineIfsFile(hFile
+                                 : %addr(buffer): %size(buffer): *omit);
+  enddo;
 
-f_closeIfsFile(hFile);
+  f_closeIfsFile(hFile);
 
-LogLog_verbose('Loaded properties from file [' + i_path + '].');
+  LogLog_verbose('Loaded properties from file [' + i_path + '].');
 
-isLoaded = *on;
+  isLoaded = *on;
 
-return isLoaded;
+  return isLoaded;
 
 
 end-proc;
@@ -772,10 +770,10 @@ dcl-proc loadPropertiesFromMbr;
     i_path like(LOG4RPG_path_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isLoaded ind inz(*off);
 
-//  Helper fields
+  //  Helper fields
   dcl-s file char(10) inz;
   dcl-s lib char(10) inz;
   dcl-s member char(10) inz;
@@ -793,98 +791,98 @@ dcl-proc loadPropertiesFromMbr;
   end-ds;
 
   dcl-s isPathUpdated ind;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-isPathUpdated = *off;
+  isPathUpdated = *off;
 
-LogLog_debug('Loading properties from member [' + i_path + '] ...');
+  LogLog_debug('Loading properties from member [' + i_path + '] ...');
 
-getMbrLocation(i_path: file: lib: member);
-if (f_ucase(lib) = cLOG4RPG_LIB_SEARCH);
-   lib = searchMemberAndReturnLibrary(file: member);
-endif;
+  getMbrLocation(i_path: file: lib: member);
+  if (f_ucase(lib) = cLOG4RPG_LIB_SEARCH);
+    lib = searchMemberAndReturnLibrary(file: member);
+  endif;
 
-if (f_startsWith('*': lib));
-   lib = rslvLibName(file: lib: '*FILE');
-   isPathUpdated = *on;
-endif;
+  if (f_startsWith('*': lib));
+    lib = rslvLibName(file: lib: '*FILE');
+    isPathUpdated = *on;
+  endif;
 
-if (f_startsWith('*': member));
-   member = rslvMbrName(file: lib: member);
-   isPathUpdated = *on;
-endif;
+  if (f_startsWith('*': member));
+    member = rslvMbrName(file: lib: member);
+    isPathUpdated = *on;
+  endif;
 
-if (isPathUpdated);
-   LogLog_debug('Resolved member to ['
-               +  %trim(lib) + '/' + %trim(file)
-               + '(' + %trim(member) + ')'
-               + '] ...');
-endif;
+  if (isPathUpdated);
+    LogLog_debug('Resolved member to ['
+                +  %trim(lib) + '/' + %trim(file)
+                + '(' + %trim(member) + ')'
+                + '] ...');
+  endif;
 
-// Test, if configuration file exists
-if not f_exist(file: lib: '*FILE': member);
-   LogLog_warning('Member ' + %trim(member) + ' in file ' +
-                   %trim(file) + ' in library ' +
-                   %trim(lib)  + ' does not exist.');
-   return isLoaded;
-endif;
+  // Test, if configuration file exists
+  if not f_exist(file: lib: '*FILE': member);
+    LogLog_warning('Member ' + %trim(member) + ' in file ' +
+                    %trim(file) + ' in library ' +
+                    %trim(lib)  + ' does not exist.');
+    return isLoaded;
+  endif;
 
-g_file = %trim(lib) + '/' + %trim(file);
-g_mbr  = %trim(member);
+  g_file = %trim(lib) + '/' + %trim(file);
+  g_mbr  = %trim(member);
 
-open(E) MBR;
+  open(E) MBR;
 
-if %error();
-   LogLog_warning('Could not open member [' + %trim(member) + '].');
-   return isLoaded;
-endif;
+  if %error();
+    LogLog_warning('Could not open member [' + %trim(member) + '].');
+    return isLoaded;
+  endif;
 
-p_rmvPgmMsg(cMsg_Rmv_All: *omit: cMsg_Same: cMsg_ToMyself);
+  p_rmvPgmMsg(cMsg_Rmv_All: *omit: cMsg_Same: cMsg_ToMyself);
 
-setll 1 MBR;
+  setll 1 MBR;
 
-dow %found(MBR);
-   if g_mbrInf.sourceFile = 'Y';
+  dow %found(MBR);
+    if g_mbrInf.sourceFile = 'Y';
       read MBR inBufSrcMbr;
-   else;
+    else;
       read MBR inBufMbr;
-   endif;
+    endif;
 
-   if %eof(MBR);
+    if %eof(MBR);
       leave;
-   endif;
+    endif;
 
-   if g_mbrInf.sourceFile = 'Y';
+    if g_mbrInf.sourceFile = 'Y';
       length = g_mbrInf.rcdLength - (%size(inBufSrcMbr.SrcSeq) +
                                      %size(inBufSrcMbr.SrcDat));
       addPropertyToList(i_pMap: %subst(inBufSrcMbr.srcDta
                                        : 1
                                        : length));
-   else;
+    else;
       if g_mbrInf.rcdLength > %len(inBufMbr.data);
-         length = %len(inBufMbr.data);
-         if not warnLength;
-            // LogLog_warning('Record length of properties file +
-            //                 exceeded maximum of ' +
-            //                 %char(%len(inBufMbr.data)) + ' byte.');
-            warnLength = *on;
-         endif;
+        length = %len(inBufMbr.data);
+        if not warnLength;
+          // LogLog_warning('Record length of properties file +
+          //                 exceeded maximum of ' +
+          //                 %char(%len(inBufMbr.data)) + ' byte.');
+          warnLength = *on;
+        endif;
       else;
-         length = g_mbrInf.rcdLength;
+        length = g_mbrInf.rcdLength;
       endif;
       addPropertyToList(i_pMap: %subst(inBufMbr.data
                                        : 1
                                        : length));
-   endif;
-enddo;
+    endif;
+  enddo;
 
-close MBR;
+  close MBR;
 
-LogLog_verbose('Loaded properties from member [' + i_path + '].');
+  LogLog_verbose('Loaded properties from member [' + i_path + '].');
 
-isLoaded = *on;
+  isLoaded = *on;
 
-return isLoaded;
+  return isLoaded;
 
 
 end-proc;
@@ -899,26 +897,26 @@ dcl-proc loadPropertiesFromString;
     i_pString pointer options(*string) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isLoaded ind inz(*off);
 
-//  Helper fields
+  //  Helper fields
   dcl-s pToken pointer inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-LogLog_debug('Loading properties from string ...');
+  LogLog_debug('Loading properties from string ...');
 
-pToken = strtok(i_pString: ';');
-dow pToken <> *NULL;
-   addPropertyToList(i_pMap: %str(pToken));
-   pToken = strtok(*NULL: ';');
-enddo;
+  pToken = strtok(i_pString: ';');
+  dow pToken <> *NULL;
+    addPropertyToList(i_pMap: %str(pToken));
+    pToken = strtok(*NULL: ';');
+  enddo;
 
-LogLog_verbose('Loaded properties from string.');
+  LogLog_verbose('Loaded properties from string.');
 
-isLoaded = *on;
+  isLoaded = *on;
 
-return isLoaded;
+  return isLoaded;
 
 
 end-proc;
@@ -934,24 +932,24 @@ dcl-proc addPropertyToList;
     i_buffer varchar(256) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s x int(10) inz;
   dcl-s char char(1) inz;
   dcl-s buffer like(i_buffer) inz;
   dcl-ds property likeds(LOG4RPG_Property_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-buffer = %trim(i_buffer);
+  buffer = %trim(i_buffer);
 
-if buffer = '';
-   return;
-endif;
+  if buffer = '';
+    return;
+  endif;
 
-char   = %subst(buffer: 1: 1);
+  char   = %subst(buffer: 1: 1);
 
-if (char <> '#') and (char <> ';') and (char <> '!');
-   x = %scan('=': buffer);
-   if (x > 1) and (x < %len(buffer));
+  if (char <> '#') and (char <> ';') and (char <> '!');
+    x = %scan('=': buffer);
+    if (x > 1) and (x < %len(buffer));
 
       property.key   = f_lcase(%trim(%subst(buffer: 1: x-1)));
       property.value = %trim(%subst(buffer: x+1));
@@ -959,10 +957,10 @@ if (char <> '#') and (char <> ';') and (char <> '!');
       BasicMap_put(i_pMap: property.key
                          : %addr(property.value)
                          : %len(property.value) + 2);
-   endif;
-endif;
+    endif;
+  endif;
 
-return;
+  return;
 
 
 end-proc;
@@ -979,107 +977,107 @@ dcl-proc getMbrLocation;
     o_mbr  char(10);
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s x int(10) inz;
   dcl-s path like(i_path) inz;
   dcl-s closingChar char(1) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-o_file = '';
-o_lib  = '';
-o_mbr  = '';
+  o_file = '';
+  o_lib  = '';
+  o_mbr  = '';
 
-if i_path = '';
-   LogLog_warning('Specified path is *BLANKS.');
-   return;
-endif;
+  if i_path = '';
+    LogLog_warning('Specified path is *BLANKS.');
+    return;
+  endif;
 
-path = f_ucase(%trim(i_path));
+  path = f_ucase(%trim(i_path));
 
-// Get library name from path
-x = %scan('/': path);
+  // Get library name from path
+  x = %scan('/': path);
 
-select;
-when x > 11;
-   LogLog_warning('Library name is too long.');
-   LogLog_warning('Path is: ' + i_path);
-   return;
-when x > 1;
-   o_lib = %subst(path: 1: x-1);
-   if x < %len(path);
+  select;
+  when x > 11;
+    LogLog_warning('Library name is too long.');
+    LogLog_warning('Path is: ' + i_path);
+    return;
+  when x > 1;
+    o_lib = %subst(path: 1: x-1);
+    if x < %len(path);
       path = %subst(path: x+1);
-   else;
+    else;
       LogLog_warning('Specified path does not contain +
                       file and member names.');
       LogLog_warning('Path is: ' + i_path);
       return;
-   endif;
-when x = 1;
-   o_lib = '*LIBL';
-   path = %subst(path: x+1);
-other;
-   o_lib = '*LIBL';
-endsl;
+    endif;
+  when x = 1;
+    o_lib = '*LIBL';
+    path = %subst(path: x+1);
+  other;
+    o_lib = '*LIBL';
+  endsl;
 
-// Get file name from path
-x = %scan('(': path);
-if x > 0;
-   closingChar = ')';
-else;
-   x = %scan('.': path);
-   if x > 0;
+  // Get file name from path
+  x = %scan('(': path);
+  if x > 0;
+    closingChar = ')';
+  else;
+    x = %scan('.': path);
+    if x > 0;
       closingChar = '';
-   else;
+    else;
       x = %len(path) + 1;
-   endif;
-endif;
+    endif;
+  endif;
 
-select;
-when x > 11;
-   LogLog_warning('File name is too long.');
-   LogLog_warning('Path is: ' + i_path);
-   return;
-when x > 1;
-   o_file = %subst(path: 1: x-1);
-   if x < %len(path);
+  select;
+  when x > 11;
+    LogLog_warning('File name is too long.');
+    LogLog_warning('Path is: ' + i_path);
+    return;
+  when x > 1;
+    o_file = %subst(path: 1: x-1);
+    if x < %len(path);
       path = %subst(path: x+1);
-   else;
+    else;
       o_mbr = '*FIRST';
       return;
-   endif;
-when x = 1;
-   LogLog_warning('File portion is missing in path.');
-   LogLog_warning('Path is: ' + i_path);
-   return;
-endsl;
+    endif;
+  when x = 1;
+    LogLog_warning('File portion is missing in path.');
+    LogLog_warning('Path is: ' + i_path);
+    return;
+  endsl;
 
-// Get member name from path
-if closingChar = '';
-   x = %len(path) + 1;
-else;
-   x = %scan(closingChar: path);
-   if x = 0;
+  // Get member name from path
+  if closingChar = '';
+    x = %len(path) + 1;
+  else;
+    x = %scan(closingChar: path);
+    if x = 0;
       LogLog_warning('Closing character [' + closingChar +
                       '] is missing.');
       LogLog_warning('Path is: ' + i_path);
       return;
-   endif;
-endif;
+    endif;
+  endif;
 
-select;
-when x > 11;
-   LogLog_warning('Member name is too long.');
-   LogLog_warning('Path is: ' + i_path);
-   return;
-when x > 1;
-   o_mbr = %subst(path: 1: x-1);
-other;
-   LogLog_warning('Member portion is missing in path.');
-   LogLog_warning('Path is: ' + i_path);
-   return;
-endsl;
+  select;
+  when x > 11;
+    LogLog_warning('Member name is too long.');
+    LogLog_warning('Path is: ' + i_path);
+    return;
+  when x > 1;
+    o_mbr = %subst(path: 1: x-1);
+  other;
+    LogLog_warning('Member portion is missing in path.');
+    LogLog_warning('Path is: ' + i_path);
+    return;
+  endsl;
 
-return;
+  return;
 
 
 end-proc;
@@ -1096,7 +1094,7 @@ dcl-proc searchMemberAndReturnLibrary;
     i_mbr  char(10) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s i int(10) inz;
   dcl-ds qObj likeds(qObj_t) inz;
 
@@ -1107,65 +1105,64 @@ dcl-proc searchMemberAndReturnLibrary;
   dcl-ds objInf likeds(qgy_objInf_t) inz;
 
   dcl-ds errCode likeds(errCode_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if (not f_exist('QGYOLOBJ': '*LIBL': '*PGM'));
-   LogLog_warning('Open List of Objects (QGYOLOBJ) API not found.');
-   LogLog_warning('- Please install the Host Servers option of i5/OS');
-   LogLog_warning('  to be able to use the ' + cLOG4RPG_LIB_SEARCH +
-                  ' special value.');
-   return '*LIBL';
-endif;
+  if (not f_exist('QGYOLOBJ': '*LIBL': '*PGM'));
+    LogLog_warning('Open List of Objects (QGYOLOBJ) API not found.');
+    LogLog_warning('- Please install the Host Servers option of i5/OS');
+    LogLog_warning('  to be able to use the ' + cLOG4RPG_LIB_SEARCH +
+                   ' special value.');
+    return '*LIBL';
+  endif;
 
-qObj.name = i_file;
-qObj.lib  = '*LIBL';
+  qObj.name = i_file;
+  qObj.lib  = '*LIBL';
 
-authCtrl.length     = %size(authCtrl);
-authCtrl.callLvl    = 0;
-authCtrl.ofsObjAuth = %size(authCtrl) - %size(authCtrl.objAuthList)
-                                      - %size(authCtrl.libAuthList);
-authCtrl.numObjAuth = 1;
-authCtrl.ofsLibAuth = %size(authCtrl) - %size(authCtrl.libAuthList);
-authCtrl.numLibAuth = 1;
-authCtrl.reserved_1 = *ALLx'00';
-authCtrl.objAuthList.auth(1) = '*USE';
-authCtrl.libAuthList.auth(1) = '*USE';
+  authCtrl.length     = %size(authCtrl);
+  authCtrl.callLvl    = 0;
+  authCtrl.ofsObjAuth = %size(authCtrl) - %size(authCtrl.objAuthList)
+                                        - %size(authCtrl.libAuthList);
+  authCtrl.numObjAuth = 1;
+  authCtrl.ofsLibAuth = %size(authCtrl) - %size(authCtrl.libAuthList);
+  authCtrl.numLibAuth = 1;
+  authCtrl.reserved_1 = *ALLx'00';
+  authCtrl.objAuthList.auth(1) = '*USE';
+  authCtrl.libAuthList.auth(1) = '*USE';
 
-selectCtrl.length     = %size(selectCtrl);
-selectCtrl.value      = 0;   // 0=select; 1=omit
-selectCtrl.ofsStat    = %size(selectCtrl) -
-                        %size(selectCtrl.statList);
-selectCtrl.numStat    = 1;
-selectCtrl.reserved_1 = 0;
-selectCtrl.statList.stat(1) = ' ';   // return no-eeror entries only
+  selectCtrl.length     = %size(selectCtrl);
+  selectCtrl.value      = 0;   // 0=select; 1=omit
+  selectCtrl.ofsStat    = %size(selectCtrl) -
+                          %size(selectCtrl.statList);
+  selectCtrl.numStat    = 1;
+  selectCtrl.reserved_1 = 0;
+  selectCtrl.statList.stat(1) = ' ';   // return no-eeror entries only
 
-clear objInf;
-clear listInf;
-errCode = f_newApiErrCode(*on);
+  clear objInf;
+  clear listInf;
+  errCode = f_newApiErrCode(*on);
 
-monitor;
-   QGYOLOBJ(objInf: 0: listInf: -1: sortInf: qObj: '*ALL':
-            authCtrl: selectCtrl: 0: '': errCode);
+  monitor;
+    QGYOLOBJ(objInf: 0: listInf: -1: sortInf: qObj: '*ALL':
+             authCtrl: selectCtrl: 0: '': errCode);
 
-   i = 0;
-   dow (i < listInf.totalRcds);
+    i = 0;
+    dow (i < listInf.totalRcds);
       i = i + 1;
       // Get next object in list
       QGYGTLE(objInf: %size(objInf)
               : listInf.hRequest: listInf: 1: i: errCode);
       if (f_exist(objInf.name: objInf.lib: '*FILE': i_mbr));
-         return objInf.lib;
+        return objInf.lib;
       endif;
-   enddo;
+    enddo;
 
-   // Close list of objects
-   QGYCLST(listInf.hREquest: errCode);
-on-error;
-   return '*LIBL';
-endmon;
+    // Close list of objects
+    QGYCLST(listInf.hREquest: errCode);
+  on-error;
+    return '*LIBL';
+  endmon;
 
-return '*LIBL';
+  return '*LIBL';
 
 
 end-proc;
-

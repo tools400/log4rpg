@@ -73,21 +73,21 @@ end-ds;
 // -----------------------------------------
 //  Prototypes
 // -----------------------------------------
-/copy QLOG4RPG,CEELIB                        CEE-Procedures
-/copy QBASICS1,PBASICS1                      Basic RPG Extensions
+/copy QLOG4RPG,CEELIB CEE-Procedures
+/copy QBASICS1,PBASICS1 Basic RPG Extensions
 
-/copy QLOG4RPG,PLOG4RPG06                    Property
-/copy QLOG4RPG,PLOG4RPG07                    PropertyList
-/copy QLOG4RPG,PLOG4RPG10                    LogLog
-/copy QLOG4RPG,PLOG4RPG12                    ClassLoader
-/copy QLOG4RPG,PLOG4RPG13                    Repository
-/copy QLOG4RPG,PLOG4RPG17                    Filter
-/copy QLOG4RPG,PLOG4RPG99                    Helpers
+/copy QLOG4RPG,PLOG4RPG06 Property
+/copy QLOG4RPG,PLOG4RPG07 PropertyList
+/copy QLOG4RPG,PLOG4RPG10 LogLog
+/copy QLOG4RPG,PLOG4RPG12 ClassLoader
+/copy QLOG4RPG,PLOG4RPG13 Repository
+/copy QLOG4RPG,PLOG4RPG17 Filter
+/copy QLOG4RPG,PLOG4RPG99 Helpers
 
-/copy QLOG4RPG,PFILTER                       Filter implementation
+/copy QLOG4RPG,PFILTER Filter implementation
 
 /define DEFINE_PROCPTR
-/copy QLOG4RPG,PAPPENDER                     Appender implementation
+/copy QLOG4RPG,PAPPENDER Appender implementation
 /undefine DEFINE_PROCPTR
 
 // -----------------------------------------
@@ -133,80 +133,80 @@ dcl-proc Appender_new export;
     i_pPropString pointer options(*nopass: *omit: *string) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-ds appender likeds(handle_t) based(pAppender);
 
-//  Paremeter positions
+  //  Paremeter positions
   dcl-c p_pPropString 3;
 
-//  Fields for optional parameters
+  //  Fields for optional parameters
   dcl-s pPropString like(i_pPropString) inz;
 
-//  Helper fields
+  //  Helper fields
   dcl-s isPresent int(10) inz;
   dcl-s pPropList like(LOG4RPG_pPropertyList_t) inz;
   dcl-ds tempAppender likeds(handle_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-initializeModule();
+  initializeModule();
 
-LogLog_debug('Creating appender [' + i_appName + '] ...');
+  LogLog_debug('Creating appender [' + i_appName + '] ...');
 
-pAppender = Appender_null();
+  pAppender = Appender_null();
 
-// Get optional parameters ...
-// ... property string
-if %parms() >= p_pPropString;
-   CEETSTA(isPresent: p_pPropString: *omit);
-else;
-   isPresent = 0;
-endif;
+  // Get optional parameters ...
+  // ... property string
+  if %parms() >= p_pPropString;
+    CEETSTA(isPresent: p_pPropString: *omit);
+  else;
+    isPresent = 0;
+  endif;
 
-if isPresent = 1;
-   pPropString = i_pPropString;
-else;
-   pPropString = *NULL;
-endif;
+  if isPresent = 1;
+    pPropString = i_pPropString;
+  else;
+    pPropString = *NULL;
+  endif;
 
-// Initialize appender
-tempAppender.name    = i_appName;
-if not ClassLoader_resolveAppender(i_appImpl
-                                   : tempAppender.appenderImpl);
-   return pAppender;
-endif;
-tempAppender.pLayout  = Layout_null();
-tempAppender.pFilter  = Filter_null();
+  // Initialize appender
+  tempAppender.name    = i_appName;
+  if not ClassLoader_resolveAppender(i_appImpl
+                                     : tempAppender.appenderImpl);
+    return pAppender;
+  endif;
+  tempAppender.pLayout  = Layout_null();
+  tempAppender.pFilter  = Filter_null();
 
-// Create properties list
-if pPropString <> *NULL;
-   pPropList = PropertyList_new(pPropString);
-else;
-   pPropList = PropertyList_null();
-endif;
+  // Create properties list
+  if pPropString <> *NULL;
+    pPropList = PropertyList_new(pPropString);
+  else;
+    pPropList = PropertyList_null();
+  endif;
 
-// Create appender handle
-pAppender = %alloc(%size(handle_t));
-appender = tempAppender;
+  // Create appender handle
+  pAppender = %alloc(%size(handle_t));
+  appender = tempAppender;
 
-// Instanciate appender implementation object
-g_pAppender_new = appender.appenderImpl.procNew.procptr;
-SrvPgmAppender_new(pAppender
-                   : appender.appenderImpl.pHandle
-                   : pPropList
-                   : '');
+  // Instanciate appender implementation object
+  g_pAppender_new = appender.appenderImpl.procNew.procptr;
+  SrvPgmAppender_new(pAppender
+                     : appender.appenderImpl.pHandle
+                     : pPropList
+                     : '');
 
-// Destroy properties list
-if not PropertyList_isNull(pPropList);
-   PropertyList_delete(pPropList);
-endif;
+  // Destroy properties list
+  if not PropertyList_isNull(pPropList);
+    PropertyList_delete(pPropList);
+  endif;
 
-// Add appender to the repository
-Repository_addAppender(pAppender);
+  // Add appender to the repository
+  Repository_addAppender(pAppender);
 
-LogLog_verbose('+ Allocated memory for appender [' +
-                  appender.name + '].');
+  LogLog_verbose('+ Allocated memory for appender [' +
+                    appender.name + '].');
 
-return pAppender;
+  return pAppender;
 
 
 end-proc;
@@ -227,48 +227,48 @@ dcl-proc Appender_doAppend export;
     i_pLogEvent like(LOG4RPG_pLogEvent_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isAppended ind inz(*off);
 
-//  Helper fields
+  //  Helper fields
   dcl-s decision int(10) inz;
   dcl-s pFilter like(LOG4RPG_pFilter_t) inz;
 
-//  Appender handle
+  //  Appender handle
   dcl-ds appender likeds(handle_t) based(i_pAppender);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Let the filter decide what to do with the log event
-pFilter = Appender_getFilter(i_pAppender);
-dow not Filter_isNull(pFilter);
-   decision = Filter_decide(pFilter: i_pLogEvent);
-   select;
-   when decision = cFILTER_DENY;
+  // Let the filter decide what to do with the log event
+  pFilter = Appender_getFilter(i_pAppender);
+  dow not Filter_isNull(pFilter);
+    decision = Filter_decide(pFilter: i_pLogEvent);
+    select;
+    when decision = cFILTER_DENY;
       return *off;
-   when decision = cFILTER_ACCEPT;
+    when decision = cFILTER_ACCEPT;
       leave;
-   when decision = cFILTER_NEUTRAL;
+    when decision = cFILTER_NEUTRAL;
       pFilter = Filter_getNext(pFilter);
-   other;
+    other;
       LogLog_warning('Invalid return value returned by +
                       Filter_decide() of filter [' +
                       Filter_getName(pFilter) + ']');
       leave;
-   endsl;
-enddo;
+    endsl;
+  enddo;
 
-// Layout text of logging event
-if Appender_requiresLayout(i_pAppender) and
-   not Layout_isNull(appender.pLayout);
-   Layout_format(appender.pLayout: i_pLogEvent);
-endif;
+  // Layout text of logging event
+  if Appender_requiresLayout(i_pAppender) and
+     not Layout_isNull(appender.pLayout);
+    Layout_format(appender.pLayout: i_pLogEvent);
+  endif;
 
-// Append line of log statement to log
-g_pAppender_doAppend = appender.appenderImpl.procDoAppend.procptr;
-isAppended = SrvPgmAppender_doAppend(
-                appender.appenderImpl.pHandle: i_pLogEvent);
+  // Append line of log statement to log
+  g_pAppender_doAppend = appender.appenderImpl.procDoAppend.procptr;
+  isAppended = SrvPgmAppender_doAppend(
+                  appender.appenderImpl.pHandle: i_pLogEvent);
 
-return isAppended;
+  return isAppended;
 
 
 end-proc;
@@ -287,11 +287,11 @@ dcl-proc Appender_getName export;
     i_pAppender like(LOG4RPG_pAppender_t) const;
   end-pi;
 
-//  Appender handle
+  //  Appender handle
   dcl-ds appender likeds(handle_t) based(i_pAppender);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return appender.name;
+  return appender.name;
 
 
 end-proc;
@@ -310,11 +310,11 @@ dcl-proc Appender_getLayout export;
     i_pAppender like(LOG4RPG_pAppender_t) const;
   end-pi;
 
-//  Appender handle
+  //  Appender handle
   dcl-ds appender likeds(handle_t) based(i_pAppender);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return appender.pLayout;
+  return appender.pLayout;
 
 
 end-proc;
@@ -337,17 +337,17 @@ dcl-proc Appender_setProperties export;
     i_prefix    like(LOG4RPG_prefix_t) const;
   end-pi;
 
-//  Appender handle
+  //  Appender handle
   dcl-ds appender likeds(handle_t) based(i_pAppender);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-g_pAppender_setProperties =
-      appender.appenderImpl.procSetProperties.procptr;
-SrvPgmAppender_setProperties(appender.appenderImpl.pHandle
-                             : i_pPropList
-                             : i_prefix);
+  g_pAppender_setProperties =
+        appender.appenderImpl.procSetProperties.procptr;
+  SrvPgmAppender_setProperties(appender.appenderImpl.pHandle
+                               : i_pPropList
+                               : i_prefix);
 
-return;
+  return;
 
 
 end-proc;
@@ -367,51 +367,51 @@ dcl-proc Appender_delete export;
     io_pAppender like(LOG4RPG_pAppender_t);
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isDeleted ind inz(*off);
 
-//  Helper fields
+  //  Helper fields
   dcl-s name like(appender.name) inz;
 
-//  Appender handle
+  //  Appender handle
   dcl-ds appender likeds(handle_t) based(io_pAppender);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-initializeModule();
+  initializeModule();
 
-if not Repository_existAppender(appender.name);
-   io_pAppender = Appender_null();
-   return *on;
-endif;
+  if not Repository_existAppender(appender.name);
+    io_pAppender = Appender_null();
+    return *on;
+  endif;
 
-LogLog_verbose('Deleting appender [' + appender.name + '] ...');
+  LogLog_verbose('Deleting appender [' + appender.name + '] ...');
 
-name = appender.name;
+  name = appender.name;
 
-// Remove appender from repository
-Repository_removeAppender(appender.name);
+  // Remove appender from repository
+  Repository_removeAppender(appender.name);
 
-// Delete appender (close appender)
-g_pAppender_delete = appender.appenderImpl.procDelete.procptr;
-isDeleted = SrvPgmAppender_delete(appender.appenderImpl.pHandle);
+  // Delete appender (close appender)
+  g_pAppender_delete = appender.appenderImpl.procDelete.procptr;
+  isDeleted = SrvPgmAppender_delete(appender.appenderImpl.pHandle);
 
-// Delete layout
-if Appender_requiresLayout(io_pAppender);
-   if not Layout_isNull(appender.pLayout);
+  // Delete layout
+  if Appender_requiresLayout(io_pAppender);
+    if not Layout_isNull(appender.pLayout);
       Layout_delete(appender.pLayout);
       appender.pLayout = Layout_null();
-   endif;
-endif;
+    endif;
+  endif;
 
-// Detach filter from appender
-appender.pFilter = Filter_null();
+  // Detach filter from appender
+  appender.pFilter = Filter_null();
 
-dealloc(N) io_pAppender;
-io_pAppender = Appender_null();
+  dealloc(N) io_pAppender;
+  io_pAppender = Appender_null();
 
-LogLog_verbose('- Freed memory of appender [' + name + '].');
+  LogLog_verbose('- Freed memory of appender [' + name + '].');
 
-return isDeleted;
+  return isDeleted;
 
 
 end-proc;
@@ -431,19 +431,19 @@ dcl-proc Appender_requiresLayout export;
     i_pAppender like(LOG4RPG_pAppender_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s reqLayout ind inz(*off);
 
-//  Appender handle
+  //  Appender handle
   dcl-ds appender likeds(handle_t) based(i_pAppender);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-g_pAppender_requiresLayout =
-            appender.appenderImpl.procRequiresLayout.procptr;
-reqLayout = SrvPgmAppender_requiresLayout(
-                              appender.appenderImpl.pHandle);
+  g_pAppender_requiresLayout =
+              appender.appenderImpl.procRequiresLayout.procptr;
+  reqLayout = SrvPgmAppender_requiresLayout(
+                                appender.appenderImpl.pHandle);
 
-return reqLayout;
+  return reqLayout;
 
 
 end-proc;
@@ -464,13 +464,13 @@ dcl-proc Appender_setLayout export;
     i_pLayout   like(LOG4RPG_pLayout_t) const;
   end-pi;
 
-//  Appender handle
+  //  Appender handle
   dcl-ds appender likeds(handle_t) based(i_pAppender);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-appender.pLayout = i_pLayout;
+  appender.pLayout = i_pLayout;
 
-return *on;
+  return *on;
 
 
 end-proc;
@@ -491,33 +491,33 @@ dcl-proc Appender_setFilter export;
     i_pFilter   like(LOG4RPG_pFilter_t) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s filterName like(LOG4RPG_filterName_t) inz;
 
-//  Appender handle
+  //  Appender handle
   dcl-ds appender likeds(handle_t) based(i_pAppender);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if Filter_isNull(i_pFilter);
-   LogLog_warning('Filter is NULL. Please check call from [' +
-                  f_caller() + '] to [' + f_this() + '].');
-   return *off;
-endif;
+  if Filter_isNull(i_pFilter);
+    LogLog_warning('Filter is NULL. Please check call from [' +
+                   f_caller() + '] to [' + f_this() + '].');
+    return *off;
+  endif;
 
-filterName = Filter_getName(i_pFilter);
+  filterName = Filter_getName(i_pFilter);
 
-if not Repository_existFilter(filterName);
-   LogLog_warning('Filter [' + filterName +
-                  '] does not exist in repository.');
-   return *off;
-endif;
+  if not Repository_existFilter(filterName);
+    LogLog_warning('Filter [' + filterName +
+                   '] does not exist in repository.');
+    return *off;
+  endif;
 
-appender.pFilter = i_pFilter;
+  appender.pFilter = i_pFilter;
 
-LogLog_debug('Filter [' + filterName +
-             '] attached to appender [' + appender.name + '].');
+  LogLog_debug('Filter [' + filterName +
+               '] attached to appender [' + appender.name + '].');
 
-return *on;
+  return *on;
 
 
 end-proc;
@@ -537,11 +537,11 @@ dcl-proc Appender_getFilter export;
     i_pAppender like(LOG4RPG_pAppender_t) const;
   end-pi;
 
-//  Appender handle
+  //  Appender handle
   dcl-ds appender likeds(handle_t) based(i_pAppender);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return appender.pFilter;
+  return appender.pFilter;
 
 
 end-proc;
@@ -561,18 +561,18 @@ dcl-proc Appender_knowsProperty export;
   dcl-pi *n ind;
     i_parameter like(LOG4RPG_Property_key_t) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-select;
-when i_parameter = cPARAMETER_LAYOUT or
-     f_startsWith(cPARAMETER_LAYOUT + '.': i_parameter);
-   return *on;
-when i_parameter = cPARAMETER_FILTER or
-     f_startsWith(cPARAMETER_FILTER + '.': i_parameter);
-   return *on;
-other;
-   return *off;
-endsl;
+  select;
+  when i_parameter = cPARAMETER_LAYOUT or
+       f_startsWith(cPARAMETER_LAYOUT + '.': i_parameter);
+    return *on;
+  when i_parameter = cPARAMETER_FILTER or
+       f_startsWith(cPARAMETER_FILTER + '.': i_parameter);
+    return *on;
+  other;
+    return *off;
+  endsl;
 
 
 end-proc;
@@ -592,20 +592,20 @@ dcl-proc Appender_isNull export;
     i_pAppender like(LOG4RPG_pAppender_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isNull ind inz(*off);
 
-//  Appender handle
+  //  Appender handle
   dcl-ds appender likeds(handle_t) based(i_pAppender);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if i_pAppender = Appender_null();
-   isNull = *on;
-else;
-   isNull = *off;
-endif;
+  if i_pAppender = Appender_null();
+    isNull = *on;
+  else;
+    isNull = *off;
+  endif;
 
-return isNull;
+  return isNull;
 
 
 end-proc;
@@ -622,9 +622,9 @@ end-proc;
 dcl-proc Appender_null export;
   dcl-pi *n like(LOG4RPG_pAppender_t);
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return *NULL;
+  return *NULL;
 
 
 end-proc;
@@ -637,23 +637,22 @@ dcl-proc initializeModule;
   dcl-pi *n;
   end-pi;
 
-//  Return value
-//
-//  Helper fields
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  //  Return value
+  //
+  //  Helper fields
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if g_isInit;
-   return;
-endif;
+  if g_isInit;
+    return;
+  endif;
 
-Loglog_verbose('Initializing module ' + sds.modContProc + '...');
+  Loglog_verbose('Initializing module ' + sds.modContProc + '...');
 
-Repository_initialize();
+  Repository_initialize();
 
-g_isInit = *on;
+  g_isInit = *on;
 
-return;
+  return;
 
 
 end-proc;
-

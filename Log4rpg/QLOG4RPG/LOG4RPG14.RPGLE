@@ -51,12 +51,12 @@
 // -----------------------------------------
 //  Type definitions
 // -----------------------------------------
-/copy QLOG4RPG,PLOG4RPG                      Public interface & type definitions
+/copy QLOG4RPG,PLOG4RPG Public interface & type definitions
 
 // -----------------------------------------
 //  Prototypes
 // -----------------------------------------
-/copy QBASICS1,PBASICS1                      Basic RPG Extensions
+/copy QBASICS1,PBASICS1 Basic RPG Extensions
 
 // -----------------------------------------
 //  Private prototypes
@@ -83,20 +83,20 @@ dcl-proc DebugMode_toInt export;
   dcl-pi *n int(5);
     i_debugMode like(LOG4RPG_debugMode_t) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-select;
-when i_debugMode = cLOG4RPG_DEBUG_QUIET;
-   return cLOG4RPG_INT_DEBUG_QUIET;
-when i_debugMode = cLOG4RPG_DEBUG_OFF;
-   return cLOG4RPG_INT_DEBUG_OFF;
-when i_debugMode = cLOG4RPG_DEBUG_ON;
-   return cLOG4RPG_INT_DEBUG_ON;
-when i_debugMode = cLOG4RPG_DEBUG_VERBOSE;
-   return cLOG4RPG_INT_DEBUG_VERBOSE;
-other;
-   return cLOG4RPG_INT_DEBUG_OFF;
-endsl;
+  select;
+  when i_debugMode = cLOG4RPG_DEBUG_QUIET;
+    return cLOG4RPG_INT_DEBUG_QUIET;
+  when i_debugMode = cLOG4RPG_DEBUG_OFF;
+    return cLOG4RPG_INT_DEBUG_OFF;
+  when i_debugMode = cLOG4RPG_DEBUG_ON;
+    return cLOG4RPG_INT_DEBUG_ON;
+  when i_debugMode = cLOG4RPG_DEBUG_VERBOSE;
+    return cLOG4RPG_INT_DEBUG_VERBOSE;
+  other;
+    return cLOG4RPG_INT_DEBUG_OFF;
+  endsl;
 
 
 end-proc;
@@ -114,20 +114,20 @@ dcl-proc DebugMode_toString export;
   dcl-pi *n like(LOG4RPG_debugMode_t);
     i_debugMode int(5) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-select;
-when i_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
-   return cLOG4RPG_DEBUG_QUIET;
-when i_debugMode = cLOG4RPG_INT_DEBUG_OFF;
-   return cLOG4RPG_DEBUG_OFF;
-when i_debugMode = cLOG4RPG_INT_DEBUG_ON;
-   return cLOG4RPG_DEBUG_ON;
-when i_debugMode = cLOG4RPG_INT_DEBUG_VERBOSE;
-   return cLOG4RPG_DEBUG_VERBOSE;
-other;
-   return '';
-endsl;
+  select;
+  when i_debugMode = cLOG4RPG_INT_DEBUG_QUIET;
+    return cLOG4RPG_DEBUG_QUIET;
+  when i_debugMode = cLOG4RPG_INT_DEBUG_OFF;
+    return cLOG4RPG_DEBUG_OFF;
+  when i_debugMode = cLOG4RPG_INT_DEBUG_ON;
+    return cLOG4RPG_DEBUG_ON;
+  when i_debugMode = cLOG4RPG_INT_DEBUG_VERBOSE;
+    return cLOG4RPG_DEBUG_VERBOSE;
+  other;
+    return '';
+  endsl;
 
 
 end-proc;
@@ -145,17 +145,16 @@ dcl-proc DebugMode_isValid export;
   dcl-pi *n ind;
     i_debugMode like(LOG4RPG_debugMode_t) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if (i_debugMode = cLOG4RPG_DEBUG_QUIET) or
-   (i_debugMode = cLOG4RPG_DEBUG_OFF  ) or
-   (i_debugMode = cLOG4RPG_DEBUG_ON   ) or
-   (i_debugMode = cLOG4RPG_DEBUG_VERBOSE);
-   return *on;
-else;
-   return *off;
-endif;
+  if (i_debugMode = cLOG4RPG_DEBUG_QUIET) or
+     (i_debugMode = cLOG4RPG_DEBUG_OFF  ) or
+     (i_debugMode = cLOG4RPG_DEBUG_ON   ) or
+     (i_debugMode = cLOG4RPG_DEBUG_VERBOSE);
+    return *on;
+  else;
+    return *off;
+  endif;
 
 
 end-proc;
-

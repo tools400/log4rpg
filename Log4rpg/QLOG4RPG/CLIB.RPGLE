@@ -1,9 +1,9 @@
 **free
-/if NOT DEFINED(CLIB)
+/if NOT defined(CLIB)
 /define CLIB
 
 //  Basic C data types
-/if NOT DEFINED(C_DATA_TYPES)
+/if NOT defined(C_DATA_TYPES)
 /define C_DATA_TYPES
 // C Data Types
 dcl-s char_t char(1) based(pDummy);
@@ -169,7 +169,7 @@ dcl-pr strcasecmp int(10) extproc('strcasecmp');
   string1 pointer options(*string) value;
   string2 pointer options(*string) value;
 end-pr;
-/if NOT DEFINED(TESTPTR)
+/if NOT defined(TESTPTR)
 /define TESTPTR
 
 //  Test Pointer (TESTPTR)
@@ -710,7 +710,7 @@ dcl-pr Qp0lRenameUnlink int(10) extproc('Qp0lRenameUnlink'); // = int
 end-pr;
 
 //  0/-1 = close()--Close File or Socket Descriptor    include <unistd.h>
-/if NOT DEFINED(c_close_function)
+/if NOT defined(c_close_function)
 /define c_close_function
 dcl-pr close int(10) extproc('close'); // = int
   i_fd int(10) value; // = int

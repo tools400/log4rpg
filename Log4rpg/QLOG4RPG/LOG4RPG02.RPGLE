@@ -46,7 +46,7 @@
 // -----------------------------------------
 //  Imported functions
 // -----------------------------------------
-/copy QLOG4RPG,PLOG4RPG                      Public API Specification
+/copy QLOG4RPG,PLOG4RPG Public API Specification
 
 // -----------------------------------------
 //  Exported functions
@@ -65,11 +65,11 @@ end-ds;
 // -----------------------------------------
 //  Prototypes
 // -----------------------------------------
-/copy QBASICS1,PBASICS1                      Basic RPG Extensions
-/copy QIFS,PIFS                              IFS Stream file support
+/copy QBASICS1,PBASICS1 Basic RPG Extensions
+/copy QIFS,PIFS IFS Stream file support
 
-/copy QLOG4RPG,PLOG4RPG10                    LogLog
-/copy QLOG4RPG,PLOG4RPG99                    Helpers
+/copy QLOG4RPG,PLOG4RPG10 LogLog
+/copy QLOG4RPG,PLOG4RPG99 Helpers
 
 // -----------------------------------------
 //  Private prototypes
@@ -97,28 +97,28 @@ dcl-proc LoggerList_new export;
   dcl-pi *n like(LOG4RPG_pLoggerList_t);
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-ds logList likeds(handle_t) based(pLogList);
 
-//  Helper fields
+  //  Helper fields
   dcl-ds tempLogList likeds(handle_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-LogLog_verbose('Creating logger list ...');
+  LogLog_verbose('Creating logger list ...');
 
-pLogList = LoggerList_null();
+  pLogList = LoggerList_null();
 
-// Initialize appender list handle
-clear tempLogList;
-tempLogList.pMap = BasicMap_new();
+  // Initialize appender list handle
+  clear tempLogList;
+  tempLogList.pMap = BasicMap_new();
 
-// Return properties list to caller
-pLogList = %alloc(%size(handle_t));
-logList = tempLogList;
+  // Return properties list to caller
+  pLogList = %alloc(%size(handle_t));
+  logList = tempLogList;
 
-LogLog_verbose('+ Allocated memory for logger list.');
+  LogLog_verbose('+ Allocated memory for logger list.');
 
-return pLogList;
+  return pLogList;
 
 
 end-proc;
@@ -138,11 +138,11 @@ dcl-proc LoggerList_getNumE export;
     i_pLogList like(LOG4RPG_pLoggerList_t) const;
   end-pi;
 
-//  Logger list handle
+  //  Logger list handle
   dcl-ds logList likeds(handle_t) based(i_pLogList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return BasicMap_getNumE(logList.pMap);
+  return BasicMap_getNumE(logList.pMap);
 
 
 end-proc;
@@ -164,18 +164,18 @@ dcl-proc LoggerList_put export;
     i_pLogger  like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s pLogger like(i_pLogger);
 
-//  Logger list handle
+  //  Logger list handle
   dcl-ds logList likeds(handle_t) based(i_pLogList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-pLogger = i_pLogger;
+  pLogger = i_pLogger;
 
-return BasicMap_put(logList.pMap: Logger_getName(pLogger)
-                                : %addr(pLogger)
-                                : %len(pLogger ));
+  return BasicMap_put(logList.pMap: Logger_getName(pLogger)
+                                  : %addr(pLogger)
+                                  : %len(pLogger ));
 
 
 end-proc;
@@ -197,11 +197,11 @@ dcl-proc LoggerList_remove export;
     i_logName  like(LOG4RPG_loggerName_t) const;
   end-pi;
 
-//  Logger list handle
+  //  Logger list handle
   dcl-ds logList likeds(handle_t) based(i_pLogList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return BasicMap_remove(logList.pMap: i_logName);
+  return BasicMap_remove(logList.pMap: i_logName);
 
 
 end-proc;
@@ -222,17 +222,17 @@ dcl-proc LoggerList_get export;
     i_logName  like(LOG4RPG_loggerName_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s pLogger like(LOG4RPG_hLogger_t) inz;
 
-//  Logger list handle
+  //  Logger list handle
   dcl-ds logList likeds(handle_t) based(i_pLogList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-BasicMap_get(logList.pMap: i_logName: %addr(pLogger)
-                                    : %size(pLogger));
+  BasicMap_get(logList.pMap: i_logName: %addr(pLogger)
+                                      : %size(pLogger));
 
-return pLogger;
+  return pLogger;
 
 
 end-proc;
@@ -253,11 +253,11 @@ dcl-proc LoggerList_exist export;
     i_logName  like(LOG4RPG_loggerName_t) const;
   end-pi;
 
-//  Logger list handle
+  //  Logger list handle
   dcl-ds logList likeds(handle_t) based(i_pLogList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return BasicMap_containsKey(logList.pMap: i_logName);
+  return BasicMap_containsKey(logList.pMap: i_logName);
 
 
 end-proc;
@@ -272,21 +272,19 @@ end-proc;
 //   logIter       - Iterator for the logger list.
 //=========================================================================
 dcl-proc LoggerList_getIterator export;
+  dcl-pi *n likeds(LOG4RPG_LoggerListIterator_t);
+    i_pLogList like(LOG4RPG_pLoggerList_t) const;
+  end-pi;
 
-  dcl-ds LoggerList_getIteratorPI likeds(LOG4RPG_Logger: ListIterator_t);
-i_pLogList      const  like(LOG4RPG_pLoggerList_t );
-  end-ds;
+  //  Return value
+  dcl-ds logIter likeds(LOG4RPG_LoggerListIterator_t) inz;
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-//  Return value
-  dcl-ds logIter DS likeds(LOG4RPG_Logger: ListIterator_t) inz;
-  end-ds;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  clear logIter;
+  logIter.pLogList = i_pLogList;
+  logIter.lastLog  = 0;
 
-clear logIter;
-logIter.pLogList = i_pLogList;
-logIter.lastLog  = 0;
-
-return logIter;
+  return logIter;
 
 
 end-proc;
@@ -306,29 +304,29 @@ dcl-proc LoggerList_getFirst export;
     io_logIter likeds(LOG4RPG_LoggerListIterator_t);
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s pLogger like(LOG4RPG_hLogger_t) inz;
 
-//  Helper fields
+  //  Helper fields
   dcl-s logName like(LOG4RPG_loggerName_t) inz;
 
-//  Logger list handle
+  //  Logger list handle
   dcl-ds logList likeds(handle_t) based(io_logIter.pLogList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-pLogger = Logger_null();
+  pLogger = Logger_null();
 
-if LoggerList_getNumE(io_logIter.pLogList) = 0;
-   return pLogger;
-endif;
+  if LoggerList_getNumE(io_logIter.pLogList) = 0;
+    return pLogger;
+  endif;
 
-io_logIter.lastLog = 1;
+  io_logIter.lastLog = 1;
 
-logName = BasicMap_getKeyByIndex(logList.pMap
-                              : io_logIter.lastLog);
-pLogger = LoggerList_get(io_logIter.pLogList: logName);
+  logName = BasicMap_getKeyByIndex(logList.pMap
+                                : io_logIter.lastLog);
+  pLogger = LoggerList_get(io_logIter.pLogList: logName);
 
-return pLogger;
+  return pLogger;
 
 
 end-proc;
@@ -348,29 +346,29 @@ dcl-proc LoggerList_getNext export;
     io_logIter likeds(LOG4RPG_LoggerListIterator_t);
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s pLogger like(LOG4RPG_hLogger_t) inz;
 
-//  Helper fields
+  //  Helper fields
   dcl-s logName like(LOG4RPG_loggerName_t) inz;
 
-//  Logger list handle
+  //  Logger list handle
   dcl-ds logList likeds(handle_t) based(io_logIter.pLogList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-pLogger = Logger_null();
+  pLogger = Logger_null();
 
-if LoggerList_getNumE(io_logIter.pLogList) <= io_logIter.lastLog;
-   return pLogger;
-endif;
+  if LoggerList_getNumE(io_logIter.pLogList) <= io_logIter.lastLog;
+    return pLogger;
+  endif;
 
-io_logIter.lastLog = io_logIter.lastLog + 1;
+  io_logIter.lastLog = io_logIter.lastLog + 1;
 
-logName = BasicMap_getKeyByIndex(logList.pMap
-                              : io_logIter.lastLog);
-pLogger = LoggerList_get(io_logIter.pLogList: logName);
+  logName = BasicMap_getKeyByIndex(logList.pMap
+                                : io_logIter.lastLog);
+  pLogger = LoggerList_get(io_logIter.pLogList: logName);
 
-return pLogger;
+  return pLogger;
 
 
 end-proc;
@@ -389,47 +387,46 @@ dcl-proc LoggerList_delete export;
     io_pLogList like(LOG4RPG_pLoggerList_t);
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isDeleted ind inz(*off);
 
-//  Helper fields
-  dcl-ds logIter DS likeds(LOG4RPG_Logger: ListIterator_t) inz;
-  end-ds;
+  //  Helper fields
+  dcl-ds logIter likeds(LOG4RPG_LoggerListIterator_t) inz;
   dcl-s pLogger like(LOG4RPG_hLogger_t) inz;
 
-//  Logger list handle
+  //  Logger list handle
   dcl-ds logList likeds(handle_t) based(io_pLogList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if BasicMap_isNull(logList.pMap);
-   return *on;
-endif;
+  if BasicMap_isNull(logList.pMap);
+    return *on;
+  endif;
 
-LogLog_verbose('Deleting logger list ...');
+  LogLog_verbose('Deleting logger list ...');
 
-p_assert(LoggerList_getNumE(io_pLogList) = 0
-         : 'All loggers should have been removed from this +
-            logger list by the repository.');
+  p_assert(LoggerList_getNumE(io_pLogList) = 0
+           : 'All loggers should have been removed from this +
+              logger list by the repository.');
 
-logIter = LoggerList_getIterator(io_pLogList);
+  logIter = LoggerList_getIterator(io_pLogList);
 
-dow LoggerList_getNumE(io_pLogList) > 0;
-   pLogger = LoggerList_getFirst(logIter);
-   LoggerList_remove(io_pLogList: Logger_getName(pLogger));
-   Logger_delete(pLogger);
-enddo;
+  dow LoggerList_getNumE(io_pLogList) > 0;
+    pLogger = LoggerList_getFirst(logIter);
+    LoggerList_remove(io_pLogList: Logger_getName(pLogger));
+    Logger_delete(pLogger);
+  enddo;
 
-if BasicMap_delete(logList.pMap) = 0;
-   isDeleted = *on;
-else;
-   isDeleted = *off;
-endif;
+  if BasicMap_delete(logList.pMap) = 0;
+    isDeleted = *on;
+  else;
+    isDeleted = *off;
+  endif;
 
-io_pLogList = LoggerList_null();
+  io_pLogList = LoggerList_null();
 
-LogLog_verbose('- Deleted Logger list');
+  LogLog_verbose('- Deleted Logger list');
 
-return isDeleted;
+  return isDeleted;
 
 
 end-proc;
@@ -449,15 +446,15 @@ dcl-proc LoggerList_isNull export;
     i_pLogList like(LOG4RPG_pLoggerList_t) const;
   end-pi;
 
-//  Logger list handle
+  //  Logger list handle
   dcl-ds logList likeds(handle_t) based(i_pLogList);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if i_pLogList = LoggerList_null();
-   return *on;
-else;
-   return BasicMap_isNull(logList.pMap);
-endif;
+  if i_pLogList = LoggerList_null();
+    return *on;
+  else;
+    return BasicMap_isNull(logList.pMap);
+  endif;
 
 
 end-proc;
@@ -475,12 +472,11 @@ dcl-proc LoggerList_null export;
   dcl-pi *n like(LOG4RPG_pLoggerList_t);
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s logList like(LOG4RPG_pLoggerList_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return BasicMap_null();
+  return BasicMap_null();
 
 
 end-proc;
-

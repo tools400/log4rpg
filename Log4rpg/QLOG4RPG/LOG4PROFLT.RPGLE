@@ -1,5 +1,5 @@
 **free
-/if NOT DEFINED(PROTOTYPES_ONLY)
+/if NOT defined(PROTOTYPES_ONLY)
 //=====================================================================*
 //  SrvPgm: LOG4RPG - Object: PropertyFilter                           *
 //=====================================================================*
@@ -85,7 +85,7 @@ dcl-pr PropertyFilter_delete ind extproc('PropertyFilter_delete');
   io_pHandle pointer;
 end-pr;
 
-/if DEFINED(PROTOTYPES_ONLY)
+/if defined(PROTOTYPES_ONLY)
 /eof
 /endif
 
@@ -97,7 +97,7 @@ end-pr;
 // -----------------------------------------
 //  Type definitions
 // -----------------------------------------
-/copy QLOG4RPG,PLOG4RPG                     Public interface & type definitions
+/copy QLOG4RPG,PLOG4RPG Public interface & type definitions
 
 dcl-ds handle_t qualified based(pDummy);
   pSuper    like(LOG4RPG_pFilter_t);
@@ -107,11 +107,11 @@ end-ds;
 // -----------------------------------------
 //  Prototypes
 // -----------------------------------------
-/copy QLOG4RPG,CLIB                         C-Library
+/copy QLOG4RPG,CLIB C-Library
 
-/copy QLOG4RPG,PLOG4RPG07                   PropertyList
-/copy QLOG4RPG,PLOG4RPG10                   LogLog
-/copy QLOG4RPG,PLOG4RPG99                   Helper
+/copy QLOG4RPG,PLOG4RPG07 PropertyList
+/copy QLOG4RPG,PLOG4RPG10 LogLog
+/copy QLOG4RPG,PLOG4RPG99 Helper
 
 // -----------------------------------------
 //  Private prototypes
@@ -127,11 +127,9 @@ end-pr;
 // -----------------------------------------
 //  Global constants
 // -----------------------------------------
-dcl-c cTHIS_CLASS;
-     D                                            'PropertyFilter')
-//
-dcl-c cPARAMETER_PROPERTY
-      const('property.');
+dcl-c cTHIS_CLASS 'PropertyFilter';
+
+dcl-c cPARAMETER_PROPERTY 'property.';
 
 /copy QLOG4RPG,PFILTER
 
@@ -160,34 +158,34 @@ dcl-proc PropertyFilter_new export;
     i_prefix    like(LOG4RPG_prefix_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isDone ind inz(*off);
 
-//  Helper fields
+  //  Helper fields
   dcl-ds tmpHandle likeds(handle_t) inz;
   dcl-ds msg likeds(msg_t) inz;
 
-//  Filter handle
+  //  Filter handle
   dcl-ds handle likeds(handle_t) based(io_pHandle);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-clear tmpHandle;
+  clear tmpHandle;
 
-// Initialize handle
-tmpHandle.pSuper    = i_pSuper;   // Handle of the super class 'Filter'
-tmpHandle.hPropList = PropertyList_new();
+  // Initialize handle
+  tmpHandle.pSuper    = i_pSuper;   // Handle of the super class 'Filter'
+  tmpHandle.hPropList = PropertyList_new();
 
-// Initialize handle from configuration properties
-if (i_pPropList <> *NULL) and not PropertyList_isNull(i_pPropList);
-   loadConfiguration(tmpHandle: i_pPropList: i_prefix);
-endif;
+  // Initialize handle from configuration properties
+  if (i_pPropList <> *NULL) and not PropertyList_isNull(i_pPropList);
+    loadConfiguration(tmpHandle: i_pPropList: i_prefix);
+  endif;
 
-io_pHandle = %alloc(%size(tmpHandle));
-handle = tmpHandle;
+  io_pHandle = %alloc(%size(tmpHandle));
+  handle = tmpHandle;
 
-LogLog_debug('Loaded instance of [' + cTHIS_CLASS + '].');
+  LogLog_debug('Loaded instance of [' + cTHIS_CLASS + '].');
 
-return isDone;
+  return isDone;
 
 
 end-proc;
@@ -209,35 +207,34 @@ dcl-proc PropertyFilter_decide export;
     i_pLogEvent like(LOG4RPG_pLogEvent_t) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s hPropList like(LOG4RPG_pPropertyList_t) inz;
   dcl-ds property likeds(LOG4RPG_property_t) inz;
-  dcl-ds propIter DS likeds(LOG4RPG_Property: ListIterator_t) inz;
-  end-ds;
+  dcl-ds propIter likeds(LOG4RPG_PropertyListIterator_t) inz;
 
-//  Filter handle
+  //  Filter handle
   dcl-ds handle likeds(handle_t) based(i_pHandle);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Return if there are no properties to add
-if PropertyList_getNumE(handle.hPropList) = 0;
-   return cFILTER_NEUTRAL;
-endif;
+  // Return if there are no properties to add
+  if PropertyList_getNumE(handle.hPropList) = 0;
+    return cFILTER_NEUTRAL;
+  endif;
 
-// Get property list of log event
-hPropList = LogEvent_getPropertyList(i_pLogEvent);
+  // Get property list of log event
+  hPropList = LogEvent_getPropertyList(i_pLogEvent);
 
-// Add attributes to log event
-propIter = PropertyList_getIterator(handle.hPropList);
+  // Add attributes to log event
+  propIter = PropertyList_getIterator(handle.hPropList);
 
-property = PropertyList_getFirst(propIter);
+  property = PropertyList_getFirst(propIter);
 
-dow property.key <> '';
-   PropertyList_put(hPropList: property);
-   property = PropertyList_getNext(propIter);
-enddo;
+  dow property.key <> '';
+    PropertyList_put(hPropList: property);
+    property = PropertyList_getNext(propIter);
+  enddo;
 
-return cFILTER_NEUTRAL;
+  return cFILTER_NEUTRAL;
 
 
 end-proc;
@@ -262,13 +259,13 @@ dcl-proc PropertyFilter_setProperties export;
     i_prefix    like(LOG4RPG_prefix_t) const;
   end-pi;
 
-//  PropertyFilter-Handle
+  //  PropertyFilter-Handle
   dcl-ds handle likeds(handle_t) based(i_pHandle);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-loadConfiguration(handle: i_pPropList: i_prefix);
+  loadConfiguration(handle: i_pPropList: i_prefix);
 
-return;
+  return;
 
 
 end-proc;
@@ -288,29 +285,29 @@ dcl-proc PropertyFilter_delete export;
     io_pHandle pointer;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s isDone ind inz(*off);
 
-//  Filter handle
+  //  Filter handle
   dcl-ds handle likeds(handle_t) based(io_pHandle);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Delete property list
-if not PropertyList_isNull(handle.hPropList);
-   PropertyList_delete(handle.hPropList);
-endif;
+  // Delete property list
+  if not PropertyList_isNull(handle.hPropList);
+    PropertyList_delete(handle.hPropList);
+  endif;
 
-// Clear handle data
-clear handle;
+  // Clear handle data
+  clear handle;
 
-// Free handle memory
-dealloc(N) io_pHandle;
+  // Free handle memory
+  dealloc(N) io_pHandle;
 
-LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
+  LogLog_verbose('Deleted instance of [' + cTHIS_CLASS + '].');
 
-isDone = *on;
+  isDone = *on;
 
-return isDone;
+  return isDone;
 
 
 end-proc;
@@ -326,49 +323,47 @@ dcl-proc loadConfiguration;
     i_prefix    like(LOG4RPG_prefix_t) const;
   end-pi;
 
-//  Local fields
+  //  Local fields
   dcl-s parameter like(property.key) inz;
   dcl-s prefix like(i_prefix) inz;
   dcl-ds property likeds(LOG4RPG_property_t) inz;
   dcl-ds tmpProperty likeds(LOG4RPG_property_t) inz;
-  dcl-ds propIter DS likeds(LOG4RPG_Property: ListIterator_t) inz;
-  end-ds;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  dcl-ds propIter likeds(LOG4RPG_PropertyListIterator_t) inz;
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-prefix = f_lcase(i_prefix);
+  prefix = f_lcase(i_prefix);
 
-propIter = PropertyList_getIterator(i_pPropList);
+  propIter = PropertyList_getIterator(i_pPropList);
 
-property = PropertyList_getFirst(propIter);
+  property = PropertyList_getFirst(propIter);
 
-dow property.key <> '';
+  dow property.key <> '';
 
-   if (prefix = '') or (f_startsWith(prefix: property.key) and
-                        %len(property.key) > %len(prefix));
+    if (prefix = '') or (f_startsWith(prefix: property.key) and
+                         %len(property.key) > %len(prefix));
 
       parameter = %subst(property.key: %len(prefix) + 1);
 
       select;
       when f_startsWith(cPARAMETER_PROPERTY: parameter);
-         tmpProperty.key = %subst(parameter
-                                  : %len(cPARAMETER_PROPERTY) + 1);
-         tmpProperty.value = property.value;
-         PropertyList_put(io_handle.hPropList: tmpProperty);
+        tmpProperty.key = %subst(parameter
+                                 : %len(cPARAMETER_PROPERTY) + 1);
+        tmpProperty.value = property.value;
+        PropertyList_put(io_handle.hPropList: tmpProperty);
       when Filter_knowsProperty(parameter);
-         // Ignore all parameters known by super Filter class
+      // Ignore all parameters known by super Filter class
       other;
-         LogLog_warning('No such property ['     +
-                         property.key            +
-                        '] in [' + cTHIS_CLASS + ']');
+        LogLog_warning('No such property ['     +
+                        property.key            +
+                       '] in [' + cTHIS_CLASS + ']');
       endsl;
 
-   endif;
+    endif;
 
-   property = PropertyList_getNext(propIter);
-enddo;
+    property = PropertyList_getNext(propIter);
+  enddo;
 
-return;
+  return;
 
 
 end-proc;
-

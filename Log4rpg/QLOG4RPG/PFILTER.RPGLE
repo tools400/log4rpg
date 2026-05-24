@@ -1,7 +1,7 @@
-**FREE
-/IF NOT DEFINED(PFILTER)
-/DEFINE PFILTER
-//
+**free
+/if NOT defined(PFILTER)
+/define PFILTER
+
 //  Who should use this copy book:   Developer of filter
 //
 //  This copy book defines the prototypes that are needed to write an
@@ -26,77 +26,61 @@
 // -----------------------------------------
 //  Type definitions
 // -----------------------------------------
-/COPY QLOG4RPG,PSHARE                        Type defs shared with appenders & layouts
-//
+/copy QLOG4RPG,PSHARE Type defs shared with appenders & layouts
+
 // -----------------------------------------
 //  Constants
 // -----------------------------------------
 //  Valid return values of Filter_decide():
-dcl-c cFILTER_ACCEPT
-      const(1);
-dcl-c cFILTER_DENY
-      const(2);
-dcl-c cFILTER_NEUTRAL
-      const(3);
-//
+dcl-c cFILTER_ACCEPT 1;
+dcl-c cFILTER_DENY 2;
+dcl-c cFILTER_NEUTRAL 3;
+
 // -----------------------------------------
 //  Filter Prototypes & Type Defs
 // -----------------------------------------
-//
+
 //  Custom filter ...
 //  ... prototye: new, returns TRUE on success else FALSE
-/IF DEFINED (DEFINE_PROCPTR)
-dcl-pr SrvPgmFilter_new
-       ind extproc(g_pFilter_new);
+/if defined(DEFINE_PROCPTR)
+dcl-pr SrvPgmFilter_new ind extproc(g_pFilter_new);
+/else
+dcl-pr SrvPgmFilter_new ind extproc('SrvPgmFilter_new');
+/endif
+  i_pSuper   like(LOG4RPG_pFilter_t) const;
+  io_pHandle pointer;
+  i_propList like(LOG4RPG_pPropertyList_t) const;
+  i_prefix   like(LOG4RPG_prefix_t) const;
 end-pr;
-/ELSE
-dcl-pr SrvPgmFilter_new
-       ind extproc('SrvPgmFilter_new');
-end-pr;
-/ENDIF
-     D  i_pSuper                           const  like(LOG4RPG_pFilter_t       )
-     D  io_pHandle                     *
-     D  i_propList                         const  like(LOG4RPG_pPropertyList_t )
-     D  i_prefix                           const  like(LOG4RPG_prefix_t        )
-//
+
 //  ... prototye: decide, returns the decision of the filter
-/IF DEFINED (DEFINE_PROCPTR)
-dcl-pr SrvPgmFilter_decide
-       int(10) extproc(g_pFilter_decide);
+/if defined(DEFINE_PROCPTR)
+dcl-pr SrvPgmFilter_decide int(10) extproc(g_pFilter_decide);
+/else
+dcl-pr SrvPgmFilter_decide int(10) extproc('SrvPgmFilter_decide');
+/endif
+  i_pHandle   pointer const;
+  i_pLogEvent like(LOG4RPG_pLogEvent_t) const;
 end-pr;
-/ELSE
-dcl-pr SrvPgmFilter_decide
-       int(10) extproc('SrvPgmFilter_decide');
+
+//  ... prototye: setProperties, sets the properties for the filter
+/if defined(DEFINE_PROCPTR)
+dcl-pr SrvPgmFilter_setProperties extproc(g_pFilter_setProperties);
+/else
+dcl-pr SrvPgmFilter_setProperties extproc('SrvPgmFilter_setProperties');
+/endif
+  i_pHandle  pointer const;
+  i_propList like(LOG4RPG_pPropertyList_t) const;
+  i_prefix   like(LOG4RPG_prefix_t) const;
 end-pr;
-/ENDIF
-     D  i_pHandle                      *   const
-     D  i_pLogEvent                        const  like(LOG4RPG_pLogEvent_t)
-//
-//  ... prototye: setProperties, sets the proeprties for the filter
-/IF DEFINED (DEFINE_PROCPTR)
-dcl-pr SrvPgmFilter_setProperties
-       extproc(g_pFilter_setProperties);
-end-pr;
-/ELSE
-dcl-pr SrvPgmFilter_setProperties
-       extproc('SrvPgmFilter_+
-       setProperties');
-end-pr;
-/ENDIF
-     D  i_pHandle                      *   const
-     D  i_propList                         const  like(LOG4RPG_pPropertyList_t )
-     D  i_prefix                           const  like(LOG4RPG_prefix_t        )
-//
+
 //  ... prototye: delete, returns TRUE on success else FALSE
-/IF DEFINED (DEFINE_PROCPTR)
-dcl-pr SrvPgmFilter_delete
-       ind extproc(g_pFilter_delete);
+/if defined(DEFINE_PROCPTR)
+dcl-pr SrvPgmFilter_delete ind extproc(g_pFilter_delete);
+/else
+dcl-pr SrvPgmFilter_delete ind extproc('SrvPgmFilter_delete');
+/endif
+  io_pHandle pointer;
 end-pr;
-/ELSE
-dcl-pr SrvPgmFilter_delete
-       ind extproc('SrvPgmFilter_delete');
-end-pr;
-/ENDIF
-     D  io_pHandle                     *
-//
-/ENDIF
+
+/endif

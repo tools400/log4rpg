@@ -1,4 +1,4 @@
-**FREE
+**free
 //=====================================================================*
 //  Module: LOG4RPG - Object: Socket Helper                            *
 //=====================================================================*
@@ -19,7 +19,7 @@
 //  2. Redistributions in binary form must reproduce the above copyright
 //     notice, this list of conditions and the following disclaimer in the
 //     documentation and/or other materials provided with the distribution.
-//
+
 //=====================================================================*
 //  History:                                                           *
 //                                                                     *
@@ -44,14 +44,14 @@
 //                                                                     *
 //   >>END-PRE-COMPILER<<                                              *
 //=====================================================================*
-/COPY QLOG4RPG,H_SPEC
+/copy QLOG4RPG,H_SPEC
 //=====================================================================*
 //
 // -----------------------------------------
 //  Exported functions
 // -----------------------------------------
-/COPY QLOG4RPG,PLOG4SOCK
-//
+/copy QLOG4RPG,PLOG4SOCK
+
 // -----------------------------------------
 //  Type definitions
 // -----------------------------------------
@@ -59,18 +59,17 @@
 // -----------------------------------------
 //  Prototypes
 // -----------------------------------------
-/COPY QLOG4RPG,PTYPES                        Private type definitions
-/COPY QLOG4RPG,QUSRJOBI                      Retrieve Job Information (QUSRJOBI) API
-//
+/copy QLOG4RPG,PTYPES Private type definitions
+/copy QLOG4RPG,QUSRJOBI Retrieve Job information(QUSRJOBI) API
+
 // -----------------------------------------
 //  Private prototypes
 // -----------------------------------------
-//
-dcl-pr mask
-       uns(10);
-  i_FD            const  like(socket_fd_t   );
+
+dcl-pr mask uns(10);
+  i_FD like(socket_fd_t) const;
 end-pr;
-//
+
 // -----------------------------------------
 //  Global constants
 // -----------------------------------------
@@ -88,173 +87,161 @@ end-pr;
 //  Set bit in file descriptor set.
 //======================================================================================
 dcl-proc FD_SET export;
-//
-dcl-pi FD_SET;
-  i_FD            const  like(socket_fd_t   );
-  io_FDSet        like(socket_fdSet_t);
-end-pi;
-//
-//  Helper fields
-dcl-s x               int(5);
-dcl-s FDSet           uns(10) dim(7) based(pFDSet);
-// ---------------------------------------------------------
+  dcl-pi *n;
+    i_FD     like(socket_fd_t) const;
+    io_FDSet like(socket_fdSet_t);
+  end-pi;
 
-pFDSet =%addr(io_FDSet);
-x = (i_FD / 32) + 1;
-FDSet(x) = %bitor(FDSet(x): mask(i_FD));
+  //  Helper fields
+  dcl-s x int(5);
+  dcl-s FDSet uns(10) dim(7) based(pFDSet);
+  // ---------------------------------------------------------
 
-return;
+  pFDSet =%addr(io_FDSet);
+  x = (i_FD / 32) + 1;
+  FDSet(x) = %bitor(FDSet(x): mask(i_FD));
 
-//
-end-proc FD_SET;
-//
+  return;
+
+
+end-proc;
+
 //======================================================================================
 //  RPG implementation of C macro: FD_CLR
 //  Clear bit in file descriptor set.
 //======================================================================================
 dcl-proc FD_CLR export;
-//
-dcl-pi FD_CLR;
-  i_FD            const  like(socket_fd_t   );
-  io_FDSet        like(socket_fdSet_t);
-end-pi;
-//
-//  Helper fields
-dcl-s x               int(5);
-dcl-s FDSet           uns(10) dim(7) based(pFDSet);
-// ---------------------------------------------------------
+  dcl-pi *n;
+    i_FD     like(socket_fd_t) const;
+    io_FDSet like(socket_fdSet_t);
+  end-pi;
 
-pFDSet =%addr(io_FDSet);
-x = (i_FD / 32) + 1;
-FDSet(x) = %bitand(FDSet(x): %bitnot(mask(i_FD)));
+  //  Helper fields
+  dcl-s x int(5);
+  dcl-s FDSet uns(10) dim(7) based(pFDSet);
+  // ---------------------------------------------------------
 
-return;
+  pFDSet =%addr(io_FDSet);
+  x = (i_FD / 32) + 1;
+  FDSet(x) = %bitand(FDSet(x): %bitnot(mask(i_FD)));
 
-//
-end-proc FD_CLR;
-//
+  return;
+
+
+end-proc;
+
 //======================================================================================
 //  RPG implementation of C macro: FD_ISSET
 //  Test bit in file descriptor set.
 //======================================================================================
 dcl-proc FD_ISSET export;
-//
-dcl-pi FD_ISSET
-       ind;
-  i_FD            value  like(socket_fd_t   );
-  i_FDSet         value  like(socket_fdSet_t);
-end-pi;
-//
-//  Funktionswert
-dcl-s isSet           ind inz(*off);
-//
-//  Helper fields
-dcl-s x               int(5);
-dcl-s FDSet           uns(10) dim(7) based(pFDSet);
-// ---------------------------------------------------------
+  dcl-pi *n ind;
+    i_FD    like(socket_fd_t) value;
+    i_FDSet like(socket_fdSet_t) value;
+  end-pi;
 
-pFDSet =%addr(i_FDSet);
-x = (i_FD / 32) + 1;
-isSet = %bitand(FDSet(x): mask(i_FD)) = mask(i_FD);
+  //  Funktionswert
+  dcl-s isSet ind inz(*off);
 
-return isSet;
+  //  Helper fields
+  dcl-s x int(5);
+  dcl-s FDSet uns(10) dim(7) based(pFDSet);
+  // ---------------------------------------------------------
 
-//
-end-proc FD_ISSET;
-//
+  pFDSet =%addr(i_FDSet);
+  x = (i_FD / 32) + 1;
+  isSet = %bitand(FDSet(x): mask(i_FD)) = mask(i_FD);
+
+  return isSet;
+
+
+end-proc;
+
 //======================================================================================
 //  RPG implementation of C macro: FD_ISSET
 //  Initialize file descriptor set with x'00'.
 //======================================================================================
 dcl-proc FD_ZERO export;
-//
-dcl-pi FD_ZERO;
-  io_FDSet        like(socket_fdSet_t);
-end-pi;
-// ---------------------------------------------------------
+  dcl-pi *n;
+    io_FDSet like(socket_fdSet_t);
+  end-pi;
+  // ---------------------------------------------------------
 
-io_FDSet = *ALLx'00';
+  io_FDSet = *ALLx'00';
 
-return;
+  return;
 
-//
-end-proc FD_ZERO;
-//
+
+end-proc;
+
 //===============================================================*
 //  Returns the IP address of the 5250 client of the
 //  specified job.
 //===============================================================*
 dcl-proc Job_getTcpIpAddr export;
-//
-dcl-pi Job_getTcpIpAddr
-       varchar(15);
-  i_qJob          const  likeds(LOG4RPG_qJob_t)
-options(*nopass);
-end-pi;
-//
-//  Parameter positions
-dcl-c p_qJob 1;
-//
-dcl-ds qJob likeds(i_qJob   );
-//
-dcl-ds jobi0600 qualified;
-  jobType         char(1) pos(61);
-  jobSubType      char(1) pos(62);
-  device          char(10) pos(127);
-end-ds;
-//
-//  Retrieve Device Description (QDCRDEVD) API
-dcl-pr QDCRDEVD
-       extpgm('QDCRDEVD');
-  o_rcvVar        char(65535) options(*varsize);
-  i_lenRcvVar     int(10) const;
-  i_format        char(8) const;
-  i_devName       char(10) const;
-  io_errCode      char(65535) options(*varsize);
-end-pr;
-//
-dcl-ds devd0600 len(1024) qualified;
-  tcpIpDotAddr    char(15) pos(878);
-end-ds;
-//
-dcl-ds errCode inz;
-  bytPrv          int(10);
-  bytAvl          int(10);
-end-ds;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  dcl-pi *n varchar(15);
+    i_qJob likeds(LOG4RPG_qJob_t) options(*nopass) const;
+  end-pi;
 
-if (%parms() >= p_qJob);
-   qJob = i_qJob;
-else;
-   clear qJob;
-   qJob.name = '*';
-endif;
+  //  Parameter positions
+  dcl-c p_qJob 1;
 
-QUSRJOBI(jobi0600:%size(jobi0600):'JOBI0600':qJob:'':errCode);
+  dcl-ds qJob likeds(i_qJob);
 
-QDCRDEVD(devd0600:%size(devd0600):'DEVD0600':jobi0600.device:errCode);
+  dcl-ds jobi0600 qualified;
+    jobType    char(1) pos(61);
+    jobSubType char(1) pos(62);
+    device     char(10) pos(127);
+  end-ds;
 
-return %trim(devd0600.tcpIpDotAddr);
+  //  Retrieve Device Description (QDCRDEVD) API
+  dcl-pr QDCRDEVD extpgm('QDCRDEVD');
+    o_rcvVar    char(65535) options(*varsize);
+    i_lenRcvVar int(10) const;
+    i_format    char(8) const;
+    i_devName   char(10) const;
+    io_errCode  char(65535) options(*varsize);
+  end-pr;
 
-//
-end-proc Job_getTcpIpAddr;
-//
+  dcl-ds devd0600 len(1024) qualified;
+    tcpIpDotAddr char(15) pos(878);
+  end-ds;
+
+  dcl-ds errCode inz;
+    bytPrv int(10);
+    bytAvl int(10);
+  end-ds;
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  if (%parms() >= p_qJob);
+    qJob = i_qJob;
+  else;
+    clear qJob;
+    qJob.name = '*';
+  endif;
+
+  QUSRJOBI(jobi0600:%size(jobi0600):'JOBI0600':qJob:'':errCode);
+
+  QDCRDEVD(devd0600:%size(devd0600):'DEVD0600':jobi0600.device:errCode);
+
+  return %trim(devd0600.tcpIpDotAddr);
+
+
+end-proc;
+
 //======================================================================================
 //  *** private ***
 //  Calculate bit mask from file descriptor.
 //======================================================================================
 dcl-proc mask;
-//
-dcl-pi mask
-       uns(10);
-  i_FD            const  like(socket_fd_t   );
-end-pi;
-//
-//  Helper fields
-// ---------------------------------------------------------
+  dcl-pi *n uns(10);
+    i_FD like(socket_fd_t) const;
+  end-pi;
 
-return %int(2 ** %rem(i_FD : 32));
+  //  Helper fields
+  // ---------------------------------------------------------
 
-//
-end-proc mask;
-//
+  return %int(2 ** %rem(i_FD : 32));
+
+
+end-proc;

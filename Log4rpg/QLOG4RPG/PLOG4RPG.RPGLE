@@ -1,6 +1,6 @@
-**FREE
-/IF NOT DEFINED(PLOG4RPG)
-/DEFINE PLOG4RPG
+**free
+/if NOT defined(PLOG4RPG)
+/define PLOG4RPG
 ///
 // -----------------------------------------
 //  Constants
@@ -14,127 +14,98 @@
 //  searched for the member. The first member that is found is used to load
 //  the configuration data.
 ///
-dcl-c cLOG4RPG_LIB_SEARCH
-      '*SEARCH';
+dcl-c cLOG4RPG_LIB_SEARCH '*SEARCH';
 
 ///
 //  Default time to wait (in minutes) to check
 //  the properties file for changes.
 ///
-dcl-c cLOG4RPG_CONFIGURATION_DEFAULT_RELOAD_DELAY
-      1;
-dcl-c cLOG4RPG_CONFIGURATION_DEFAULT_RELOAD_DELAY_UNIT
-      '*MINUTES';
+dcl-c cLOG4RPG_CONFIGURATION_DEFAULT_RELOAD_DELAY 1;
+dcl-c cLOG4RPG_CONFIGURATION_DEFAULT_RELOAD_DELAY_UNIT '*MINUTES';
 
 ///
 //  Debug Level:
 //  Specifies the possible values of
 //  configuration property: log4rpg.rootLogger=
 ///
-dcl-c cLOG4RPG_LEVEL_DEBUG
-      'DEBUG';
-dcl-c cLOG4RPG_LEVEL_INFO
-      'INFO';
-dcl-c cLOG4RPG_LEVEL_WARN
-      'WARN';
-dcl-c cLOG4RPG_LEVEL_ERROR
-      'ERROR';
-dcl-c cLOG4RPG_LEVEL_FATAL
-      'FATAL';
+dcl-c cLOG4RPG_LEVEL_DEBUG 'DEBUG';
+dcl-c cLOG4RPG_LEVEL_INFO 'INFO';
+dcl-c cLOG4RPG_LEVEL_WARN 'WARN';
+dcl-c cLOG4RPG_LEVEL_ERROR 'ERROR';
+dcl-c cLOG4RPG_LEVEL_FATAL 'FATAL';
 
 ///
 //  Debug mode:
 //  Specifies the possible values of
 //  configuration property: log4rpg.debug=
 ///
-dcl-c cLOG4RPG_DEBUG_QUIET
-      'quiet';
-dcl-c cLOG4RPG_DEBUG_OFF
-      'off';
-dcl-c cLOG4RPG_DEBUG_ON
-      'on';
-dcl-c cLOG4RPG_DEBUG_VERBOSE
-      'verbose';
+dcl-c cLOG4RPG_DEBUG_QUIET 'quiet';
+dcl-c cLOG4RPG_DEBUG_OFF 'off';
+dcl-c cLOG4RPG_DEBUG_ON 'on';
+dcl-c cLOG4RPG_DEBUG_VERBOSE 'verbose';
 
 ///
 //  Debug output:
 //  Specifies the possible values of
 //  configuration property: log4rpg.debug=
 ///
-dcl-c cLOG4RPG_DEBUG_OUTPUT_PRINTER
-      const('printer');
-dcl-c cLOG4RPG_DEBUG_OUTPUT_STDOUT
-      const('stdout');
+dcl-c cLOG4RPG_DEBUG_OUTPUT_PRINTER 'printer';
+dcl-c cLOG4RPG_DEBUG_OUTPUT_STDOUT 'stdout';
 
 ///
 //  Specifies the maximum length of a formatted Log4rpg message
 //  that is appebnded to the log. The maximum length of the
 //  input message is defined by template LOG4RPG_text_t.
 ///
-dcl-c cLOG4RPG_MAX_TEXT_LENGTH
-      const(4096);
+dcl-c cLOG4RPG_MAX_TEXT_LENGTH 4096;
 
 ///
 // -----------------------------------------
 //  Type definition
 // -----------------------------------------
 ///
-dcl-s LOG4RPG_appenderName_t
-      varchar(32) template;
+dcl-s LOG4RPG_appenderName_t varchar(32) template;
 
-dcl-s LOG4RPG_debugMode_t
-      varchar(10) template;
+dcl-s LOG4RPG_debugMode_t varchar(10) template;
 
-dcl-s LOG4RPG_debugOutput_t
-      varchar(10) template;
+dcl-s LOG4RPG_debugOutput_t varchar(10) template;
 
-dcl-s LOG4RPG_filterName_t
-      varchar(32) template;
+dcl-s LOG4RPG_filterName_t varchar(32) template;
 
-dcl-s LOG4RPG_hLogger_t
-      pointer template;
+dcl-s LOG4RPG_hLogger_t pointer template;
 
-dcl-s LOG4RPG_implClass_t
-      varchar(128) template;
+dcl-s LOG4RPG_implClass_t varchar(128) template;
 
-dcl-s LOG4RPG_level_t
-      varchar(10) template;
+dcl-s LOG4RPG_level_t varchar(10) template;
 
-dcl-s LOG4RPG_loggerName_t
-      varchar(128) template;
+dcl-s LOG4RPG_loggerName_t varchar(128) template;
 
-dcl-ds LOG4RPG_msg_t
-       qualified template;
-  id              char(7);
-  data            char(512);
-  type            char(10);
-  file            char(10);
-  lib             char(10);
+dcl-ds LOG4RPG_msg_t qualified template;
+  id   char(7);
+  data char(512);
+  type char(10);
+  file char(10);
+  lib  char(10);
 end-ds;
 
-dcl-s LOG4RPG_pAppender_t
-      pointer template;
+dcl-s LOG4RPG_pAppender_t pointer template;
 
-dcl-s LOG4RPG_path_t
-      varchar(256) template;
+dcl-s LOG4RPG_path_t varchar(256) template;
 
-dcl-s LOG4RPG_pFilter_t
-      pointer template;
+dcl-s LOG4RPG_pFilter_t pointer template;
 
-dcl-s LOG4RPG_pLayout_t
-      pointer template;
+dcl-s LOG4RPG_pLayout_t pointer template;
 
-dcl-s LOG4RPG_text_t
-      varchar(2048) template;
+dcl-s LOG4RPG_text_t varchar(2048) template;
 
-/IF DEFINED(TYPES_ONLY)
-/EOF
-/ENDIF
+/if defined(TYPES_ONLY)
+/eof
+/endif
 
 // LOGGER_STUB has been replaced with TYPES_ONLY in v1.13
-/IF DEFINED(LOGGER_STUB)
-/EOF
-/ENDIF
+/if defined(LOGGER_STUB)
+/eof
+/endif
 
 ///
 // -----------------------------------------
@@ -149,12 +120,8 @@ dcl-s LOG4RPG_text_t
 //
 //  @return *ON if logging is enabled, otherwise *OFF
 ///
-dcl-pr Logger_setLogging
-       ind
-       extproc('LOG4RPG01+
-       _Logger_setLogging+
-       ');
-  i_isLogging     ind const;
+dcl-pr Logger_setLogging ind extproc('LOG4RPG01_Logger_setLogging');
+  i_isLogging ind const;
 end-pr;
 
 ///
@@ -162,11 +129,7 @@ end-pr;
 //
 //  @return *ON if logging is enabled, otherwise *OFF
 ///
-dcl-pr Logger_isLogging
-       ind
-       extproc('LOG4RPG01+
-       _Logger_isLogging+
-       ');
+dcl-pr Logger_isLogging ind extproc('LOG4RPG01_Logger_isLogging');
 end-pr;
 
 ///
@@ -174,11 +137,7 @@ end-pr;
 //
 //  @return handle of the 'root' logger
 ///
-dcl-pr Logger_getRootLogger
-       like(LOG4RPG_hLogger_t)
-       extproc('LOG4RPG01+
-       _Logger_getRootLogger+
-       ');
+dcl-pr Logger_getRootLogger like(LOG4RPG_hLogger_t) extproc('LOG4RPG01_Logger_getRootLogger');
 end-pr;
 
 ///
@@ -188,12 +147,8 @@ end-pr;
 //
 //  @return handle of the logger
 ///
-dcl-pr Logger_getLogger
-       like(LOG4RPG_hLogger_t)
-       extproc('LOG4RPG01+
-       _Logger_getLogger+
-       ');
-  i_logName       const  like(LOG4RPG_loggerName_t);
+dcl-pr Logger_getLogger like(LOG4RPG_hLogger_t) extproc('LOG4RPG01_Logger_getLogger');
+  i_logName like(LOG4RPG_loggerName_t) const;
 end-pr;
 
 ///
@@ -203,12 +158,9 @@ end-pr;
 //         or Logger_getLogger()
 //  @param Message text that is appended to the log
 ///
-dcl-pr Logger_debug
-       extproc('LOG4RPG01+
-       _Logger_debug+
-       ');
-  i_hLogger       const  like(LOG4RPG_hLogger_t);
-  i_text          const  like(LOG4RPG_text_t);
+dcl-pr Logger_debug extproc('LOG4RPG01_Logger_debug');
+  i_hLogger like(LOG4RPG_hLogger_t) const;
+  i_text    like(LOG4RPG_text_t) const;
 end-pr;
 
 ///
@@ -218,12 +170,9 @@ end-pr;
 //         or Logger_getLogger()
 //  @param Message that is appended to the log
 ///
-dcl-pr Logger_debugMsg
-       extproc('LOG4RPG01+
-       _Logger_debugMsg+
-       ');
-  i_hLogger       const  like(LOG4RPG_hLogger_t);
-  i_msg           const  likeds(LOG4RPG_msg_t);
+dcl-pr Logger_debugMsg extproc('LOG4RPG01_Logger_debugMsg');
+  i_hLogger like(LOG4RPG_hLogger_t) const;
+  i_msg     likeds(LOG4RPG_msg_t) const;
 end-pr;
 
 ///
@@ -233,12 +182,9 @@ end-pr;
 //         or Logger_getLogger()
 //  @param Message text that is appended to the log
 ///
-dcl-pr Logger_info
-       extproc('LOG4RPG01+
-       _Logger_info+
-       ');
-  i_hLogger       const  like(LOG4RPG_hLogger_t);
-  i_text          const  like(LOG4RPG_text_t);
+dcl-pr Logger_info extproc('LOG4RPG01_Logger_info');
+  i_hLogger like(LOG4RPG_hLogger_t) const;
+  i_text    like(LOG4RPG_text_t) const;
 end-pr;
 
 ///
@@ -248,12 +194,9 @@ end-pr;
 //         or Logger_getLogger()
 //  @param Message that is appended to the log
 ///
-dcl-pr Logger_infoMsg
-       extproc('LOG4RPG01+
-       _Logger_infoMsg+
-       ');
-  i_hLogger       const  like(LOG4RPG_hLogger_t);
-  i_msg           const  likeds(LOG4RPG_msg_t);
+dcl-pr Logger_infoMsg extproc('LOG4RPG01_Logger_infoMsg');
+  i_hLogger like(LOG4RPG_hLogger_t) const;
+  i_msg     likeds(LOG4RPG_msg_t) const;
 end-pr;
 
 ///
@@ -263,12 +206,9 @@ end-pr;
 //         or Logger_getLogger()
 //  @param Message text that is appended to the log
 ///
-dcl-pr Logger_warn
-       extproc('LOG4RPG01+
-       _Logger_warn+
-       ');
-  i_hLogger       const  like(LOG4RPG_hLogger_t);
-  i_text          const  like(LOG4RPG_text_t);
+dcl-pr Logger_warn extproc('LOG4RPG01_Logger_warn');
+  i_hLogger like(LOG4RPG_hLogger_t) const;
+  i_text    like(LOG4RPG_text_t) const;
 end-pr;
 
 ///
@@ -278,12 +218,9 @@ end-pr;
 //         or Logger_getLogger()
 //  @param Message that is appended to the log
 ///
-dcl-pr Logger_warnMsg
-       extproc('LOG4RPG01+
-       _Logger_warnMsg+
-       ');
-  i_hLogger       const  like(LOG4RPG_hLogger_t);
-  i_msg           const  likeds(LOG4RPG_msg_t);
+dcl-pr Logger_warnMsg extproc('LOG4RPG01_Logger_warnMsg');
+  i_hLogger like(LOG4RPG_hLogger_t) const;
+  i_msg     likeds(LOG4RPG_msg_t) const;
 end-pr;
 
 ///
@@ -293,12 +230,9 @@ end-pr;
 //         or Logger_getLogger()
 //  @param Message text that is appended to the log
 ///
-dcl-pr Logger_error
-       extproc('LOG4RPG01+
-       _Logger_error+
-       ');
-  i_hLogger       const  like(LOG4RPG_hLogger_t);
-  i_text          const  like(LOG4RPG_text_t);
+dcl-pr Logger_error extproc('LOG4RPG01_Logger_error');
+  i_hLogger like(LOG4RPG_hLogger_t) const;
+  i_text    like(LOG4RPG_text_t) const;
 end-pr;
 
 ///
@@ -308,12 +242,9 @@ end-pr;
 //         or Logger_getLogger()
 //  @param Message that is appended to the log
 ///
-dcl-pr Logger_errorMsg
-       extproc('LOG4RPG01+
-       _Logger_errorMsg+
-       ');
-  i_hLogger       const  like(LOG4RPG_hLogger_t);
-  i_msg           const  likeds(LOG4RPG_msg_t);
+dcl-pr Logger_errorMsg extproc('LOG4RPG01_Logger_errorMsg');
+  i_hLogger like(LOG4RPG_hLogger_t) const;
+  i_msg     likeds(LOG4RPG_msg_t) const;
 end-pr;
 
 ///
@@ -323,12 +254,9 @@ end-pr;
 //         or Logger_getLogger()
 //  @param Message text that is appended to the log
 ///
-dcl-pr Logger_fatal
-       extproc('LOG4RPG01+
-       _Logger_fatal+
-       ');
-  i_hLogger       const  like(LOG4RPG_hLogger_t);
-  i_text          const  like(LOG4RPG_text_t);
+dcl-pr Logger_fatal extproc('LOG4RPG01_Logger_fatal');
+  i_hLogger like(LOG4RPG_hLogger_t) const;
+  i_text    like(LOG4RPG_text_t) const;
 end-pr;
 
 ///
@@ -338,12 +266,9 @@ end-pr;
 //         or Logger_getLogger()
 //  @param Message that is appended to the log
 ///
-dcl-pr Logger_fatalMsg
-       extproc('LOG4RPG01+
-       _Logger_fatalMsg+
-       ');
-  i_hLogger       const  like(LOG4RPG_hLogger_t);
-  i_msg           const  likeds(LOG4RPG_msg_t);
+dcl-pr Logger_fatalMsg extproc('LOG4RPG01_Logger_fatalMsg');
+  i_hLogger like(LOG4RPG_hLogger_t) const;
+  i_msg     likeds(LOG4RPG_msg_t) const;
 end-pr;
 
 ///
@@ -355,13 +280,10 @@ end-pr;
 //  @param Debug level
 //  @param Message text that is appended to the log
 ///
-dcl-pr Logger_forcedLog
-       extproc('LOG4RPG01+
-       _Logger_forcedLog+
-       ');
-  i_hLogger       const  like(LOG4RPG_hLogger_t);
-  i_level         const  like(LOG4RPG_level_t);
-  i_text          const  like(LOG4RPG_text_t);
+dcl-pr Logger_forcedLog extproc('LOG4RPG01_Logger_forcedLog');
+  i_hLogger like(LOG4RPG_hLogger_t) const;
+  i_level   like(LOG4RPG_level_t) const;
+  i_text    like(LOG4RPG_text_t) const;
 end-pr;
 
 ///
@@ -373,13 +295,10 @@ end-pr;
 //  @param Debug level
 //  @param Message that is appended to the log
 ///
-dcl-pr Logger_forcedLogMsg
-       extproc('LOG4RPG01+
-       _Logger_forcedLogMsg+
-       ');
-  i_hLogger       const  like(LOG4RPG_hLogger_t);
-  i_level         const  like(LOG4RPG_level_t);
-  i_msg           const  likeds(LOG4RPG_msg_t);
+dcl-pr Logger_forcedLogMsg extproc('LOG4RPG01_Logger_forcedLogMsg');
+  i_hLogger like(LOG4RPG_hLogger_t) const;
+  i_level   like(LOG4RPG_level_t) const;
+  i_msg     likeds(LOG4RPG_msg_t) const;
 end-pr;
 
 ///
@@ -389,12 +308,8 @@ end-pr;
 //  @param Logger handle as returned by Logger_getRootLogger()
 //         or Logger_getLogger()
 ///
-dcl-pr Logger_isDebugEnabled
-       ind
-       extproc('LOG4RPG01+
-       _Logger_isDebugEnabled+
-       ');
-  i_hLogger       const  like(LOG4RPG_hLogger_t);
+dcl-pr Logger_isDebugEnabled ind extproc('LOG4RPG01_Logger_isDebugEnabled');
+  i_hLogger like(LOG4RPG_hLogger_t) const;
 end-pr;
 
 ///
@@ -405,12 +320,8 @@ end-pr;
 //  @param Logger handle as returned by Logger_getRootLogger()
 //         or Logger_getLogger()
 ///
-dcl-pr Logger_isInfoEnabled
-       ind
-       extproc('LOG4RPG01+
-       _Logger_isInfoEnabled+
-       ');
-  i_hLogger       const  like(LOG4RPG_hLogger_t);
+dcl-pr Logger_isInfoEnabled ind extproc('LOG4RPG01_Logger_isInfoEnabled');
+  i_hLogger like(LOG4RPG_hLogger_t) const;
 end-pr;
 
 ///
@@ -421,12 +332,8 @@ end-pr;
 //  @param Logger handle as returned by Logger_getRootLogger()
 //         or Logger_getLogger()
 ///
-dcl-pr Logger_isWarnEnabled
-       ind
-       extproc('LOG4RPG01+
-       _Logger_isWarnEnabled+
-       ');
-  i_hLogger       const  like(LOG4RPG_hLogger_t);
+dcl-pr Logger_isWarnEnabled ind extproc('LOG4RPG01_Logger_isWarnEnabled');
+  i_hLogger like(LOG4RPG_hLogger_t) const;
 end-pr;
 
 ///
@@ -437,12 +344,8 @@ end-pr;
 //  @param Logger handle as returned by Logger_getRootLogger()
 //         or Logger_getLogger()
 ///
-dcl-pr Logger_isErrorEnabled
-       ind
-       extproc('LOG4RPG01+
-       _Logger_isErrorEnabled+
-       ');
-  i_hLogger       const  like(LOG4RPG_hLogger_t);
+dcl-pr Logger_isErrorEnabled ind extproc('LOG4RPG01_Logger_isErrorEnabled');
+  i_hLogger like(LOG4RPG_hLogger_t) const;
 end-pr;
 
 ///
@@ -453,12 +356,8 @@ end-pr;
 //  @param Logger handle as returned by Logger_getRootLogger()
 //         or Logger_getLogger()
 ///
-dcl-pr Logger_isFatalEnabled
-       ind
-       extproc('LOG4RPG01+
-       _Logger_isFatalEnabled+
-       ');
-  i_hLogger       const  like(LOG4RPG_hLogger_t);
+dcl-pr Logger_isFatalEnabled ind extproc('LOG4RPG01_Logger_isFatalEnabled');
+  i_hLogger like(LOG4RPG_hLogger_t) const;
 end-pr;
 
 ///
@@ -467,12 +366,8 @@ end-pr;
 //  @param Logger handle as returned by Logger_getRootLogger()
 //         or Logger_getLogger()
 ///
-dcl-pr Logger_getName
-       like(LOG4RPG_loggerName_t)
-       extproc('LOG4RPG01+
-       _Logger_getName+
-       ');
-  i_hLogger       const  like(LOG4RPG_hLogger_t);
+dcl-pr Logger_getName like(LOG4RPG_loggerName_t) extproc('LOG4RPG01_Logger_getName');
+  i_hLogger like(LOG4RPG_hLogger_t) const;
 end-pr;
 
 ///
@@ -483,12 +378,8 @@ end-pr;
 //
 //  @return *ON if the logger handle is NULL, otherwise *OFF
 ///
-dcl-pr Logger_isNull
-       ind
-       extproc('LOG4RPG01+
-       _Logger_isNull+
-       ');
-  i_hLogger       const  like(LOG4RPG_hLogger_t);
+dcl-pr Logger_isNull ind extproc('LOG4RPG01_Logger_isNull');
+  i_hLogger like(LOG4RPG_hLogger_t) const;
 end-pr;
 
 ///
@@ -496,11 +387,7 @@ end-pr;
 //
 //  @return Null logger handle
 ///
-dcl-pr Logger_null
-       like(LOG4RPG_hLogger_t)
-       extproc('LOG4RPG01+
-       _Logger_null+
-       ');
+dcl-pr Logger_null like(LOG4RPG_hLogger_t) extproc('LOG4RPG01_Logger_null');
 end-pr;
 
 ///
@@ -516,12 +403,9 @@ end-pr;
 //         - cLOG4RPG_LEVEL_ERROR
 //         - cLOG4RPG_LEVEL_FATAL
 ///
-dcl-pr Logger_setLevel
-       extproc('LOG4RPG01+
-       _Logger_setLevel+
-       ');
-  i_hLogger       const  like(LOG4RPG_hLogger_t);
-  i_level         const  like(LOG4RPG_level_t);
+dcl-pr Logger_setLevel extproc('LOG4RPG01_Logger_setLevel');
+  i_hLogger like(LOG4RPG_hLogger_t) const;
+  i_level   like(LOG4RPG_level_t) const;
 end-pr;
 
 ///
@@ -539,13 +423,9 @@ end-pr;
 //         - cLOG4RPG_DEBUG_OUTPUT_PRINTER
 //         - cLOG4RPG_DEBUG_OUTPUT_STDOUT
 ///
-dcl-pr Logger_setInternalDebugging
-       extproc('LOG4RPG01+
-       _Logger_setInternalDebugging+
-       ');
-  i_debugMode     const  like(LOG4RPG_debugMode_t);
-  i_output        const  like(LOG4RPG_debugOutput_t)
-       options(*nopass);
+dcl-pr Logger_setInternalDebugging extproc('LOG4RPG01_Logger_setInternalDebugging');
+  i_debugMode like(LOG4RPG_debugMode_t) const;
+  i_output    like(LOG4RPG_debugOutput_t) options(*nopass) const;
 end-pr;
 
 ///
@@ -553,11 +433,8 @@ end-pr;
 //
 //  @return Mode of the internal logger
 ///
-dcl-pr Logger_getInternalDebugMode
-       like(LOG4RPG_debugMode_t)
-       extproc('LOG4RPG01+
-       _Logger_getInternalDebugMode+
-       ');
+dcl-pr Logger_getInternalDebugMode like(LOG4RPG_debugMode_t)
+  extproc('LOG4RPG01_Logger_getInternalDebugMode');
 end-pr;
 
 ///
@@ -566,11 +443,8 @@ end-pr;
 //
 //  @return Output target of the internal logger
 ///
-dcl-pr Logger_getInternalDebugOutput
-       like(LOG4RPG_debugOutput_t)
-       extproc('LOG4RPG01+
-       _Logger_getInternalDebugOutput+
-       ');
+dcl-pr Logger_getInternalDebugOutput like(LOG4RPG_debugOutput_t)
+  extproc('LOG4RPG01_Logger_getInternalDebugOutput');
 end-pr;
 
 ///
@@ -586,12 +460,8 @@ end-pr;
 //  @return *ON if the configuration was successfully applied,
 //          otherwise *OFF
 ///
-dcl-pr Configurator_loadDefaultConfiguration
-       ind
-       extproc('LOG4RPG08+
-       _Configurator_+
-       loadDefaultConfiguration+
-       ');
+dcl-pr Configurator_loadDefaultConfiguration ind
+  extproc('LOG4RPG08_Configurator_loadDefaultConfiguration');
 end-pr;
 
 ///
@@ -610,13 +480,9 @@ end-pr;
 //  @return *ON if the configuration was successfully applied,
 //          otherwise *OFF
 ///
-dcl-pr Configurator_loadPropertiesConfiguration
-       ind
-       extproc('LOG4RPG08+
-       _Configurator_+
-       loadPropertiesConfiguration+
-       ');
-  i_path          const  like(LOG4RPG_path_t);
+dcl-pr Configurator_loadPropertiesConfiguration ind
+  extproc('LOG4RPG08_Configurator_loadPropertiesConfiguration');
+  i_path like(LOG4RPG_path_t) const;
 end-pr;
 
 ///
@@ -634,24 +500,17 @@ end-pr;
 //         The possible values are:
 //         - cLOG4RPG_CONFIGURATION_DEFAULT_RELOAD_DELAY
 ///
-dcl-pr Configurator_loadAndWatchPropertiesConfiguration
-       ind
-       extproc('LOG4RPG08+
-       _Configurator_+
-       loadAndWatchPropertiesConfiguration+
-       ');
-  i_path          const  like(LOG4RPG_path_t);
-  i_waitMinutes   int(10) const  options(*nopass);
-  i_unit          char(10) const  options(*nopass);
+dcl-pr Configurator_loadAndWatchPropertiesConfiguration ind
+  extproc('LOG4RPG08_Configurator_loadAndWatchPropertiesConfiguration');
+  i_path        like(LOG4RPG_path_t) const;
+  i_waitMinutes int(10) options(*nopass) const;
+  i_unit        char(10) options(*nopass) const;
 end-pr;
 
 ///
 //  Clears the configuration data.
 ///
-dcl-pr Configurator_clearConfiguration
-       extproc('LOG4RPG08+
-       _Configurator_clearConfiguration+
-       ');
+dcl-pr Configurator_clearConfiguration extproc('LOG4RPG08_Configurator_clearConfiguration');
 end-pr;
 
 ///
@@ -661,24 +520,15 @@ end-pr;
 //  @param Semicolon separated list of configuration
 //         properties.
 ///
-dcl-pr Layout_new
-       like(LOG4RPG_pLayout_t)
-       extproc('LOG4RPG11+
-       _Layout_new+
-       ');
-  i_layoutImpl    const  like(LOG4RPG_implClass_t);
-  i_pPropString   pointer const  options(*nopass:
-       *omit: *string);
+dcl-pr Layout_new like(LOG4RPG_pLayout_t) extproc('LOG4RPG11_Layout_new');
+  i_layoutImpl  like(LOG4RPG_implClass_t) const;
+  i_pPropString pointer options(*nopass: *omit: *string) const;
 end-pr;
 
 ///
 //  Returns a NULL layout.
 ///
-dcl-pr Layout_null
-       like(LOG4RPG_pLayout_t)
-       extproc('LOG4RPG11+
-       _Layout_null+
-       ');
+dcl-pr Layout_null like(LOG4RPG_pLayout_t) extproc('LOG4RPG11_Layout_null');
 end-pr;
 
 ///
@@ -689,37 +539,24 @@ end-pr;
 //  @param Semicolon separated list of configuration
 //         properties.
 ///
-dcl-pr Appender_new
-       like(LOG4RPG_pAppender_t)
-       extproc('LOG4RPG03+
-       _Appender_new+
-       ');
-  i_appName       const  like(LOG4RPG_appenderName_t);
-  i_appImpl       const  like(LOG4RPG_implClass_t);
-  i_pPropString   pointer const  options(*nopass:
-       *omit: *string);
+dcl-pr Appender_new like(LOG4RPG_pAppender_t) extproc('LOG4RPG03_Appender_new');
+  i_appName     like(LOG4RPG_appenderName_t) const;
+  i_appImpl     like(LOG4RPG_implClass_t) const;
+  i_pPropString pointer options(*nopass: *omit: *string) const;
 end-pr;
 
 ///
 //  Returns a NULL appender.
 ///
-dcl-pr Appender_null
-       like(LOG4RPG_pAppender_t)
-       extproc('LOG4RPG03+
-       _Appender_null+
-       ');
+dcl-pr Appender_null like(LOG4RPG_pAppender_t) extproc('LOG4RPG03_Appender_null');
 end-pr;
 
 ///
 //  Sets the layout for the specified appender.
 ///
-dcl-pr Appender_setLayout
-       ind
-       extproc('LOG4RPG03+
-       _Appender_setLayout+
-       ');
-  i_pAppender     const  like(LOG4RPG_pAppender_t);
-  i_pLayout       const  like(LOG4RPG_pLayout_t);
+dcl-pr Appender_setLayout ind extproc('LOG4RPG03_Appender_setLayout');
+  i_pAppender like(LOG4RPG_pAppender_t) const;
+  i_pLayout   like(LOG4RPG_pLayout_t) const;
 end-pr;
 
 ///
@@ -728,13 +565,9 @@ end-pr;
 //  @param Appender handle as returned by Appender_new()
 //  @param Filter handle as returned by Filter_new()
 ///
-dcl-pr Appender_setFilter
-       ind
-       extproc('LOG4RPG03+
-       _Appender_setFilter+
-       ');
-  i_pAppender     const  like(LOG4RPG_pAppender_t);
-  i_pFilter       const  like(LOG4RPG_pFilter_t);
+dcl-pr Appender_setFilter ind extproc('LOG4RPG03_Appender_setFilter');
+  i_pAppender like(LOG4RPG_pAppender_t) const;
+  i_pFilter   like(LOG4RPG_pFilter_t) const;
 end-pr;
 
 ///
@@ -744,12 +577,9 @@ end-pr;
 //         or Logger_getLogger()
 //  @param Appender handle as returned by Appender_new()
 ///
-dcl-pr Logger_addAppender
-       extproc('LOG4RPG01+
-       _Logger_addAppender+
-       ');
-  i_hLogger       const  like(LOG4RPG_hLogger_t);
-  i_hAppender     const  like(LOG4RPG_pAppender_t);
+dcl-pr Logger_addAppender extproc('LOG4RPG01_Logger_addAppender');
+  i_hLogger   like(LOG4RPG_hLogger_t) const;
+  i_hAppender like(LOG4RPG_pAppender_t) const;
 end-pr;
 
 ///
@@ -760,25 +590,16 @@ end-pr;
 //  @param Semicolon separated list of configuration
 //         properties.
 ///
-dcl-pr Filter_new
-       like(LOG4RPG_pFilter_t)
-       extproc('LOG4RPG17+
-       _Filter_new+
-       ');
-  i_fltName       const  like(LOG4RPG_filterName_t);
-  i_fltImpl       const  like(LOG4RPG_implClass_t);
-  i_pPropString   pointer const  options(*nopass:
-       *omit: *string);
+dcl-pr Filter_new like(LOG4RPG_pFilter_t) extproc('LOG4RPG17_Filter_new');
+  i_fltName     like(LOG4RPG_filterName_t) const;
+  i_fltImpl     like(LOG4RPG_implClass_t) const;
+  i_pPropString pointer options(*nopass: *omit: *string) const;
 end-pr;
 
 ///
 //  Returns a NULL filter.
 ///
-dcl-pr Filter_null
-       like(LOG4RPG_pFilter_t)
-       extproc('LOG4RPG17+
-       _Filter_null+
-       ');
+dcl-pr Filter_null like(LOG4RPG_pFilter_t) extproc('LOG4RPG17_Filter_null');
 end-pr;
 
 ///
@@ -787,12 +608,9 @@ end-pr;
 //  @param Filter handle as returned by Filter_new()
 //  @param Filter handle of the next filter as returned by Filter_new()
 ///
-dcl-pr Filter_setNext
-       extproc('LOG4RPG17+
-       _Filter_setNext+
-       ');
-  i_pFilter       const  like(LOG4RPG_pFilter_t);
-  i_pNextFilter   const  like(LOG4RPG_pFilter_t);
+dcl-pr Filter_setNext extproc('LOG4RPG17_Filter_setNext');
+  i_pFilter     like(LOG4RPG_pFilter_t) const;
+  i_pNextFilter like(LOG4RPG_pFilter_t) const;
 end-pr;
 
-/ENDIF
+/endif

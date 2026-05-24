@@ -59,7 +59,7 @@
 // -----------------------------------------
 //  Imported functions
 // -----------------------------------------
-/copy QLOG4RPG,PLOG4RPG                      Public API Specification
+/copy QLOG4RPG,PLOG4RPG Public API Specification
 
 // -----------------------------------------
 //  Exported functions
@@ -74,13 +74,13 @@
 // -----------------------------------------
 //  Prototypes
 // -----------------------------------------
-/copy QLOG4RPG,CEELIB                        CEE-Procedures
-/copy QBASICS1,PBASICS1                      Basic RPG Extensions
+/copy QLOG4RPG,CEELIB CEE-Procedures
+/copy QBASICS1,PBASICS1 Basic RPG Extensions
 
-/copy QLOG4RPG,PLOG4RPG01                    Logger
-/copy QLOG4RPG,PLOG4RPG02                    LoggerList
-/copy QLOG4RPG,PLOG4RPG10                    LogLog
-/copy QLOG4RPG,PLOG4RPG18                    FilterList
+/copy QLOG4RPG,PLOG4RPG01 Logger
+/copy QLOG4RPG,PLOG4RPG02 LoggerList
+/copy QLOG4RPG,PLOG4RPG10 LogLog
+/copy QLOG4RPG,PLOG4RPG18 FilterList
 
 // -----------------------------------------
 //  Private prototypes
@@ -144,9 +144,9 @@ dcl-proc Repository_addLogger export;
   dcl-pi *n int(10);
     i_pLogger like(LOG4RPG_hLogger_t) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return LoggerList_put(g_loggerRepos: i_pLogger);
+  return LoggerList_put(g_loggerRepos: i_pLogger);
 
 
 end-proc;
@@ -164,9 +164,9 @@ dcl-proc Repository_removeLogger export;
   dcl-pi *n int(10);
     i_logName like(LOG4RPG_loggerName_t) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return LoggerList_remove(g_loggerRepos: i_logName);
+  return LoggerList_remove(g_loggerRepos: i_logName);
 
 
 end-proc;
@@ -186,13 +186,13 @@ dcl-proc Repository_existLogger export;
   end-pi;
 
   dcl-s hLogger like(LOG4RPG_hLogger_t);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if (not LoggerList_exist(g_loggerRepos: i_logName));
-   return *off;
-endif;
+  if (not LoggerList_exist(g_loggerRepos: i_logName));
+    return *off;
+  endif;
 
-return *on;
+  return *on;
 
 
 end-proc;
@@ -212,56 +212,56 @@ dcl-proc Repository_getLogger export;
     i_logName like(LOG4RPG_loggerName_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-ds logger likeds(LOG4RPG_logger_t) based(pLogger);
 
-//  Helper fields
+  //  Helper fields
   dcl-s c int(10) inz;
 
-//  Logger handle
+  //  Logger handle
   dcl-ds node likeds(LOG4RPG_logger_t) based(pNode);
   dcl-ds parent likeds(LOG4RPG_logger_t) based(pParent);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-LogLog_verbose('Retrieving logger [' + i_logName + ']');
+  LogLog_verbose('Retrieving logger [' + i_logName + ']');
 
-pLogger = Logger_null();
+  pLogger = Logger_null();
 
-pNode = LoggerList_get(g_loggerRepos: i_logName);
+  pNode = LoggerList_get(g_loggerRepos: i_logName);
 
-select;
-when pNode = *NULL;
-   pLogger = Logger_new(i_logName);
-   Repository_addLogger(pLogger);
-   updateParents(pLogger);
-   return pLogger;
-when Node_isLoggerNode(pNode);
-   pLogger = pNode;
-   return pLogger;
-when Node_isProvisionNode(pNode);
+  select;
+  when pNode = *NULL;
+    pLogger = Logger_new(i_logName);
+    Repository_addLogger(pLogger);
+    updateParents(pLogger);
+    return pLogger;
+  when Node_isLoggerNode(pNode);
+    pLogger = pNode;
+    return pLogger;
+  when Node_isProvisionNode(pNode);
 
-   // Remove provision node from repositiory
-   Repository_removeLogger(node.name);
+    // Remove provision node from repositiory
+    Repository_removeLogger(node.name);
 
-   // Disconnect provision node from parent
-   pParent = ProvisionNode_getParent(pNode);
-   c = Node_findChild(pParent: pNode);
-   Node_removeChild(pParent: c);
+    // Disconnect provision node from parent
+    pParent = ProvisionNode_getParent(pNode);
+    c = Node_findChild(pParent: pNode);
+    Node_removeChild(pParent: c);
 
-   // Create a logger node and move children to the logger.
-   pLogger = Logger_new(node.name);
-   ProvisionNode_moveChildren(pNode: pLogger);
-   ProvisionNode_free(pNode);
+    // Create a logger node and move children to the logger.
+    pLogger = Logger_new(node.name);
+    ProvisionNode_moveChildren(pNode: pLogger);
+    ProvisionNode_free(pNode);
 
-   // Add logger node to parent.
-   Node_addChild(pParent: pLogger);
+    // Add logger node to parent.
+    Node_addChild(pParent: pLogger);
 
-   // Add the new logger node to the repositiory
-   Repository_addLogger(pLogger);
-   return pLogger;
-endsl;
+    // Add the new logger node to the repositiory
+    Repository_addLogger(pLogger);
+    return pLogger;
+  endsl;
 
-return Logger_null();
+  return Logger_null();
 
 
 end-proc;
@@ -280,9 +280,9 @@ dcl-proc Repository_addAppender export;
   dcl-pi *n int(10);
     i_pAppender like(LOG4RPG_pAppender_t) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return AppenderList_put(g_appendRepos: i_pAppender);
+  return AppenderList_put(g_appendRepos: i_pAppender);
 
 
 end-proc;
@@ -300,9 +300,9 @@ dcl-proc Repository_removeAppender export;
   dcl-pi *n int(10);
     i_appName like(LOG4RPG_appenderName_t) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return AppenderList_remove(g_appendRepos: i_appName);
+  return AppenderList_remove(g_appendRepos: i_appName);
 
 
 end-proc;
@@ -320,9 +320,9 @@ dcl-proc Repository_existAppender export;
   dcl-pi *n ind;
     i_appName like(LOG4RPG_appenderName_t) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return AppenderList_exist(g_appendRepos: i_appName);
+  return AppenderList_exist(g_appendRepos: i_appName);
 
 
 end-proc;
@@ -342,18 +342,18 @@ dcl-proc Repository_getAppender export;
     i_appName like(LOG4RPG_appenderName_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s pAppender like(LOG4RPG_pAppender_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-LogLog_verbose('Retrieving appender [' + i_appName + ']');
+  LogLog_verbose('Retrieving appender [' + i_appName + ']');
 
-pAppender = AppenderList_get(g_appendRepos: i_appName);
-if Appender_isNull(pAppender);
-   return Appender_null();
-else;
-   return pAppender;
-endif;
+  pAppender = AppenderList_get(g_appendRepos: i_appName);
+  if Appender_isNull(pAppender);
+    return Appender_null();
+  else;
+    return pAppender;
+  endif;
 
 
 end-proc;
@@ -372,9 +372,9 @@ dcl-proc Repository_addFilter export;
   dcl-pi *n int(10);
     i_pFilter like(LOG4RPG_pFilter_t) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return FilterList_put(g_filterRepos: i_pFilter);
+  return FilterList_put(g_filterRepos: i_pFilter);
 
 
 end-proc;
@@ -392,9 +392,9 @@ dcl-proc Repository_removeFilter export;
   dcl-pi *n int(10);
     i_fltName like(LOG4RPG_filterName_t) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return FilterList_remove(g_filterRepos: i_fltName);
+  return FilterList_remove(g_filterRepos: i_fltName);
 
 
 end-proc;
@@ -412,9 +412,9 @@ dcl-proc Repository_existFilter export;
   dcl-pi *n ind;
     i_fltName like(LOG4RPG_filterName_t) const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return FilterList_exist(g_filterRepos: i_fltName);
+  return FilterList_exist(g_filterRepos: i_fltName);
 
 
 end-proc;
@@ -434,18 +434,18 @@ dcl-proc Repository_getFilter export;
     i_fltName like(LOG4RPG_filterName_t) const;
   end-pi;
 
-//  Return value
+  //  Return value
   dcl-s pFilter like(LOG4RPG_pFilter_t) inz;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-LogLog_verbose('Retrieving filter [' + i_fltName + ']');
+  LogLog_verbose('Retrieving filter [' + i_fltName + ']');
 
-pFilter = FilterList_get(g_filterRepos: i_fltName);
-if Filter_isNull(pFilter);
-   return Filter_null();
-else;
-   return pFilter;
-endif;
+  pFilter = FilterList_get(g_filterRepos: i_fltName);
+  if Filter_isNull(pFilter);
+    return Filter_null();
+  else;
+    return pFilter;
+  endif;
 
 
 end-proc;
@@ -463,17 +463,17 @@ dcl-proc Repository_setShutdown export;
   dcl-pi *n;
     i_isShutdown ind const;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-g_isShutdown = i_isShutdown;
+  g_isShutdown = i_isShutdown;
 
-if g_isShutdown;
-   LogLog_verbose('Repository SHUTDOWN mode set to ON');
-else;
-   LogLog_verbose('Repository SHUTDOWN mode set to OFF');
-endif;
+  if g_isShutdown;
+    LogLog_verbose('Repository SHUTDOWN mode set to ON');
+  else;
+    LogLog_verbose('Repository SHUTDOWN mode set to OFF');
+  endif;
 
-return;
+  return;
 
 
 end-proc;
@@ -490,9 +490,9 @@ end-proc;
 dcl-proc Repository_isShutdown export;
   dcl-pi *n ind;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-return g_isShutdown;
+  return g_isShutdown;
 
 
 end-proc;
@@ -509,11 +509,11 @@ end-proc;
 dcl-proc Repository_initialize export;
   dcl-pi *n;
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-initializeModule();
+  initializeModule();
 
-return;
+  return;
 
 
 end-proc;
@@ -531,48 +531,47 @@ dcl-proc Repository_prepareReload export;
   dcl-pi *n;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s x int(10) inz;
   dcl-s pNode like(LOG4RPG_hLogger_t) inz;
-  dcl-ds nodeIter DS likeds(LOG4RPG_Logger: ListIterator_t) inz;
-  end-ds;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  dcl-ds nodeIter likeds(LOG4RPG_LoggerListIterator_t) inz;
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// -------------------------------------------- //
-//   Reset loggers                              //
-// -------------------------------------------- //
-LogLog_verbose('Preparing repository to +
-               reload configuration data ...');
+  // -------------------------------------------- //
+  //   Reset loggers                              //
+  // -------------------------------------------- //
+  LogLog_verbose('Preparing repository to +
+                 reload configuration data ...');
 
-if not LoggerList_isNull(g_loggerRepos);
-   nodeIter = LoggerList_getIterator(g_loggerRepos);
+  if not LoggerList_isNull(g_loggerRepos);
+    nodeIter = LoggerList_getIterator(g_loggerRepos);
 
-   pNode = LoggerList_getFirst(nodeIter);
-   dow (pNode <> *NULL);
+    pNode = LoggerList_getFirst(nodeIter);
+    dow (pNode <> *NULL);
       if Node_isLoggerNode(pNode);
-         LogLog_verbose('... resetting logger ' +
-                        Logger_getName(pNode) + ' ...');
-         Logger_removeAllAppenders(pNode);
-         Logger_resetLevel(pNode);
-         LogLog_verbose('... reset logger ' +
-                        Logger_getName(pNode) + '.');
+        LogLog_verbose('... resetting logger ' +
+                       Logger_getName(pNode) + ' ...');
+        Logger_removeAllAppenders(pNode);
+        Logger_resetLevel(pNode);
+        LogLog_verbose('... reset logger ' +
+                       Logger_getName(pNode) + '.');
       endif;
       pNode = LoggerList_getNext(nodeIter);
-   enddo;
+    enddo;
 
-endif;
+  endif;
 
-// -------------------------------------------- //
-//   Delete filter                              //
-// -------------------------------------------- //
-Repository_clearFilters();
+  // -------------------------------------------- //
+  //   Delete filter                              //
+  // -------------------------------------------- //
+  Repository_clearFilters();
 
-// -------------------------------------------- //
-//   Delete appender                            //
-// -------------------------------------------- //
-Repository_clearAppenders();
+  // -------------------------------------------- //
+  //   Delete appender                            //
+  // -------------------------------------------- //
+  Repository_clearAppenders();
 
-return;
+  return;
 
 
 end-proc;
@@ -585,41 +584,41 @@ dcl-proc Repository_dumpHierarchy export;
     i_pLogger like(LOG4RPG_hLogger_t) options(*nopass) const;
   end-pi;
 
-//  Parameter positions
+  //  Parameter positions
   dcl-c p_pLogger 1;
 
-//  Optional parameter fields
+  //  Optional parameter fields
   dcl-s pLogger like(i_pLogger) inz;
 
-//  Helper fields
+  //  Helper fields
   dcl-s x int(10) inz;
   dcl-s numChildren int(10) inz;
   dcl-ds logger likeds(LOG4RPG_logger_t) based(pLogger);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if (LogLog_getInternalDebugMode() <> cLOG4RPG_DEBUG_VERBOSE);
-   return;
-endif;
+  if (LogLog_getInternalDebugMode() <> cLOG4RPG_DEBUG_VERBOSE);
+    return;
+  endif;
 
-if (%parms() >= p_pLogger and %addr(i_pLogger) <> *NULL);
-   pLogger = i_pLogger;
-else;
-   pLogger = Repository_getLogger(cROOT_LOGGER);
-endif;
+  if (%parms() >= p_pLogger and %addr(i_pLogger) <> *NULL);
+    pLogger = i_pLogger;
+  else;
+    pLogger = Repository_getLogger(cROOT_LOGGER);
+  endif;
 
-if (Node_getNumChildren(pLogger) <= 0);
-   return;
-endif;
+  if (Node_getNumChildren(pLogger) <= 0);
+    return;
+  endif;
 
-LogLog_verbose('');
-LogLog_verbose('Logger Hierarchy:');
-LogLog_verbose('----------------');
+  LogLog_verbose('');
+  LogLog_verbose('Logger Hierarchy:');
+  LogLog_verbose('----------------');
 
-LogLog_verbose(f_space(0) + Node_toString(pLogger));
+  LogLog_verbose(f_space(0) + Node_toString(pLogger));
 
-dumpHierarchy(pLogger: 1);
+  dumpHierarchy(pLogger: 1);
 
-LogLog_verbose('----------------');
+  LogLog_verbose('----------------');
 
 end-proc;
 
@@ -633,30 +632,30 @@ dcl-proc dumpHierarchy;
     i_level   int(10) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s x int(10) inz;
   dcl-s numChildren int(10) inz;
   dcl-ds logger likeds(LOG4RPG_logger_t) based(pLogger);
   dcl-ds child likeds(LOG4RPG_logger_t) based(pChild);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-pLogger = i_pLogger;
+  pLogger = i_pLogger;
 
-numChildren = Node_getNumChildren(i_pLogger);
-if (numChildren <= 0);
-   return;
-endif;
+  numChildren = Node_getNumChildren(i_pLogger);
+  if (numChildren <= 0);
+    return;
+  endif;
 
-for x = 1 to numChildren;
-   pChild = Node_getChild(i_pLogger: x);
+  for x = 1 to numChildren;
+    pChild = Node_getChild(i_pLogger: x);
 
-   LogLog_verbose(f_space(i_level) + Node_toString(pChild));
+    LogLog_verbose(f_space(i_level) + Node_toString(pChild));
 
-   p_assert(child.pParent = i_pLogger
-            : 'Child''s parent does not match the actual parent');
+    p_assert(child.pParent = i_pLogger
+             : 'Child''s parent does not match the actual parent');
 
-   dumpHierarchy(pChild: i_level + 1);
-endfor;
+    dumpHierarchy(pChild: i_level + 1);
+  endfor;
 
 end-proc;
 
@@ -673,55 +672,52 @@ dcl-proc Repository_clear export;
   dcl-pi *n;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s x int(10) inz;
   dcl-s pNode like(LOG4RPG_hLogger_t) inz;
-  dcl-ds nodeIter DS likeds(LOG4RPG_Logger: ListIterator_t) inz;
-  end-ds;
+  dcl-ds nodeIter likeds(LOG4RPG_LoggerListIterator_t) inz;
   dcl-s pAppender like(LOG4RPG_pAppender_t) inz;
-  dcl-ds appIter DS likeds(LOG4RPG_Appender: ListIterator_t) inz;
-  end-ds;
+  dcl-ds appIter likeds(LOG4RPG_AppenderListIterator_t) inz;
   dcl-s pFilter like(LOG4RPG_pFilter_t) inz;
-  dcl-ds fltIter DS likeds(LOG4RPG_Filter: ListIterator_t) inz;
-  end-ds;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  dcl-ds fltIter likeds(LOG4RPG_FilterListIterator_t) inz;
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// Set repository SHUTDOWN-mode
-Repository_setShutdown(*on);
+  // Set repository SHUTDOWN-mode
+  Repository_setShutdown(*on);
 
-// -------------------------------------------- //
-//   Delete logger                              //
-// -------------------------------------------- //
-LogLog_verbose('Deleting loggers ...');
+  // -------------------------------------------- //
+  //   Delete logger                              //
+  // -------------------------------------------- //
+  LogLog_verbose('Deleting loggers ...');
 
-if not LoggerList_isNull(g_loggerRepos);
-   nodeIter = LoggerList_getIterator(g_loggerRepos);
+  if not LoggerList_isNull(g_loggerRepos);
+    nodeIter = LoggerList_getIterator(g_loggerRepos);
 
-   x = LoggerList_getNumE(g_loggerRepos);
-   dow (x > 0);
+    x = LoggerList_getNumE(g_loggerRepos);
+    dow (x > 0);
       pNode = LoggerList_getFirst(nodeIter);
       Repository_removeLogger(Node_getName(pNode));
       if Node_isProvisionNode(pNode);
-         ProvisionNode_free(pNode);   // Also removes the node from the repository
+        ProvisionNode_free(pNode);   // Also removes the node from the repository
       else;
-         Logger_delete(pNode);   // Also removes the logger from the repository
+        Logger_delete(pNode);   // Also removes the logger from the repository
       endif;
       x = LoggerList_getNumE(g_loggerRepos);
-   enddo;
+    enddo;
 
-endif;
+  endif;
 
-// -------------------------------------------- //
-//   Delete filter                              //
-// -------------------------------------------- //
-Repository_clearFilters();
+  // -------------------------------------------- //
+  //   Delete filter                              //
+  // -------------------------------------------- //
+  Repository_clearFilters();
 
-// -------------------------------------------- //
-//   Delete appender                            //
-// -------------------------------------------- //
-Repository_clearAppenders();
+  // -------------------------------------------- //
+  //   Delete appender                            //
+  // -------------------------------------------- //
+  Repository_clearAppenders();
 
-return;
+  return;
 
 
 end-proc;
@@ -739,31 +735,30 @@ dcl-proc Repository_clearFilters export;
   dcl-pi *n;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s x int(10) inz;
   dcl-s pFilter like(LOG4RPG_pFilter_t) inz;
-  dcl-ds fltIter DS likeds(LOG4RPG_Filter: ListIterator_t) inz;
-  end-ds;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  dcl-ds fltIter likeds(LOG4RPG_FilterListIterator_t) inz;
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// -------------------------------------------- //
-//   Delete filter                              //
-// -------------------------------------------- //
-LogLog_verbose('Deleting filters ...');
+  // -------------------------------------------- //
+  //   Delete filter                              //
+  // -------------------------------------------- //
+  LogLog_verbose('Deleting filters ...');
 
-if not FilterList_isNull(g_filterRepos);
-   fltIter = FilterList_getIterator(g_filterRepos);
+  if not FilterList_isNull(g_filterRepos);
+    fltIter = FilterList_getIterator(g_filterRepos);
 
-   x = FilterList_getNumE(g_filterRepos);
-   dow (x > 0);
+    x = FilterList_getNumE(g_filterRepos);
+    dow (x > 0);
       pFilter = FilterList_getFirst(fltIter);
       Filter_delete(pFilter); // Also removes the filter from the repository
       x = FilterList_getNumE(g_filterRepos);
-   enddo;
+    enddo;
 
-endif;
+  endif;
 
-return;
+  return;
 
 
 end-proc;
@@ -781,31 +776,30 @@ dcl-proc Repository_clearAppenders export;
   dcl-pi *n;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s x int(10) inz;
   dcl-s pAppender like(LOG4RPG_pAppender_t) inz;
-  dcl-ds appIter DS likeds(LOG4RPG_Appender: ListIterator_t) inz;
-  end-ds;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  dcl-ds appIter likeds(LOG4RPG_AppenderListIterator_t) inz;
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// -------------------------------------------- //
-//   Delete appender                            //
-// -------------------------------------------- //
-LogLog_verbose('Deleting appenders ...');
+  // -------------------------------------------- //
+  //   Delete appender                            //
+  // -------------------------------------------- //
+  LogLog_verbose('Deleting appenders ...');
 
-if not AppenderList_isNull(g_appendRepos);
-   appIter = AppenderList_getIterator(g_appendRepos);
+  if not AppenderList_isNull(g_appendRepos);
+    appIter = AppenderList_getIterator(g_appendRepos);
 
-   x = AppenderList_getNumE(g_appendRepos);
-   dow (x > 0);
+    x = AppenderList_getNumE(g_appendRepos);
+    dow (x > 0);
       pAppender = AppenderList_getFirst(appIter);
       Appender_delete(pAppender); // Also removes the appender from the repository
       x = AppenderList_getNumE(g_appendRepos);
-   enddo;
+    enddo;
 
-endif;
+  endif;
 
-return;
+  return;
 
 
 end-proc;
@@ -860,54 +854,54 @@ dcl-proc PRIVATE_onActivationGroupEnd export;
     io_result_code uns(10);
     io_user_rc     uns(10);
   end-pi;
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-LogLog_debug('=== Starting clean up for repository ===');
+  LogLog_debug('=== Starting clean up for repository ===');
 
-// -------------------------------------------- //
-//   Clear configuration data                   //
-// -------------------------------------------- //
-Repository_clear();
+  // -------------------------------------------- //
+  //   Clear configuration data                   //
+  // -------------------------------------------- //
+  Repository_clear();
 
-// -------------------------------------------- //
-//   Delete logger list                         //
-// -------------------------------------------- //
-p_assert(LoggerList_getNumE(g_loggerRepos) = 0
-         : 'Loggers should have been deleted.');
+  // -------------------------------------------- //
+  //   Delete logger list                         //
+  // -------------------------------------------- //
+  p_assert(LoggerList_getNumE(g_loggerRepos) = 0
+  : 'Loggers should have been deleted.');
 
-if LoggerList_delete(g_loggerRepos);
-   LogLog_verbose('- Deleted logger list of repository.');
-else;
-   LogLog_error('Failed to delete logger list of repository.');
-endif;
+  if LoggerList_delete(g_loggerRepos);
+    LogLog_verbose('- Deleted logger list of repository.');
+  else;
+    LogLog_error('Failed to delete logger list of repository.');
+  endif;
 
-// -------------------------------------------- //
-//   Delete filter list                         //
-// -------------------------------------------- //
-p_assert(FilterList_getNumE(g_filterRepos) = 0
-         : 'Filters should have been deleted.');
+  // -------------------------------------------- //
+  //   Delete filter list                         //
+  // -------------------------------------------- //
+  p_assert(FilterList_getNumE(g_filterRepos) = 0
+  : 'Filters should have been deleted.');
 
-if FilterList_delete(g_filterRepos);
-   LogLog_verbose('- Deleted filter list of repository.');
-else;
-   LogLog_error('Failed to delete filter list of repository.');
-endif;
+  if FilterList_delete(g_filterRepos);
+    LogLog_verbose('- Deleted filter list of repository.');
+  else;
+    LogLog_error('Failed to delete filter list of repository.');
+  endif;
 
-// -------------------------------------------- //
-//   Delete appender list                       //
-// -------------------------------------------- //
-p_assert(AppenderList_getNumE(g_appendRepos) = 0
-         : 'Appenders should have been deleted.');
+  // -------------------------------------------- //
+  //   Delete appender list                       //
+  // -------------------------------------------- //
+  p_assert(AppenderList_getNumE(g_appendRepos) = 0
+  : 'Appenders should have been deleted.');
 
-if AppenderList_delete(g_appendRepos);
-   LogLog_verbose('- Deleted appender list of repository.');
-else;
-   LogLog_error('Failed to delete appender list of repository.');
-endif;
+  if AppenderList_delete(g_appendRepos);
+    LogLog_verbose('- Deleted appender list of repository.');
+  else;
+    LogLog_error('Failed to delete appender list of repository.');
+  endif;
 
-LogLog_verbose('- Freed repository.');
+  LogLog_verbose('- Freed repository.');
 
-return;
+  return;
 
 
 end-proc;
@@ -921,56 +915,56 @@ dcl-proc updateParents;
     i_pLogger like(LOG4RPG_hLogger_t) const;
   end-pi;
 
-//  Helper fields
+  //  Helper fields
   dcl-s x int(10) inz;
   dcl-s logName like(LOG4RPG_loggerName_t) inz;
   dcl-s substr like(logName) inz;
   dcl-ds parent likeds(LOG4RPG_logger_t) based(pParent);
   dcl-ds child likeds(LOG4RPG_logger_t) based(pChild);
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-logName = Logger_getName(i_pLogger);
-if logName = cROOT_LOGGER;
-   Logger_setParent(i_pLogger: Logger_null());
-   return;
-endif;
+  logName = Logger_getName(i_pLogger);
+  if logName = cROOT_LOGGER;
+    Logger_setParent(i_pLogger: Logger_null());
+    return;
+  endif;
 
-pChild = i_pLogger;
-pParent = Logger_null();
+  pChild = i_pLogger;
+  pParent = Logger_null();
 
-x = f_scanR('.': logName: %len(logName));
-dow x > 1;
-   substr = f_left(logName: x-1);
+  x = f_scanR('.': logName: %len(logName));
+  dow x > 1;
+    substr = f_left(logName: x-1);
 
-   pParent = LoggerList_get(g_loggerRepos: substr);
+    pParent = LoggerList_get(g_loggerRepos: substr);
 
-   select;
-   when pParent = *NULL;
+    select;
+    when pParent = *NULL;
       pParent = ProvisionNode_makeProvisionNode(substr: pChild);
       Repository_addLogger(pParent);
-   when Node_isLoggerNode(pParent);
+    when Node_isLoggerNode(pParent);
       if (Node_getParent(pChild) = Node_null());
-         Logger_addChild(pParent: pChild);
+        Logger_addChild(pParent: pChild);
       endif;
-   when Node_isProvisionNode(pParent);
+    when Node_isProvisionNode(pParent);
       if (ProvisionNode_getParent(pChild) = ProvisionNode_null());
-         ProvisionNode_addChild(pParent: pChild);
+        ProvisionNode_addChild(pParent: pChild);
       endif;
-   endsl;
+    endsl;
 
-   p_assert(Node_getParent(pChild) = pParent
-            : 'Parent node must match the child''s parent');
+    p_assert(Node_getParent(pChild) = pParent
+    : 'Parent node must match the child''s parent');
 
-   x = f_scanR('.': logName: x-1);
-   pChild = pParent;
-enddo;
+    x = f_scanR('.': logName: x-1);
+    pChild = pParent;
+  enddo;
 
-if (Node_getParent(pChild) = Node_null());
-   logName = Logger_getName(pChild);
-   LogLog_debug('Parent not found. Set parent of node [' + logName
-                 + '] to ''root''.');
-   Node_addChild(Repository_getLogger(cROOT_LOGGER): pChild);
-endif;
+  if (Node_getParent(pChild) = Node_null());
+    logName = Logger_getName(pChild);
+    LogLog_debug('Parent not found. Set parent of node [' + logName
+    + '] to ''root''.');
+    Node_addChild(Repository_getLogger(cROOT_LOGGER): pChild);
+  endif;
 
 
 end-proc;
@@ -983,57 +977,56 @@ dcl-proc initializeModule;
   dcl-pi *n;
   end-pi;
 
-//  Return value
-//
-//  Helper fields
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  //  Return value
+  //
+  //  Helper fields
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-if g_isInit;
-   return;
-endif;
+  if g_isInit;
+    return;
+  endif;
 
-Loglog_verbose('Initializing module ' + sds.modContProc + '...');
+  Loglog_verbose('Initializing module ' + sds.modContProc + '...');
 
-// Disable Repository SHUTDOWN-mode
-Repository_setShutdown(*off);
+  // Disable Repository SHUTDOWN-mode
+  Repository_setShutdown(*off);
 
-// Register activation group exit procedure
-CEE4RAGE(%paddr('LOG4RPG13_PRIVATE_onActivationGroupEnd'): *OMIT);
+  // Register activation group exit procedure
+  CEE4RAGE(%paddr('LOG4RPG13_PRIVATE_onActivationGroupEnd'): *OMIT);
 
-// Create logger 'repository'
-g_loggerRepos = LoggerList_null();
-g_loggerRepos = LoggerList_new();
-if not LoggerList_isNull(g_loggerRepos);
-   LogLog_verbose('+ Created logger list of repository.');
-else;
-   LogLog_error('+ Failed to create logger list of repository.');
-endif;
+  // Create logger 'repository'
+  g_loggerRepos = LoggerList_null();
+  g_loggerRepos = LoggerList_new();
+  if not LoggerList_isNull(g_loggerRepos);
+    LogLog_verbose('+ Created logger list of repository.');
+  else;
+    LogLog_error('+ Failed to create logger list of repository.');
+  endif;
 
-// Create filter 'repository'
-g_filterRepos = FilterList_null();
-g_filterRepos = FilterList_new();
-if not FilterList_isNull(g_filterRepos);
-   LogLog_verbose('+ Created filter list of repository.');
-else;
-   LogLog_error('+ Failed to create filter list of repository.');
-endif;
+  // Create filter 'repository'
+  g_filterRepos = FilterList_null();
+  g_filterRepos = FilterList_new();
+  if not FilterList_isNull(g_filterRepos);
+    LogLog_verbose('+ Created filter list of repository.');
+  else;
+    LogLog_error('+ Failed to create filter list of repository.');
+  endif;
 
-// Create appender 'repository'
-g_appendRepos = AppenderList_null();
-g_appendRepos = AppenderList_new();
-if not AppenderList_isNull(g_appendRepos);
-   LogLog_verbose('+ Created appender list of repository.');
-else;
-   LogLog_error('+ Failed to create appender list of repository.');
-endif;
+  // Create appender 'repository'
+  g_appendRepos = AppenderList_null();
+  g_appendRepos = AppenderList_new();
+  if not AppenderList_isNull(g_appendRepos);
+    LogLog_verbose('+ Created appender list of repository.');
+  else;
+    LogLog_error('+ Failed to create appender list of repository.');
+  endif;
 
-LogLog_verbose('+ Initialized repository.');
+  LogLog_verbose('+ Initialized repository.');
 
-// Ready!
-g_isInit = *on;
+  // Ready!
+  g_isInit = *on;
 
-return;
+  return;
 
 
 end-proc;
-
