@@ -113,8 +113,6 @@ dcl-c cESC_BACKSLASH x'EC';
 dcl-s g_debugMode uns(5) inz(cLOG4RPG_INT_DEBUG_OFF);
 dcl-s g_output uns(5) inz(cLOG4RPG_INT_DEBUG_OUTPUT_PRINTER);
 
-dcl-s g_printText char(117);
-
 // -----------------------------------------
 //  Output to printer
 // -----------------------------------------
@@ -538,10 +536,10 @@ dcl-proc writeToPrinter;
   endif;
 
   dow   startPos > 0;
-    g_printText = f_wordWrap(i_text
-                             : %len(lineOutput) - LEFT_BORDER - RIGHT_BORDER
-                             : startPos
-                             : cWORDWRAP_PARAGRAPH_TEXT);
+    lineOutput = f_wordWrap(i_text
+                            : %len(lineOutput) - LEFT_BORDER - RIGHT_BORDER
+                            : startPos
+                            : cWORDWRAP_PARAGRAPH_TEXT);
     write LOG4RPG lineOutput;
   enddo;
 
