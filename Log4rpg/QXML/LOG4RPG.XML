@@ -51,7 +51,7 @@
       appblddate CDATA #REQUIRED
      >
      ]>
-<upload  appname="LOG4RPG"  appauthor="Thomas Raddatz"  appblddate=" 5/31/2026">
+<upload  appname="LOG4RPG"  appauthor="Thomas Raddatz"  appblddate=" 6/08/2026">
 <install_instructions><![CDATA[
      *----------------------------------------------------------------      ------
      *  1. Upload entire XML to your AS/400 to a source file 112 long, into any mbr
@@ -4441,11 +4441,11 @@ srccssid=  "01141">
 <copysrc><![CDATA[
 **free
 /if not defined(COPYRIGHT_DSPEC)
-ctl-opt copyright('LOG4RPG V1.14.0 - 20.05.2026 - mailto:thomas.raddatz@tools400.de');
+ctl-opt copyright('LOG4RPG V1.14.1 - 08.06.2026 - mailto:thomas.raddatz@tools400.de');
 /eof
 /endif
-dcl-c cLOG4RPG_VERSION '1.14.0';
-dcl-c cLOG4RPG_DATE '20.05.2026';
+dcl-c cLOG4RPG_VERSION '1.14.1';
+dcl-c cLOG4RPG_DATE '08.06.2026';
 ]]>  </copysrc>
 </mbr>
 <sendmsg  sendmsgid="CPF9897" sendmsgtype = "*STATUS   "><![CDATA[
@@ -9109,52 +9109,6 @@ end-pr;
 // ------------------------------------
 
 dcl-s g_isLoaded ind inz(*off);
-
-dcl-ds g_procptr qualified;
-  setStubOfs                          pointer(*proc);
-  setLogging                          pointer(*proc);
-  isLogging                           pointer(*proc);
-  getRootLogger                       pointer(*proc);
-  getLogger                           pointer(*proc);
-  debug                               pointer(*proc);
-  debugMsg                            pointer(*proc);
-  isDebugEnabled                      pointer(*proc);
-  info                                pointer(*proc);
-  infoMsg                             pointer(*proc);
-  isInfoEnabled                       pointer(*proc);
-  warn                                pointer(*proc);
-  warnMsg                             pointer(*proc);
-  isWarnEnabled                       pointer(*proc);
-  error                               pointer(*proc);
-  errorMsg                            pointer(*proc);
-  isErrorEnabled                      pointer(*proc);
-  fatal                               pointer(*proc);
-  fatalMsg                            pointer(*proc);
-  isFatalEnabled                      pointer(*proc);
-  forcedLog                           pointer(*proc);
-  forcedLogMsg                        pointer(*proc);
-  getName                             pointer(*proc);
-  isNull                              pointer(*proc);
-  null                                pointer(*proc);
-  setLevel                            pointer(*proc);
-  setInternalDebugging                pointer(*proc);
-  getInternalDebugMode                pointer(*proc);
-  getInternalDebugOutput              pointer(*proc);
-  loadDefaultConfiguration            pointer(*proc);
-  loadPropertiesConfiguration         pointer(*proc);
-  loadAndWatchPropertiesConfiguration pointer(*proc);
-  clearConfiguration                  pointer(*proc);
-  Layout_new                          pointer(*proc);
-  Layout_null                         pointer(*proc);
-  Appender_new                        pointer(*proc);
-  Appender_null                       pointer(*proc);
-  Appender_setLayout                  pointer(*proc);
-  Appender_setFilter                  pointer(*proc);
-  Logger_addAppender                  pointer(*proc);
-  Filter_new                          pointer(*proc);
-  Filter_null                         pointer(*proc);
-  Filter_setNext                      pointer(*proc);
-end-ds;
 
 //=========================================================================
 //  Loads the LOG4RPG service program and forwards all requests to it.
@@ -30535,6 +30489,54 @@ dcl-pr Impl_Filter_setNext extproc(g_procptr.Filter_setNext);
   i_pFilter     like(LOG4RPG_pFilter_t) const;
   i_pNextFilter like(LOG4RPG_pFilter_t) const;
 end-pr;
+
+dcl-ds g_procptr qualified;
+  setStubOfs                          pointer(*proc);
+  setLogging                          pointer(*proc);
+  isLogging                           pointer(*proc);
+  getRootLogger                       pointer(*proc);
+  getLogger                           pointer(*proc);
+  debug                               pointer(*proc);
+  debugMsg                            pointer(*proc);
+  isDebugEnabled                      pointer(*proc);
+  info                                pointer(*proc);
+  infoMsg                             pointer(*proc);
+  isInfoEnabled                       pointer(*proc);
+  warn                                pointer(*proc);
+  warnMsg                             pointer(*proc);
+  isWarnEnabled                       pointer(*proc);
+  error                               pointer(*proc);
+  errorMsg                            pointer(*proc);
+  isErrorEnabled                      pointer(*proc);
+  fatal                               pointer(*proc);
+  fatalMsg                            pointer(*proc);
+  isFatalEnabled                      pointer(*proc);
+  forcedLog                           pointer(*proc);
+  forcedLogMsg                        pointer(*proc);
+  getName                             pointer(*proc);
+  isNull                              pointer(*proc);
+  null                                pointer(*proc);
+  setLevel                            pointer(*proc);
+  setInternalDebugging                pointer(*proc);
+  getInternalDebugMode                pointer(*proc);
+  getInternalDebugOutput              pointer(*proc);
+  loadDefaultConfiguration            pointer(*proc);
+  loadPropertiesConfiguration         pointer(*proc);
+  loadAndWatchPropertiesConfiguration pointer(*proc);
+  clearConfiguration                  pointer(*proc);
+  Layout_new                          pointer(*proc);
+  Layout_null                         pointer(*proc);
+  Appender_new                        pointer(*proc);
+  Appender_null                       pointer(*proc);
+  Appender_setLayout                  pointer(*proc);
+  Appender_setFilter                  pointer(*proc);
+  Logger_addAppender                  pointer(*proc);
+  Filter_new                          pointer(*proc);
+  Filter_null                         pointer(*proc);
+  Filter_setNext                      pointer(*proc);
+end-ds;
+
+/include qlog4rpg,plog4rpg
 
 /endif
 ]]>  </copysrc>

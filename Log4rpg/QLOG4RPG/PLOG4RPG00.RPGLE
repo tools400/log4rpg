@@ -255,4 +255,52 @@ dcl-pr Impl_Filter_setNext extproc(g_procptr.Filter_setNext);
   i_pNextFilter like(LOG4RPG_pFilter_t) const;
 end-pr;
 
+dcl-ds g_procptr qualified;
+  setStubOfs                          pointer(*proc);
+  setLogging                          pointer(*proc);
+  isLogging                           pointer(*proc);
+  getRootLogger                       pointer(*proc);
+  getLogger                           pointer(*proc);
+  debug                               pointer(*proc);
+  debugMsg                            pointer(*proc);
+  isDebugEnabled                      pointer(*proc);
+  info                                pointer(*proc);
+  infoMsg                             pointer(*proc);
+  isInfoEnabled                       pointer(*proc);
+  warn                                pointer(*proc);
+  warnMsg                             pointer(*proc);
+  isWarnEnabled                       pointer(*proc);
+  error                               pointer(*proc);
+  errorMsg                            pointer(*proc);
+  isErrorEnabled                      pointer(*proc);
+  fatal                               pointer(*proc);
+  fatalMsg                            pointer(*proc);
+  isFatalEnabled                      pointer(*proc);
+  forcedLog                           pointer(*proc);
+  forcedLogMsg                        pointer(*proc);
+  getName                             pointer(*proc);
+  isNull                              pointer(*proc);
+  null                                pointer(*proc);
+  setLevel                            pointer(*proc);
+  setInternalDebugging                pointer(*proc);
+  getInternalDebugMode                pointer(*proc);
+  getInternalDebugOutput              pointer(*proc);
+  loadDefaultConfiguration            pointer(*proc);
+  loadPropertiesConfiguration         pointer(*proc);
+  loadAndWatchPropertiesConfiguration pointer(*proc);
+  clearConfiguration                  pointer(*proc);
+  Layout_new                          pointer(*proc);
+  Layout_null                         pointer(*proc);
+  Appender_new                        pointer(*proc);
+  Appender_null                       pointer(*proc);
+  Appender_setLayout                  pointer(*proc);
+  Appender_setFilter                  pointer(*proc);
+  Logger_addAppender                  pointer(*proc);
+  Filter_new                          pointer(*proc);
+  Filter_null                         pointer(*proc);
+  Filter_setNext                      pointer(*proc);
+end-ds;
+
+/include qlog4rpg,plog4rpg
+
 /endif
