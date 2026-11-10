@@ -91,6 +91,10 @@ Then logon to your IBM i system and follow these steps:
 
    **Hint: The answers are case-insensitive.**
 
+## Liability
+
+This software is free and provided without warranty. You use it at your own risk: test it with non-critical data first, and back up your data before you use it. The [license](LICENSE) applies in addition.
+
 ---
 
 © 2025, Thomas Raddatz
