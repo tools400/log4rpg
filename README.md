@@ -21,29 +21,27 @@ Detailed documentation is provided on the [Log4rpg](documentation/Log4rpg.md) do
 
 ## Installation
 
-Installing Log4rpg is a bit uncomfortable, because I could not yet migrate all my projects from Sourceforge to GitHub. Basically there are two options:
+There are two options for installing Log4rpg:
 
-* Cloning (Git, GitHub) or checking out (SVN, Sourceforge) the projects and importing them to RDi as i Projects.
+* Cloning the repositories of the projects from GitHub and importing them to RDi as i Projects.
 * Downloading the XML packages and running the installation utility.
 
-This document focuses on the XML packages and the installer, because it seems as if still a lot of people are not familiar with SVN and Git.
+This document focuses on the XML packages and the installer, because they do not require Git.
 
 ### Prerequisites
 
 The Log4rpg requires two additional service programs:
 
-* [BASICS1](https://sourceforge.net/p/tools400/code/HEAD/tree/rpg-srvpgm/BASICS1/trunk/QXML/)
-* [IFS](https://sourceforge.net/p/tools400/code/HEAD/tree/rpg-srvpgm/IFS/trunk/QXML/)
-
-Both service programs are hosted on Sourceforge.
+* [BASICS1](https://github.com/tools400/basics1)
+* [IFS](https://github.com/tools400/ifs)
 
 ### Installation
 
-Start with downloading the XML packages to your PC. Click the link, open the member and click the download link or button:
+Start with downloading the XML packages to your PC. Click the link and then the button *Download raw file*:
 
-* [BASICS1](https://sourceforge.net/p/tools400/code/HEAD/tree/rpg-srvpgm/BASICS1/trunk/QXML/)
-* [IFS](https://sourceforge.net/p/tools400/code/HEAD/tree/rpg-srvpgm/IFS/trunk/QXML/)
-* [LOG4RPG](https://github.com/tools400/log4rpg/tree/master/Log4rpg/QXML)
+* [BASICS1](https://github.com/tools400/basics1/blob/main/QXML/BASICS1.XML)
+* [IFS](https://github.com/tools400/ifs/blob/main/QXML/IFS.XML)
+* [LOG4RPG](https://github.com/tools400/log4rpg/blob/master/Log4rpg/QXML/LOG4RPG.XML)
 
 Then logon to your IBM i system and follow these steps:
 
@@ -86,8 +84,8 @@ Then logon to your IBM i system and follow these steps:
 
    The questions asked by LOG4RPG are:
 
-   * _Use *LIBL at runtime? (L_YES, L_NO)_ - answer it with `L_NO` if you do not want to use `*LIBL` for resolving service program BASICS1 at runtime
    * _Create sample programs? (YES, NO)_ - typically you would answer `NO`
+   * _Use *LIBL at runtime? (L_YES, L_NO)_ - answer it with `L_NO` if you do not want to use `*LIBL` for resolving service programs BASICS1 and IFS at runtime
 
    **Hint: The answers are case-insensitive.**
 
