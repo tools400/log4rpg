@@ -17,7 +17,7 @@ With Log4rpg it is possible to enable and disable logging just by modifying a co
 
 ## Usage
 
-Detailed documentation is privided on the [Log4rpg](documentation/Log4rpg.md) documentation pages.
+Detailed documentation is provided on the [Log4rpg](documentation/Log4rpg.md) documentation pages.
 
 ## Installation
 
